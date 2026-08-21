@@ -1,4 +1,4 @@
-package org.example.apis;
+package com.uade.tpo.marketplace;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
