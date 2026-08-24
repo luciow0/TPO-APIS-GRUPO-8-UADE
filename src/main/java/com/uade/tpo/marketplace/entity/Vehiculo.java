@@ -1,23 +1,22 @@
 package com.uade.tpo.marketplace.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
 @Entity
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 
 public class Vehiculo {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_vehiculo")
     private Long idVehiculo;
 
     private String patente;
@@ -26,15 +25,15 @@ public class Vehiculo {
     private Integer anio;
     private String color;
 
-    //@Column(name = "cantidad_asientos")
+    @Column(name = "cantidad_asientos")
     private Integer cantidadAsientos;
 
-   // @ManyToOne
-   // @JoinColumn(name = "id_usuario")
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
     private Usuario propietario;
 
-   // @ManyToOne
-   // @JoinColumn(name = "id_tipo_vehiculo")
-    private TipoVehiculo tipoVehiculo;
+   @ManyToOne
+   @JoinColumn(name = "id_tipo_vehiculo")
+   private TipoVehiculo tipoVehiculo;
 
 }
