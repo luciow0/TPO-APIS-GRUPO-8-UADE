@@ -1,8 +1,7 @@
 package com.uade.tpo.marketplace.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,6 @@ import java.time.LocalDate;
 
 @Entity
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 
@@ -21,25 +19,25 @@ public class Publicacion {
     @Id
     private Long idPublicacion;
 
-   // @Column(name = "fecha_publicacion")
-    private LocalDate fechaPublicacion;
+   @Column()
+   private LocalDate fechaPublicacion;
 
     private String estado;
 
-    //@Column(name = "precio_dia")
+    @Column()
     private Double precioDia;
 
-  //  @Column(name = "descuento_porcentaje")
+    @Column()
     private Double descuentoPorcentaje;
 
     private String descripcion;
 
-   // @ManyToOne
-   // @JoinColumn(name = "id_vehiculo")
+    @OneToOne
+    @JoinColumn(name = "id_vehiculo")
     private Vehiculo vehiculo;
 
-//    @ManyToOne
-   // @JoinColumn(name = "id_ubicacion")
+    @ManyToOne
+    @JoinColumn(name = "id_ubicacion")
     private Ubicacion ubicacion;
 
 

@@ -25,6 +25,7 @@ public class Vehiculo {
     private Integer anio;
     private String color;
 
+
     @Column(name = "cantidad_asientos")
     private Integer cantidadAsientos;
 

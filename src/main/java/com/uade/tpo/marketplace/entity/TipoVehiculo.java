@@ -3,7 +3,6 @@ package com.uade.tpo.marketplace.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,5 +17,5 @@ public class TipoVehiculo {
     @Column(name = "id_tipo_vehiculo")
     private Long idTipoVehiculo;
 
-    private String nombre;
+    private String tipo;
 }
