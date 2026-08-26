@@ -43,4 +43,7 @@ public class Reserva {
    @JoinColumn(name = "id_publicacion")
     private Publicacion publicacion;
 
+    @OneToOne
+    @JoinColumn(name = "id_pago")
+    private Pago pago;
 }
