@@ -1,9 +1,12 @@
 package com.uade.tpo.marketplace.entity;
 
-
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,19 +18,12 @@ public class ImagenVehiculo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_imagen")
     private Long idImagen;
 
     private String url;
     private Integer orden;
 
-   @ManyToOne
-   @JoinColumn(name = "id_vehiculo")
-   private Vehiculo vehiculo;
-
-
-
-
-
-
+    @ManyToOne
+    @JoinColumn(name = "id_vehiculo", nullable = false)
+    private Vehiculo vehiculo;
 }

@@ -1,4 +1,4 @@
-package com.uade.tpo.marketplace.Enum;
+package com.uade.tpo.marketplace.enums;
 
 public enum MetodoPago {
     MERCADO_PAGO,
