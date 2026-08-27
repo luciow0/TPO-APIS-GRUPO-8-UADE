@@ -2,12 +2,11 @@ package com.uade.tpo.marketplace.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class TipoVehiculo {
@@ -16,6 +15,5 @@ public class TipoVehiculo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_tipo_vehiculo")
     private Long idTipoVehiculo;
-
     private String tipo;
 }
