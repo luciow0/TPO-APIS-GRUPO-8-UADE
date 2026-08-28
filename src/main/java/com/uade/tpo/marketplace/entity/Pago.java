@@ -3,7 +3,6 @@ package com.uade.tpo.marketplace.entity;
 import com.uade.tpo.marketplace.Enum.MetodoPago;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
