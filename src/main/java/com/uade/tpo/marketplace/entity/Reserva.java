@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.uade.tpo.marketplace.Enum.EstadoReserva;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -30,7 +32,9 @@ public class Reserva {
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
 
-    private String estado;
+    @Enumerated(EnumType.STRING)
+    private EstadoReserva estado;
+
 
     @Column(name = "precio_dia_aplicado")
     private Double precioDiaAplicado;
@@ -43,7 +47,4 @@ public class Reserva {
    @JoinColumn(name = "id_publicacion")
     private Publicacion publicacion;
 
-    @OneToOne
-    @JoinColumn(name = "id_pago")
-    private Pago pago;
 }
