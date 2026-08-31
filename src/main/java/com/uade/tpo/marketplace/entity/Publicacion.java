@@ -1,6 +1,11 @@
 package com.uade.tpo.marketplace.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import com.uade.tpo.marketplace.enums.EstadoPublicacion;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,19 +16,32 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
-
-@Entity
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity
 public class Publicacion {
+
+    public Publicacion() {
+    }
+
+    public Publicacion(
+            BigDecimal precioDia,
+            BigDecimal descuentoPorcentaje,
+            String descripcion,
+            LocalTime horaRetiroDevolucion,
+            Vehiculo vehiculo,
+            Ubicacion ubicacion) {
+
+        this.fechaPublicacion = LocalDate.now();
+        this.estado = EstadoPublicacion.ACTIVA;
+        this.precioDia = precioDia;
+        this.descuentoPorcentaje = descuentoPorcentaje;
+        this.descripcion = descripcion;
+        this.horaRetiroDevolucion = horaRetiroDevolucion;
+        this.vehiculo = vehiculo;
+        this.ubicacion = ubicacion;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,7 +60,6 @@ public class Publicacion {
 
     private String descripcion;
 
-    // Hora única fijada por el propietario para retiro y devolución.
     private LocalTime horaRetiroDevolucion;
 
     @OneToOne

@@ -1,5 +1,10 @@
 package com.uade.tpo.marketplace.service;
 
+import java.util.Optional;
+
+import com.uade.tpo.marketplace.entity.Ubicacion;
+
 public interface UbicacionService {
-    // V0 comun: cada responsable define aqui las operaciones de su entidad.
+
+    Optional<Ubicacion> obtenerUbicacionPorId(Long id);
 }
