@@ -1,12 +1,8 @@
 package com.uade.tpo.marketplace.service;
 
 import com.uade.tpo.marketplace.entity.TipoVehiculo;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import java.util.List;
 
 public interface TipoVehiculoService {
-
-    public Page<TipoVehiculo> getTipoVehiculo(PageRequest pageRequest);
-
+    List<TipoVehiculo> getTiposVehiculo();
 }
