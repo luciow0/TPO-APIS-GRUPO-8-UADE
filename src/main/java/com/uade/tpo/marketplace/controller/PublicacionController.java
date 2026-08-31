@@ -5,6 +5,8 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,8 +59,10 @@ public class PublicacionController {
                 publicacionService.crearPublicacion(request);
 
         return ResponseEntity
-                .created(URI.create(
-                        "/publicaciones/" + publicacion.getIdPublicacion()))
+                .created(
+                        URI.create(
+                                "/publicaciones/"
+                                        + publicacion.getIdPublicacion()))
                 .body(publicacion);
     }
 
@@ -70,7 +74,9 @@ public class PublicacionController {
             PublicacionDuplicateException {
 
         Publicacion publicacion =
-                publicacionService.modificarPublicacion(id, request);
+                publicacionService.modificarPublicacion(
+                        id,
+                        request);
 
         return ResponseEntity.ok(publicacion);
     }
@@ -108,54 +114,101 @@ public class PublicacionController {
     }
 
     @GetMapping("/filtros/estado")
-    public ResponseEntity<List<Publicacion>> obtenerPorEstado(
-            @RequestParam EstadoPublicacion estado) {
+    public ResponseEntity<List<Publicacion>>
+            obtenerPublicacionesPorEstado(
+                    @RequestParam EstadoPublicacion estado) {
 
         return ResponseEntity.ok(
-                publicacionService.obtenerPublicacionesPorEstado(estado));
+                publicacionService
+                        .obtenerPublicacionesPorEstado(estado));
     }
 
     @GetMapping("/filtros/precio")
-    public ResponseEntity<List<Publicacion>> obtenerPorPrecio(
-            @RequestParam BigDecimal precioMin,
-            @RequestParam BigDecimal precioMax) {
+    public ResponseEntity<List<Publicacion>>
+            obtenerPublicacionesPorPrecio(
+                    @RequestParam BigDecimal precioMin,
+                    @RequestParam BigDecimal precioMax) {
 
         return ResponseEntity.ok(
-                publicacionService.obtenerPublicacionesPorPrecio(
-                        precioMin,
-                        precioMax));
+                publicacionService
+                        .obtenerPublicacionesPorPrecio(
+                                precioMin,
+                                precioMax));
     }
 
     @GetMapping("/filtros/tipo")
-    public ResponseEntity<List<Publicacion>> obtenerPorTipoVehiculo(
-            @RequestParam Long idTipoVehiculo) {
+    public ResponseEntity<List<Publicacion>>
+            obtenerPublicacionesPorTipoVehiculo(
+                    @RequestParam Long idTipoVehiculo) {
 
         return ResponseEntity.ok(
-                publicacionService.obtenerPublicacionesPorTipoVehiculo(
-                        idTipoVehiculo));
+                publicacionService
+                        .obtenerPublicacionesPorTipoVehiculo(
+                                idTipoVehiculo));
     }
 
     @GetMapping("/filtros/marca")
-    public ResponseEntity<List<Publicacion>> obtenerPorMarca(
-            @RequestParam String marca) {
+    public ResponseEntity<List<Publicacion>>
+            obtenerPublicacionesPorMarca(
+                    @RequestParam String marca) {
 
         return ResponseEntity.ok(
-                publicacionService.obtenerPublicacionesPorMarca(marca));
+                publicacionService
+                        .obtenerPublicacionesPorMarca(marca));
     }
 
     @GetMapping("/filtros/modelo")
-    public ResponseEntity<List<Publicacion>> obtenerPorModelo(
-            @RequestParam String modelo) {
+    public ResponseEntity<List<Publicacion>>
+            obtenerPublicacionesPorModelo(
+                    @RequestParam String modelo) {
 
         return ResponseEntity.ok(
-                publicacionService.obtenerPublicacionesPorModelo(modelo));
+                publicacionService
+                        .obtenerPublicacionesPorModelo(modelo));
     }
 
-    @GetMapping("/filtros/zona")
-    public ResponseEntity<List<Publicacion>> obtenerPorZona(
-            @RequestParam String zona) {
+    @GetMapping("/filtros/provincia")
+    public ResponseEntity<Page<Publicacion>>
+            obtenerPublicacionesPorProvincia(
+                    @RequestParam String provincia,
+                    Pageable pageable) {
 
         return ResponseEntity.ok(
-                publicacionService.obtenerPublicacionesPorZona(zona));
+                publicacionService
+                        .obtenerPublicacionesPorProvincia(
+                                provincia,
+                                pageable));
+    }
+
+    @GetMapping("/filtros/provincia-ciudad")
+    public ResponseEntity<Page<Publicacion>>
+            obtenerPublicacionesPorProvinciaYCiudad(
+                    @RequestParam String provincia,
+                    @RequestParam String ciudad,
+                    Pageable pageable) {
+
+        return ResponseEntity.ok(
+                publicacionService
+                        .obtenerPublicacionesPorProvinciaYCiudad(
+                                provincia,
+                                ciudad,
+                                pageable));
+    }
+
+    @GetMapping("/filtros/provincia-ciudad-localidad")
+    public ResponseEntity<Page<Publicacion>>
+            obtenerPublicacionesPorProvinciaCiudadYLocalidad(
+                    @RequestParam String provincia,
+                    @RequestParam String ciudad,
+                    @RequestParam String localidad,
+                    Pageable pageable) {
+
+        return ResponseEntity.ok(
+                publicacionService
+                        .obtenerPublicacionesPorProvinciaCiudadYLocalidad(
+                                provincia,
+                                ciudad,
+                                localidad,
+                                pageable));
     }
 }
