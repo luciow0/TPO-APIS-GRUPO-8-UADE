@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,315 +22,379 @@ import com.uade.tpo.marketplace.repository.PublicacionRepository;
 @Service
 public class PublicacionServiceImpl implements PublicacionService {
 
-    @Autowired
-    private PublicacionRepository publicacionRepository;
+        @Autowired
+        private PublicacionRepository publicacionRepository;
 
-    @Autowired
-    private VehiculoService vehiculoService;
+        @Autowired
+        private VehiculoService vehiculoService;
 
-    @Autowired
-    private UbicacionService ubicacionService;
+        @Autowired
+        private UbicacionService ubicacionService;
 
-    @Override
-    public Publicacion crearPublicacion(PublicacionRequest request)
-            throws PublicacionDuplicateException {
+        @Override
+        public Publicacion crearPublicacion(PublicacionRequest request)
+                        throws PublicacionDuplicateException {
 
-        validarRequest(request);
+                validarRequest(request);
 
-        Vehiculo vehiculo = vehiculoService
-                .obtenerVehiculoPorId(request.getIdVehiculo())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Vehiculo no encontrado"));
+                Vehiculo vehiculo = vehiculoService
+                                .obtenerVehiculoPorId(request.getIdVehiculo())
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Vehiculo no encontrado"));
 
-        Ubicacion ubicacion = ubicacionService
-                .obtenerUbicacionPorId(request.getIdUbicacion())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Ubicacion no encontrada"));
+                Ubicacion ubicacion = ubicacionService
+                                .obtenerUbicacionPorId(request.getIdUbicacion())
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Ubicacion no encontrada"));
 
-        if (publicacionRepository.existsByVehiculo_IdVehiculo(request.getIdVehiculo())) {
-            throw new PublicacionDuplicateException();
+                if (publicacionRepository
+                                .existsByVehiculo_IdVehiculo(request.getIdVehiculo())) {
+
+                        throw new PublicacionDuplicateException();
+                }
+
+                BigDecimal descuento = request.getDescuentoPorcentaje();
+
+                if (descuento == null) {
+                        descuento = BigDecimal.ZERO;
+                }
+
+                Publicacion publicacion = new Publicacion(
+                                request.getPrecioDia(),
+                                descuento,
+                                request.getDescripcion(),
+                                request.getHoraRetiroDevolucion(),
+                                vehiculo,
+                                ubicacion);
+
+                return publicacionRepository.save(publicacion);
         }
 
-        BigDecimal descuento = request.getDescuentoPorcentaje();
-
-        if (descuento == null) {
-            descuento = BigDecimal.ZERO;
+        @Override
+        public List<Publicacion> obtenerPublicaciones() {
+                return publicacionRepository.findAll();
         }
 
-        Publicacion publicacion = new Publicacion(
-                request.getPrecioDia(),
-                descuento,
-                request.getDescripcion().trim(),
-                request.getHoraRetiroDevolucion(),
-                vehiculo,
-                ubicacion);
+        @Override
+        public Publicacion obtenerPublicacionPorId(Long id)
+                        throws PublicacionNotFoundException {
 
-        return publicacionRepository.save(publicacion);
-    }
-
-    @Override
-    public List<Publicacion> obtenerPublicaciones() {
-        return publicacionRepository.findAll();
-    }
-
-    @Override
-    public Publicacion obtenerPublicacionPorId(Long id)
-            throws PublicacionNotFoundException {
-
-        return publicacionRepository.findById(id)
-                .orElseThrow(PublicacionNotFoundException::new);
-    }
-
-    @Override
-    public Publicacion modificarPublicacion(Long id, PublicacionRequest request)
-            throws PublicacionNotFoundException, PublicacionDuplicateException {
-
-        Publicacion publicacion = publicacionRepository.findById(id)
-                .orElseThrow(PublicacionNotFoundException::new);
-
-        validarRequest(request);
-
-        Vehiculo vehiculo = vehiculoService
-                .obtenerVehiculoPorId(request.getIdVehiculo())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Vehiculo no encontrado"));
-
-        Ubicacion ubicacion = ubicacionService
-                .obtenerUbicacionPorId(request.getIdUbicacion())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Ubicacion no encontrada"));
-
-        if (!publicacion.getVehiculo().getIdVehiculo().equals(request.getIdVehiculo())
-                && publicacionRepository.existsByVehiculo_IdVehiculo(request.getIdVehiculo())) {
-
-            throw new PublicacionDuplicateException();
+                return publicacionRepository.findById(id)
+                                .orElseThrow(PublicacionNotFoundException::new);
         }
 
-        BigDecimal descuento = request.getDescuentoPorcentaje();
+        @Override
+        public Publicacion modificarPublicacion(
+                        Long id,
+                        PublicacionRequest request)
+                        throws PublicacionNotFoundException,
+                        PublicacionDuplicateException {
 
-        if (descuento == null) {
-            descuento = BigDecimal.ZERO;
+                Publicacion publicacion = publicacionRepository.findById(id)
+                                .orElseThrow(PublicacionNotFoundException::new);
+
+                validarRequest(request);
+
+                Vehiculo vehiculo = vehiculoService
+                                .obtenerVehiculoPorId(request.getIdVehiculo())
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Vehiculo no encontrado"));
+
+                Ubicacion ubicacion = ubicacionService
+                                .obtenerUbicacionPorId(request.getIdUbicacion())
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Ubicacion no encontrada"));
+
+                if (!publicacion.getVehiculo()
+                                .getIdVehiculo()
+                                .equals(request.getIdVehiculo())
+                                && publicacionRepository
+                                                .existsByVehiculo_IdVehiculo(
+                                                                request.getIdVehiculo())) {
+
+                        throw new PublicacionDuplicateException();
+                }
+
+                BigDecimal descuento = request.getDescuentoPorcentaje();
+
+                if (descuento == null) {
+                        descuento = BigDecimal.ZERO;
+                }
+
+                publicacion.setPrecioDia(request.getPrecioDia());
+                publicacion.setDescuentoPorcentaje(descuento);
+                publicacion.setDescripcion(request.getDescripcion());
+                publicacion.setHoraRetiroDevolucion(
+                                request.getHoraRetiroDevolucion());
+                publicacion.setVehiculo(vehiculo);
+                publicacion.setUbicacion(ubicacion);
+
+                return publicacionRepository.save(publicacion);
         }
 
-        publicacion.setPrecioDia(request.getPrecioDia());
-        publicacion.setDescuentoPorcentaje(descuento);
-        publicacion.setDescripcion(request.getDescripcion().trim());
-        publicacion.setHoraRetiroDevolucion(request.getHoraRetiroDevolucion());
-        publicacion.setVehiculo(vehiculo);
-        publicacion.setUbicacion(ubicacion);
+        @Override
+        public void eliminarPublicacion(Long id)
+                        throws PublicacionNotFoundException {
 
-        return publicacionRepository.save(publicacion);
-    }
+                Publicacion publicacion = publicacionRepository.findById(id)
+                                .orElseThrow(PublicacionNotFoundException::new);
 
-    @Override
-    public void eliminarPublicacion(Long id)
-            throws PublicacionNotFoundException {
+                publicacion.setEstado(EstadoPublicacion.DESACTIVADA);
 
-        Publicacion publicacion = publicacionRepository.findById(id)
-                .orElseThrow(PublicacionNotFoundException::new);
-
-        publicacion.setEstado(EstadoPublicacion.DESACTIVADA);
-
-        publicacionRepository.save(publicacion);
-    }
-
-    @Override
-    public Publicacion pausarPublicacion(Long id)
-            throws PublicacionNotFoundException {
-
-        Publicacion publicacion = publicacionRepository.findById(id)
-                .orElseThrow(PublicacionNotFoundException::new);
-
-        if (publicacion.getEstado() == EstadoPublicacion.DESACTIVADA) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "No se puede pausar una publicacion desactivada");
+                publicacionRepository.save(publicacion);
         }
 
-        publicacion.setEstado(EstadoPublicacion.PAUSADA);
+        @Override
+        public Publicacion pausarPublicacion(Long id)
+                        throws PublicacionNotFoundException {
 
-        return publicacionRepository.save(publicacion);
-    }
+                Publicacion publicacion = publicacionRepository.findById(id)
+                                .orElseThrow(PublicacionNotFoundException::new);
 
-    @Override
-    public Publicacion reactivarPublicacion(Long id)
-            throws PublicacionNotFoundException {
+                if (publicacion.getEstado() == EstadoPublicacion.DESACTIVADA) {
 
-        Publicacion publicacion = publicacionRepository.findById(id)
-                .orElseThrow(PublicacionNotFoundException::new);
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "No se puede pausar una publicacion desactivada");
+                }
 
-        publicacion.setEstado(EstadoPublicacion.ACTIVA);
+                publicacion.setEstado(EstadoPublicacion.PAUSADA);
 
-        return publicacionRepository.save(publicacion);
-    }
-
-    @Override
-    public List<Publicacion> obtenerPublicacionesPorEstado(
-            EstadoPublicacion estado) {
-
-        if (estado == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El estado es obligatorio");
+                return publicacionRepository.save(publicacion);
         }
 
-        return publicacionRepository.findByEstado(estado);
-    }
+        @Override
+        public Publicacion reactivarPublicacion(Long id)
+                        throws PublicacionNotFoundException {
 
-    @Override
-    public List<Publicacion> obtenerPublicacionesPorPrecio(
-            BigDecimal precioMin,
-            BigDecimal precioMax) {
+                Publicacion publicacion = publicacionRepository.findById(id)
+                                .orElseThrow(PublicacionNotFoundException::new);
 
-        if (precioMin == null || precioMax == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El precio minimo y maximo son obligatorios");
+                publicacion.setEstado(EstadoPublicacion.ACTIVA);
+
+                return publicacionRepository.save(publicacion);
         }
 
-        if (precioMin.compareTo(BigDecimal.ZERO) < 0
-                || precioMax.compareTo(BigDecimal.ZERO) < 0) {
+        @Override
+        public List<Publicacion> obtenerPublicacionesPorEstado(
+                        EstadoPublicacion estado) {
 
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Los precios no pueden ser negativos");
+                return publicacionRepository.findByEstado(estado);
         }
 
-        if (precioMin.compareTo(precioMax) > 0) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El precio minimo no puede ser mayor al precio maximo");
+        @Override
+        public List<Publicacion> obtenerPublicacionesPorPrecio(
+                        BigDecimal precioMin,
+                        BigDecimal precioMax) {
+
+                if (precioMin == null || precioMax == null) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Los precios minimo y maximo son obligatorios");
+                }
+
+                if (precioMin.compareTo(BigDecimal.ZERO) < 0
+                                || precioMax.compareTo(BigDecimal.ZERO) < 0) {
+
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Los precios no pueden ser negativos");
+                }
+
+                if (precioMin.compareTo(precioMax) > 0) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "El precio minimo no puede ser mayor al precio maximo");
+                }
+
+                return soloPublicacionesActivas(
+                                publicacionRepository.findByPrecioDiaBetween(
+                                                precioMin,
+                                                precioMax));
         }
 
-        return soloPublicacionesActivas(
-                publicacionRepository.findByPrecioDiaBetween(
-                        precioMin,
-                        precioMax));
-    }
+        @Override
+        public List<Publicacion> obtenerPublicacionesPorTipoVehiculo(
+                        Long idTipoVehiculo) {
 
-    @Override
-    public List<Publicacion> obtenerPublicacionesPorTipoVehiculo(
-            Long idTipoVehiculo) {
+                if (idTipoVehiculo == null) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "El tipo de vehiculo es obligatorio");
+                }
 
-        if (idTipoVehiculo == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El tipo de vehiculo es obligatorio");
+                return soloPublicacionesActivas(
+                                publicacionRepository
+                                                .findByVehiculo_TipoVehiculo_IdTipoVehiculo(
+                                                                idTipoVehiculo));
         }
 
-        return soloPublicacionesActivas(
-                publicacionRepository
-                        .findByVehiculo_TipoVehiculo_IdTipoVehiculo(idTipoVehiculo));
-    }
+        @Override
+        public List<Publicacion> obtenerPublicacionesPorMarca(
+                        String marca) {
 
-    @Override
-    public List<Publicacion> obtenerPublicacionesPorMarca(
-            String marca) {
+                validarTextoFiltro(marca, "La marca es obligatoria");
 
-        if (marca == null || marca.isBlank()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La marca es obligatoria");
+                return soloPublicacionesActivas(
+                                publicacionRepository
+                                                .findByVehiculo_MarcaIgnoreCase(
+                                                                marca.trim()));
         }
 
-        return soloPublicacionesActivas(
-                publicacionRepository
-                        .findByVehiculo_MarcaIgnoreCase(marca.trim()));
-    }
+        @Override
+        public List<Publicacion> obtenerPublicacionesPorModelo(
+                        String modelo) {
 
-    @Override
-    public List<Publicacion> obtenerPublicacionesPorModelo(
-            String modelo) {
+                validarTextoFiltro(modelo, "El modelo es obligatorio");
 
-        if (modelo == null || modelo.isBlank()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El modelo es obligatorio");
+                return soloPublicacionesActivas(
+                                publicacionRepository
+                                                .findByVehiculo_ModeloIgnoreCase(
+                                                                modelo.trim()));
         }
 
-        return soloPublicacionesActivas(
-                publicacionRepository
-                        .findByVehiculo_ModeloIgnoreCase(modelo.trim()));
-    }
+        @Override
+        public Page<Publicacion> obtenerPublicacionesPorProvincia(
+                        String provincia,
+                        Pageable pageable) {
 
-    @Override
-    public List<Publicacion> obtenerPublicacionesPorZona(
-            String zona) {
+                validarTextoFiltro(
+                                provincia,
+                                "La provincia es obligatoria");
 
-        if (zona == null || zona.isBlank()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La zona es obligatoria");
+                return publicacionRepository
+                                .findByUbicacion_ProvinciaIgnoreCaseAndEstado(
+                                                provincia.trim(),
+                                                EstadoPublicacion.ACTIVA,
+                                                pageable);
         }
 
-        return soloPublicacionesActivas(
-                publicacionRepository
-                        .findByUbicacion_ZonaIgnoreCase(zona.trim()));
-    }
+        @Override
+        public Page<Publicacion> obtenerPublicacionesPorProvinciaYCiudad(
+                        String provincia,
+                        String ciudad,
+                        Pageable pageable) {
 
-    private List<Publicacion> soloPublicacionesActivas(
-            List<Publicacion> publicaciones) {
+                validarTextoFiltro(
+                                provincia,
+                                "La provincia es obligatoria");
 
-        return publicaciones.stream()
-                .filter(publicacion ->
-                        publicacion.getEstado() == EstadoPublicacion.ACTIVA)
-                .toList();
-    }
+                validarTextoFiltro(
+                                ciudad,
+                                "La ciudad es obligatoria");
 
-    private void validarRequest(PublicacionRequest request) {
-
-        if (request == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La publicacion no puede estar vacia");
+                return publicacionRepository
+                                .findByUbicacion_ProvinciaIgnoreCaseAndUbicacion_CiudadIgnoreCaseAndEstado(
+                                                provincia.trim(),
+                                                ciudad.trim(),
+                                                EstadoPublicacion.ACTIVA,
+                                                pageable);
         }
 
-        if (request.getPrecioDia() == null
-                || request.getPrecioDia().compareTo(BigDecimal.ZERO) <= 0) {
+        @Override
+        public Page<Publicacion> obtenerPublicacionesPorProvinciaCiudadYLocalidad(
+                        String provincia,
+                        String ciudad,
+                        String localidad,
+                        Pageable pageable) {
 
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El precio por dia debe ser mayor a cero");
+                validarTextoFiltro(
+                                provincia,
+                                "La provincia es obligatoria");
+
+                validarTextoFiltro(
+                                ciudad,
+                                "La ciudad es obligatoria");
+
+                validarTextoFiltro(
+                                localidad,
+                                "La localidad es obligatoria");
+
+                return publicacionRepository
+                                .findByUbicacion_ProvinciaIgnoreCaseAndUbicacion_CiudadIgnoreCaseAndUbicacion_LocalidadIgnoreCaseAndEstado(
+                                                provincia.trim(),
+                                                ciudad.trim(),
+                                                localidad.trim(),
+                                                EstadoPublicacion.ACTIVA,
+                                                pageable);
         }
 
-        if (request.getDescuentoPorcentaje() != null
-                && (request.getDescuentoPorcentaje().compareTo(BigDecimal.ZERO) < 0
-                || request.getDescuentoPorcentaje()
-                        .compareTo(BigDecimal.valueOf(100)) > 0)) {
+        private List<Publicacion> soloPublicacionesActivas(
+                        List<Publicacion> publicaciones) {
 
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El descuento debe estar entre 0 y 100");
+                return publicaciones.stream()
+                                .filter(publicacion -> publicacion.getEstado() == EstadoPublicacion.ACTIVA)
+                                .toList();
         }
 
-        if (request.getDescripcion() == null
-                || request.getDescripcion().isBlank()) {
+        private void validarTextoFiltro(
+                        String valor,
+                        String mensaje) {
 
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La descripcion es obligatoria");
+                if (valor == null || valor.isBlank()) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        mensaje);
+                }
         }
 
-        if (request.getHoraRetiroDevolucion() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La hora de retiro y devolucion es obligatoria");
-        }
+        private void validarRequest(PublicacionRequest request) {
 
-        if (request.getIdVehiculo() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El vehiculo es obligatorio");
-        }
+                if (request == null) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "La publicacion no puede estar vacia");
+                }
 
-        if (request.getIdUbicacion() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La ubicacion es obligatoria");
+                if (request.getPrecioDia() == null
+                                || request.getPrecioDia()
+                                                .compareTo(BigDecimal.ZERO) <= 0) {
+
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "El precio por dia debe ser mayor a cero");
+                }
+
+                if (request.getDescuentoPorcentaje() != null
+                                && (request.getDescuentoPorcentaje()
+                                                .compareTo(BigDecimal.ZERO) < 0
+                                                || request.getDescuentoPorcentaje()
+                                                                .compareTo(
+                                                                                new BigDecimal("100")) > 0)) {
+
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "El descuento debe estar entre 0 y 100");
+                }
+
+                if (request.getDescripcion() == null
+                                || request.getDescripcion().isBlank()) {
+
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "La descripcion es obligatoria");
+                }
+
+                if (request.getHoraRetiroDevolucion() == null) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "La hora de retiro y devolucion es obligatoria");
+                }
+
+                if (request.getIdVehiculo() == null) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "El vehiculo es obligatorio");
+                }
+
+                if (request.getIdUbicacion() == null) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "La ubicacion es obligatoria");
+                }
         }
-    }
 }
