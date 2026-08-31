@@ -1,5 +1,6 @@
 package com.uade.tpo.marketplace.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,8 +20,10 @@ public class Ubicacion {
     private Long idUbicacion;
 
     private String direccion;
-    private String zona;
+    private String ciudad;
     private String localidad;
     private String provincia;
+
+    @Column(name = "codigo_postal")
     private String codigoPostal;
 }
