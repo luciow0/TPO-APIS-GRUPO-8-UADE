@@ -1,34 +1,44 @@
 package com.uade.tpo.marketplace.entity;
 
-
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 
-@Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.Data;
 
+@Data
+@Entity
 public class Disponibilidad {
+
+    public Disponibilidad() {
+    }
+
+    public Disponibilidad(
+            LocalDate fechaInicio,
+            LocalDate fechaFin,
+            Publicacion publicacion) {
+
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.publicacion = publicacion;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_disponibilidad")
     private Long idDisponibilidad;
 
-    @Column(name = "fecha_inicio")
+    @Column(nullable = false)
     private LocalDate fechaInicio;
 
-    @Column(name = "fecha_fin")
+    @Column(nullable = false)
     private LocalDate fechaFin;
 
     @ManyToOne
-    @JoinColumn(name = "id_publicacion")
+    @JoinColumn(name = "id_publicacion", nullable = false)
     private Publicacion publicacion;
-
 }
