@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.tpo.marketplace.entity.Vehiculo;
+import com.uade.tpo.marketplace.exception.EntityNotFoundException;
 import com.uade.tpo.marketplace.repository.VehiculoRepository;
 
 @Service
@@ -43,7 +44,29 @@ public class VehiculoServiceImpl implements VehiculoService {
     }
 
     @Override
+    @Transactional
+    public Vehiculo actualizar(Long id, Vehiculo vehiculo) {
+        Vehiculo vehiculoExistente = vehiculoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Vehículo no encontrado con id: " + id));
+
+        vehiculoExistente.setPatente(vehiculo.getPatente());
+        vehiculoExistente.setMarca(vehiculo.getMarca());
+        vehiculoExistente.setModelo(vehiculo.getModelo());
+        vehiculoExistente.setAnio(vehiculo.getAnio());
+        vehiculoExistente.setColor(vehiculo.getColor());
+        vehiculoExistente.setCantidadAsientos(vehiculo.getCantidadAsientos());
+        vehiculoExistente.setPropietario(vehiculo.getPropietario());
+
+        return vehiculoRepository.save(vehiculoExistente);
+    }
+
+    @Override
     public void eliminar(Long id) {
         vehiculoRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean existePatente(String patente) {
+        return vehiculoRepository.existsByPatente(patente);
     }
 }
