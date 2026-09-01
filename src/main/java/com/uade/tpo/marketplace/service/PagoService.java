@@ -1,5 +1,20 @@
 package com.uade.tpo.marketplace.service;
 
-public interface PagoService {
+import java.util.Optional;
+import com.uade.tpo.marketplace.exceptions.ReservaInvalidException;
+import com.uade.tpo.marketplace.exceptions.ReservaNotFoundException;
 
+import com.uade.tpo.marketplace.Enum.MetodoPago;
+import com.uade.tpo.marketplace.entity.Pago;
+
+public interface PagoService {
+    Optional<Pago> getPagoById(Long idPago);
+
+    Optional<Pago> getPagoByReserva(Long idReserva);
+
+    Pago crearPago(Long idReserva, MetodoPago metodoPago);
+
+    Pago aprobarPago(Long idPago) throws ReservaNotFoundException, ReservaInvalidException;
+
+    Pago rechazarPago(Long idPago);
 }
