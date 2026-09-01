@@ -1,9 +1,8 @@
 package com.uade.tpo.marketplace.entity;
-
+import com.uade.tpo.marketplace.Enum.EstadoPago;
 import com.uade.tpo.marketplace.Enum.MetodoPago;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,7 +21,12 @@ public class Pago {
     private LocalDate fecha;
     private float monto;
     @Enumerated(EnumType.STRING)
+    private EstadoPago estado;
+    @Enumerated(EnumType.STRING)
     private MetodoPago metodo;
-    private boolean estado; // pendiente false, pago true
+
+    @OneToOne
+    @JoinColumn(name = "id_reserva")
+    private Reserva reserva;
 
 }

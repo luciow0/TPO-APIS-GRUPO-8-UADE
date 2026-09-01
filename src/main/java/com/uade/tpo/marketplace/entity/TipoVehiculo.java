@@ -1,6 +1,5 @@
 package com.uade.tpo.marketplace.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,5 +14,6 @@ public class TipoVehiculo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_tipo_vehiculo")
     private Long idTipoVehiculo;
-    private String tipo;
+
+    private String nombre;
 }
