@@ -1,10 +1,11 @@
 package com.uade.tpo.marketplace.service;
 
-import com.uade.tpo.marketplace.entity.TipoVehiculo;
-import com.uade.tpo.marketplace.repository.TipoVehiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+
+import com.uade.tpo.marketplace.entity.TipoVehiculo;
+import com.uade.tpo.marketplace.repository.TipoVehiculoRepository;
 
 @Service
 public class TipoVehiculoServiceImpl implements TipoVehiculoService {
@@ -13,7 +14,7 @@ public class TipoVehiculoServiceImpl implements TipoVehiculoService {
     private TipoVehiculoRepository tipoVehiculoRepository;
 
     @Override
-    public List<TipoVehiculo> getTiposVehiculo() {
-        return tipoVehiculoRepository.findAll();
+    public Page<TipoVehiculo> getTipoVehiculo(PageRequest pageable) {
+        return tipoVehiculoRepository.findAll(pageable);
     }
 }
