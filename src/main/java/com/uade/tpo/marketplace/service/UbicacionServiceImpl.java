@@ -1,16 +1,25 @@
 package com.uade.tpo.marketplace.service;
 
-import com.uade.tpo.marketplace.entity.Ubicacion;
-import com.uade.tpo.marketplace.repository.UbicacionRepository;
-import jakarta.persistence.EntityNotFoundException;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.uade.tpo.marketplace.entity.Ubicacion;
+import com.uade.tpo.marketplace.repository.UbicacionRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UbicacionServiceImpl implements UbicacionService {
 
     @Autowired
     private UbicacionRepository ubicacionRepository;
+
+    @Override
+    public Optional<Ubicacion> obtenerUbicacionPorId(Long idUbicacion) {
+        return ubicacionRepository.findById(idUbicacion);
+    }
 
     @Override
     public Ubicacion updateUbicacion(Long idUbicacion, Ubicacion nuevosDatos) {
