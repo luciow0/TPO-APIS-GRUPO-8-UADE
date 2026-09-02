@@ -20,4 +20,6 @@ public interface ReservaService {
         Reserva cancelarReserva(Long idReserva,Long idUsuario )throws ReservaNotFoundException, ReservaInvalidException;
 
         Reserva confirmarReserva(Long idReserva)throws ReservaNotFoundException, ReservaInvalidException;
+
+        Reserva rechazarReserva(Long idReserva)throws ReservaNotFoundException, ReservaInvalidException;
 }

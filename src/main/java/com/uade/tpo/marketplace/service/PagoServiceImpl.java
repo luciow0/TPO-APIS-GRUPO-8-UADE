@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.tpo.marketplace.Enum.EstadoPago;
 import com.uade.tpo.marketplace.Enum.MetodoPago;
@@ -33,6 +34,7 @@ public class PagoServiceImpl implements PagoService {
     private ReservaService reservaService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Pago aprobarPago(Long idPago)
             throws PagoNotFoundException, PagoInvalidException,
             ReservaNotFoundException, ReservaInvalidException {
@@ -100,8 +102,10 @@ public class PagoServiceImpl implements PagoService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Pago rechazarPago(Long idPago)
-            throws PagoNotFoundException, PagoInvalidException {
+            throws PagoNotFoundException, PagoInvalidException,
+            ReservaNotFoundException, ReservaInvalidException {
         Optional<Pago> pagoOptional = pagoRepository.findById(idPago);
 
         if (pagoOptional.isEmpty()) {
@@ -113,6 +117,10 @@ public class PagoServiceImpl implements PagoService {
         if (pago.getEstado() != EstadoPago.PENDIENTE) {
             throw new PagoInvalidException();
         }
+
+        reservaService.rechazarReserva(
+            pago.getReserva().getIdReserva()
+        );
 
         pago.setEstado(EstadoPago.RECHAZADO);
 

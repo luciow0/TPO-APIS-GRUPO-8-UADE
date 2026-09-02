@@ -74,7 +74,8 @@ public class PagoController {
 
     @PutMapping("/{idPago}/rechazar")
     public ResponseEntity<Pago> rechazarPago(@PathVariable Long idPago)
-            throws PagoNotFoundException, PagoInvalidException {
+            throws PagoNotFoundException, PagoInvalidException,
+            ReservaNotFoundException, ReservaInvalidException {
 
         Pago result = pagoService.rechazarPago(idPago);
 

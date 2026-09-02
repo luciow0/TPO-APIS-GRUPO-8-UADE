@@ -77,6 +77,28 @@ public class ReservaServiceImpl implements ReservaService {
 
         return reservaRepository.save(reserva);
     }
+
+    @Override
+    public Reserva rechazarReserva(Long idReserva)
+            throws ReservaNotFoundException, ReservaInvalidException {
+
+        Optional<Reserva> reservaOptional =
+            reservaRepository.findById(idReserva);
+
+        if (reservaOptional.isEmpty()) {
+            throw new ReservaNotFoundException();
+        }
+
+        Reserva reserva = reservaOptional.get();
+
+        if (reserva.getEstado() != EstadoReserva.PENDIENTE) {
+            throw new ReservaInvalidException();
+        }
+
+        reserva.setEstado(EstadoReserva.RECHAZADA);
+
+        return reservaRepository.save(reserva);
+    }
     
     @Override
     public Reserva crearReserva(Long idUsuario, Long idPublicacion, LocalDate fechaInicio, LocalDate fechaFin) {

@@ -23,5 +23,6 @@ public interface PagoService {
             ReservaNotFoundException, ReservaInvalidException;
 
     Pago rechazarPago(Long idPago)
-            throws PagoNotFoundException, PagoInvalidException;
+            throws PagoNotFoundException, PagoInvalidException,
+            ReservaNotFoundException, ReservaInvalidException;
 }
