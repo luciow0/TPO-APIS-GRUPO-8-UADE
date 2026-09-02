@@ -1,6 +1,9 @@
 package com.uade.tpo.marketplace.service;
 
 import java.util.Optional;
+import com.uade.tpo.marketplace.exceptions.PagoDuplicateException;
+import com.uade.tpo.marketplace.exceptions.PagoInvalidException;
+import com.uade.tpo.marketplace.exceptions.PagoNotFoundException;
 import com.uade.tpo.marketplace.exceptions.ReservaInvalidException;
 import com.uade.tpo.marketplace.exceptions.ReservaNotFoundException;
 
@@ -12,9 +15,13 @@ public interface PagoService {
 
     Optional<Pago> getPagoByReserva(Long idReserva);
 
-    Pago crearPago(Long idReserva, MetodoPago metodoPago);
+    Pago crearPago(Long idReserva, MetodoPago metodoPago)
+            throws ReservaNotFoundException, PagoDuplicateException;
 
-    Pago aprobarPago(Long idPago) throws ReservaNotFoundException, ReservaInvalidException;
+    Pago aprobarPago(Long idPago)
+            throws PagoNotFoundException, PagoInvalidException,
+            ReservaNotFoundException, ReservaInvalidException;
 
-    Pago rechazarPago(Long idPago);
+    Pago rechazarPago(Long idPago)
+            throws PagoNotFoundException, PagoInvalidException;
 }

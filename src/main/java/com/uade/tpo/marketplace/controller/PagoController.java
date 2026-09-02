@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplace.dto.PagoRequest;
 import com.uade.tpo.marketplace.entity.Pago;
+import com.uade.tpo.marketplace.exceptions.PagoDuplicateException;
+import com.uade.tpo.marketplace.exceptions.PagoInvalidException;
+import com.uade.tpo.marketplace.exceptions.PagoNotFoundException;
+import com.uade.tpo.marketplace.exceptions.ReservaInvalidException;
+import com.uade.tpo.marketplace.exceptions.ReservaNotFoundException;
 import com.uade.tpo.marketplace.service.PagoService;
 
 @RestController
@@ -49,7 +54,8 @@ public class PagoController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> crearPago(@RequestBody PagoRequest pagoRequest) {
+    public ResponseEntity<Object> crearPago(@RequestBody PagoRequest pagoRequest)
+            throws ReservaNotFoundException, PagoDuplicateException {
 
         Pago result = pagoService.crearPago(pagoRequest.getIdReserva(),pagoRequest.getMetodoPago());
 
@@ -57,7 +63,9 @@ public class PagoController {
     }
 
     @PutMapping("/{idPago}/aprobar")
-    public ResponseEntity<Pago> aprobarPago(@PathVariable Long idPago) {
+    public ResponseEntity<Pago> aprobarPago(@PathVariable Long idPago)
+            throws PagoNotFoundException, PagoInvalidException,
+            ReservaNotFoundException, ReservaInvalidException {
 
         Pago result = pagoService.aprobarPago(idPago);
 
@@ -65,7 +73,8 @@ public class PagoController {
     }
 
     @PutMapping("/{idPago}/rechazar")
-    public ResponseEntity<Pago> rechazarPago(@PathVariable Long idPago) {
+    public ResponseEntity<Pago> rechazarPago(@PathVariable Long idPago)
+            throws PagoNotFoundException, PagoInvalidException {
 
         Pago result = pagoService.rechazarPago(idPago);
 
