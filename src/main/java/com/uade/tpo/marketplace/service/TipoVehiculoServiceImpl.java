@@ -14,7 +14,7 @@ public class TipoVehiculoServiceImpl implements TipoVehiculoService {
     private TipoVehiculoRepository tipoVehiculoRepository;
 
     @Override
-    public Page<TipoVehiculo> getTipoVehiculo(PageRequest pageable) {
-        return tipoVehiculoRepository.findAll(pageable);
+    public List<TipoVehiculo> getTiposVehiculo() {
+        return tipoVehiculoRepository.findAll();
     }
 }
