@@ -1,4 +1,4 @@
-package com.uade.tpo.marketplace.enums;
+package com.uade.tpo.marketplace.Enum;
 
 public enum EstadoPublicacion {
     ACTIVA,
