@@ -33,6 +33,12 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Usuario obtenerUsuarioPorId(Long idUsuario) {
+        return obtenerUsuario(idUsuario);
+    }
+
+    @Override
     @Transactional
     public UsuarioDTO crear(UsuarioDTO usuarioDTO) {
         if (usuarioRepository.existsByEmail(usuarioDTO.getEmail())) {
