@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.uade.tpo.marketplace.entity.Publicacion;
-import com.uade.tpo.marketplace.enums.EstadoPublicacion;
+import com.uade.tpo.marketplace.Enum.EstadoPublicacion;
 
 @Repository
 public interface PublicacionRepository extends JpaRepository<Publicacion, Long> {

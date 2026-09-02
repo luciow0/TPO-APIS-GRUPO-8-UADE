@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import com.uade.tpo.marketplace.enums.EstadoPublicacion;
+import com.uade.tpo.marketplace.Enum.EstadoPublicacion;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
