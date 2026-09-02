@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplace.dto.PublicacionRequest;
 import com.uade.tpo.marketplace.entity.Publicacion;
-import com.uade.tpo.marketplace.enums.EstadoPublicacion;
+import com.uade.tpo.marketplace.Enum.EstadoPublicacion;
 import com.uade.tpo.marketplace.exceptions.PublicacionDuplicateException;
 import com.uade.tpo.marketplace.exceptions.PublicacionNotFoundException;
 import com.uade.tpo.marketplace.service.PublicacionService;
