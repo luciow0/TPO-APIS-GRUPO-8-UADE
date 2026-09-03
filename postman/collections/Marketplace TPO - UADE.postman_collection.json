@@ -1,0 +1,1537 @@
+{
+  "info": {
+    "_postman_id": "ee2a9eec-da1d-4aa9-a21e-1708f2f886d9",
+    "name": "Marketplace TPO - UADE",
+    "description": "Coleccion de endpoints del proyecto TPO-APIS-GRUPO-8-UADE.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "26402567"
+  },
+  "item": [
+    {
+      "name": "Usuario",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar usuario por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"pepe\",\n  \"apellido\": \"gomez\",\n  \"email\": \"pepe@mail.com\",\n  \"password\": \"pepe1234\",\n  \"telefono\": \"1122334455\",\n  \"fechaNacimiento\": \"2000-05-10\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"pepe\",\n  \"apellido\": \"gomez\",\n  \"email\": \"pepe@mail.com\",\n  \"password\": \"pepe1234\",\n  \"telefono\": \"1122334455\",\n  \"fechaNacimiento\": \"2000-05-10\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Vehiculo",
+      "item": [
+        {
+          "name": "Listar vehiculos (paginado)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vehiculo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehiculo"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener vehiculo por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vehiculo/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehiculo",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar vehiculo por patente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vehiculo/patente/:patente",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehiculo",
+                "patente",
+                ":patente"
+              ],
+              "variable": [
+                {
+                  "key": "patente",
+                  "value": "AB123C"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear vehiculo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patente\": \"AB123C\",\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"anio\": 2020,\n  \"color\": \"Negro\",\n  \"cantidadAsientos\": 5,\n  \"propietario\": { \"idUsuario\": 1 },\n  \"tipoVehiculo\": { \"idTipoVehiculo\": 1 }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehiculo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehiculo"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar vehiculo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patente\": \"AB123C\",\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"anio\": 2021,\n  \"color\": \"Gris\",\n  \"cantidadAsientos\": 5,\n  \"propietario\": { \"idUsuario\": 1 },\n  \"tipoVehiculo\": { \"idTipoVehiculo\": 1 }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehiculo/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehiculo",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar vehiculo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vehiculo/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehiculo",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "TipoVehiculo",
+      "item": [
+        {
+          "name": "Listar tipos de vehiculo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tipo-vehiculo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tipo-vehiculo"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ImagenVehiculo",
+      "item": [
+        {
+          "name": "Listar imagenes (paginado)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/imagen-vehiculo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "imagen-vehiculo"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener imagen por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/imagen-vehiculo/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "imagen-vehiculo",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar imagenes por vehiculo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/imagen-vehiculo/por-vehiculo/:idVehiculo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "imagen-vehiculo",
+                "por-vehiculo",
+                ":idVehiculo"
+              ],
+              "variable": [
+                {
+                  "key": "idVehiculo",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear imagen",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://misfotos.com/auto1.jpg\",\n  \"orden\": 1,\n  \"vehiculo\": { \"idVehiculo\": 1 }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/imagen-vehiculo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "imagen-vehiculo"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar imagen",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://misfotos.com/auto1-editada.jpg\",\n  \"orden\": 2,\n  \"vehiculo\": { \"idVehiculo\": 1 }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/imagen-vehiculo/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "imagen-vehiculo",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar imagen",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/imagen-vehiculo/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "imagen-vehiculo",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Publicacion",
+      "item": [
+        {
+          "name": "Listar publicaciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener publicacion por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear publicacion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"precioDia\": 15000.00,\n  \"descuentoPorcentaje\": 10.0,\n  \"descripcion\": \"Auto en excelente estado\",\n  \"horaRetiroDevolucion\": \"10:00:00\",\n  \"idVehiculo\": 1,\n  \"idUbicacion\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modificar publicacion",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"precioDia\": 18000.00,\n  \"descuentoPorcentaje\": 5.0,\n  \"descripcion\": \"Auto actualizado\",\n  \"horaRetiroDevolucion\": \"12:00:00\",\n  \"idVehiculo\": 1,\n  \"idUbicacion\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar publicacion",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Pausar publicacion",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones/:id/pausar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones",
+                ":id",
+                "pausar"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reactivar publicacion",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones/:id/reactivar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones",
+                ":id",
+                "reactivar"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filtro por estado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones/filtros/estado?estado=ACTIVA",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones",
+                "filtros",
+                "estado"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "ACTIVA",
+                  "description": "ACTIVA | PAUSADA | DESACTIVADA"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filtro por precio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones/filtros/precio?precioMin=1000&precioMax=20000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones",
+                "filtros",
+                "precio"
+              ],
+              "query": [
+                {
+                  "key": "precioMin",
+                  "value": "1000"
+                },
+                {
+                  "key": "precioMax",
+                  "value": "20000"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filtro por tipo de vehiculo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones/filtros/tipo?idTipoVehiculo=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones",
+                "filtros",
+                "tipo"
+              ],
+              "query": [
+                {
+                  "key": "idTipoVehiculo",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filtro por marca",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones/filtros/marca?marca=Toyota",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones",
+                "filtros",
+                "marca"
+              ],
+              "query": [
+                {
+                  "key": "marca",
+                  "value": "Toyota"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filtro por modelo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones/filtros/modelo?modelo=Corolla",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones",
+                "filtros",
+                "modelo"
+              ],
+              "query": [
+                {
+                  "key": "modelo",
+                  "value": "Corolla"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filtro por provincia",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones/filtros/provincia?provincia=Buenos Aires",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones",
+                "filtros",
+                "provincia"
+              ],
+              "query": [
+                {
+                  "key": "provincia",
+                  "value": "Buenos Aires"
+                },
+                {
+                  "key": "page",
+                  "value": "0",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filtro por provincia y ciudad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones/filtros/provincia-ciudad?provincia=Buenos Aires&ciudad=La Plata",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones",
+                "filtros",
+                "provincia-ciudad"
+              ],
+              "query": [
+                {
+                  "key": "provincia",
+                  "value": "Buenos Aires"
+                },
+                {
+                  "key": "ciudad",
+                  "value": "La Plata"
+                },
+                {
+                  "key": "page",
+                  "value": "0",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filtro por provincia, ciudad y localidad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publicaciones/filtros/provincia-ciudad-localidad?provincia=Buenos Aires&ciudad=La Plata&localidad=Centro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publicaciones",
+                "filtros",
+                "provincia-ciudad-localidad"
+              ],
+              "query": [
+                {
+                  "key": "provincia",
+                  "value": "Buenos Aires"
+                },
+                {
+                  "key": "ciudad",
+                  "value": "La Plata"
+                },
+                {
+                  "key": "localidad",
+                  "value": "Centro"
+                },
+                {
+                  "key": "page",
+                  "value": "0",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Disponibilidad",
+      "item": [
+        {
+          "name": "Listar disponibilidades",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/disponibilidades",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "disponibilidades"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener disponibilidad por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/disponibilidades/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "disponibilidades",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Disponibilidades por publicacion",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/disponibilidades/publicacion/:idPublicacion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "disponibilidades",
+                "publicacion",
+                ":idPublicacion"
+              ],
+              "variable": [
+                {
+                  "key": "idPublicacion",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear disponibilidad",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicio\": \"2026-06-01\",\n  \"fechaFin\": \"2026-06-30\",\n  \"idPublicacion\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/disponibilidades",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "disponibilidades"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modificar disponibilidad",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicio\": \"2026-07-01\",\n  \"fechaFin\": \"2026-07-15\",\n  \"idPublicacion\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/disponibilidades/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "disponibilidades",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar disponibilidad",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/disponibilidades/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "disponibilidades",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Carrito",
+      "item": [
+        {
+          "name": "Crear carrito",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUsuario\": 1,\n  \"idPublicacion\": 1,\n  \"fechaInicio\": \"2026-06-05\",\n  \"fechaFin\": \"2026-06-10\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/carritos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carritos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener carrito por usuario",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carritos/usuario/:idUsuario",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carritos",
+                "usuario",
+                ":idUsuario"
+              ],
+              "variable": [
+                {
+                  "key": "idUsuario",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modificar fechas del carrito",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUsuario\": 1,\n  \"fechaInicio\": \"2026-06-07\",\n  \"fechaFin\": \"2026-06-12\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/carritos/:idCarrito/fechas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carritos",
+                ":idCarrito",
+                "fechas"
+              ],
+              "variable": [
+                {
+                  "key": "idCarrito",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar carrito",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carritos/:idCarrito?idUsuario=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carritos",
+                ":idCarrito"
+              ],
+              "query": [
+                {
+                  "key": "idUsuario",
+                  "value": "1"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "idCarrito",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Continuar reserva (desde carrito)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carritos/:idCarrito/continuar?idUsuario=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carritos",
+                ":idCarrito",
+                "continuar"
+              ],
+              "query": [
+                {
+                  "key": "idUsuario",
+                  "value": "1"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "idCarrito",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reserva",
+      "item": [
+        {
+          "name": "Obtener reserva por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reservas/:idReserva",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas",
+                ":idReserva"
+              ],
+              "variable": [
+                {
+                  "key": "idReserva",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reservas por usuario (paginado)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reservas/usuario/:idUsuario",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas",
+                "usuario",
+                ":idUsuario"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "idUsuario",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar reserva",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reservas/:idReserva/cancelar?idUsuario=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas",
+                ":idReserva",
+                "cancelar"
+              ],
+              "query": [
+                {
+                  "key": "idUsuario",
+                  "value": "1"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "idReserva",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pago",
+      "item": [
+        {
+          "name": "Obtener pago por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pagos/:idPago",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos",
+                ":idPago"
+              ],
+              "variable": [
+                {
+                  "key": "idPago",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener pago por reserva",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pagos/reserva/:idReserva",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos",
+                "reserva",
+                ":idReserva"
+              ],
+              "variable": [
+                {
+                  "key": "idReserva",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear pago",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idReserva\": 1,\n  \"metodoPago\": \"MERCADO_PAGO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pagos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Aprobar pago",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pagos/:idPago/aprobar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos",
+                ":idPago",
+                "aprobar"
+              ],
+              "variable": [
+                {
+                  "key": "idPago",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rechazar pago",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pagos/:idPago/rechazar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos",
+                ":idPago",
+                "rechazar"
+              ],
+              "variable": [
+                {
+                  "key": "idPago",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
