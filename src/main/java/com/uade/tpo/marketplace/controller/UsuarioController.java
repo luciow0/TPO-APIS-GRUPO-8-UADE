@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplace.dto.UsuarioDTO;
+import com.uade.tpo.marketplace.exception.UsuarioDuplicateException;
+import com.uade.tpo.marketplace.exception.UsuarioNotFoundException;
 import com.uade.tpo.marketplace.service.UsuarioService;
 
 import jakarta.validation.Valid;
@@ -32,24 +34,24 @@ public class UsuarioController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<UsuarioDTO> buscarPorId(@PathVariable Long id) {
+	public ResponseEntity<UsuarioDTO> buscarPorId(@PathVariable Long id) throws UsuarioNotFoundException {
 		return ResponseEntity.ok(usuarioService.buscarPorId(id));
 	}
 
 	@PostMapping
-	public ResponseEntity<UsuarioDTO> crear(@Valid @RequestBody UsuarioDTO usuarioDTO) {
+	public ResponseEntity<UsuarioDTO> crear(@Valid @RequestBody UsuarioDTO usuarioDTO) throws UsuarioDuplicateException {
 		return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.crear(usuarioDTO));
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<UsuarioDTO> actualizar(
 			@PathVariable Long id,
-			@Valid @RequestBody UsuarioDTO usuarioDTO) {
+			@Valid @RequestBody UsuarioDTO usuarioDTO) throws UsuarioNotFoundException, UsuarioDuplicateException {
 		return ResponseEntity.ok(usuarioService.actualizar(id, usuarioDTO));
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+	public ResponseEntity<Void> eliminar(@PathVariable Long id) throws UsuarioNotFoundException {
 		usuarioService.eliminar(id);
 		return ResponseEntity.noContent().build();
 	}

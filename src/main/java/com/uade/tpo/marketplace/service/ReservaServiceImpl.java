@@ -3,8 +3,8 @@ package com.uade.tpo.marketplace.service;
 import com.uade.tpo.marketplace.Enum.EstadoReserva;
 import com.uade.tpo.marketplace.entity.Carrito;
 import com.uade.tpo.marketplace.entity.Reserva;
-import com.uade.tpo.marketplace.exceptions.ReservaInvalidException;
-import com.uade.tpo.marketplace.exceptions.ReservaNotFoundException;
+import com.uade.tpo.marketplace.exception.ReservaInvalidException;
+import com.uade.tpo.marketplace.exception.ReservaNotFoundException;
 import com.uade.tpo.marketplace.repository.ReservaRepository;
 import com.uade.tpo.marketplace.service.ReservaService;
 

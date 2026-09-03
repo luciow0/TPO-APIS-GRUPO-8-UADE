@@ -1,21 +1,27 @@
 package com.uade.tpo.marketplace.service;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.tpo.marketplace.dto.UsuarioDTO;
 import com.uade.tpo.marketplace.entity.Usuario;
-import com.uade.tpo.marketplace.exception.EntityNotFoundException;
+import com.uade.tpo.marketplace.exception.UsuarioDuplicateException;
+import com.uade.tpo.marketplace.exception.UsuarioNotFoundException;
 import com.uade.tpo.marketplace.repository.UsuarioRepository;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -28,21 +34,21 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional(readOnly = true)
-    public UsuarioDTO buscarPorId(Long id) {
+    public UsuarioDTO buscarPorId(Long id) throws UsuarioNotFoundException {
         return convertirADTO(obtenerUsuario(id));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Usuario obtenerUsuarioPorId(Long idUsuario) {
+    public Usuario obtenerUsuarioPorId(Long idUsuario) throws UsuarioNotFoundException {
         return obtenerUsuario(idUsuario);
     }
 
     @Override
     @Transactional
-    public UsuarioDTO crear(UsuarioDTO usuarioDTO) {
+    public UsuarioDTO crear(UsuarioDTO usuarioDTO) throws UsuarioDuplicateException {
         if (usuarioRepository.existsByEmail(usuarioDTO.getEmail())) {
-            throw new IllegalArgumentException("El email ya está registrado: " + usuarioDTO.getEmail());
+            throw new UsuarioDuplicateException();
         }
 
         Usuario usuario = convertirAEntidad(usuarioDTO);
@@ -51,18 +57,19 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
-    public UsuarioDTO actualizar(Long id, UsuarioDTO usuarioDTO) {
+    public UsuarioDTO actualizar(Long id, UsuarioDTO usuarioDTO)
+            throws UsuarioNotFoundException, UsuarioDuplicateException {
         Usuario usuario = obtenerUsuario(id);
 
-        usuarioRepository.findByEmail(usuarioDTO.getEmail())
-                .filter(otroUsuario -> !otroUsuario.getIdUsuario().equals(id))
-                .ifPresent(otroUsuario -> {
-                    throw new IllegalArgumentException("El email ya está registrado: " + usuarioDTO.getEmail());
-                });
+        Optional<Usuario> otroUsuario = usuarioRepository.findByEmail(usuarioDTO.getEmail());
+        if (otroUsuario.isPresent() && !otroUsuario.get().getIdUsuario().equals(id)) {
+            throw new UsuarioDuplicateException();
+        }
 
         usuario.setNombre(usuarioDTO.getNombre());
         usuario.setApellido(usuarioDTO.getApellido());
         usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
         usuario.setTelefono(usuarioDTO.getTelefono());
         usuario.setFechaNacimiento(usuarioDTO.getFechaNacimiento());
         return convertirADTO(usuarioRepository.save(usuario));
@@ -70,13 +77,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
-    public void eliminar(Long id) {
+    public void eliminar(Long id) throws UsuarioNotFoundException {
         usuarioRepository.delete(obtenerUsuario(id));
     }
 
-    private Usuario obtenerUsuario(Long id) {
+    private Usuario obtenerUsuario(Long id) throws UsuarioNotFoundException {
         return usuarioRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + id));
+                .orElseThrow(UsuarioNotFoundException::new);
     }
 
     private UsuarioDTO convertirADTO(Usuario usuario) {
@@ -95,6 +102,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setNombre(usuarioDTO.getNombre());
         usuario.setApellido(usuarioDTO.getApellido());
         usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
         usuario.setTelefono(usuarioDTO.getTelefono());
         usuario.setFechaNacimiento(usuarioDTO.getFechaNacimiento());
         return usuario;

@@ -1,11 +1,11 @@
-package com.uade.tpo.marketplace.exceptions;
+package com.uade.tpo.marketplace.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(
         code = HttpStatus.BAD_REQUEST,
-        reason = "La operacion sobre el carrito no es valida"
+        reason = "La reserva ya tiene un pago asociado"
 )
-public class CarritoInvalidException extends Exception {
+public class PagoDuplicateException extends Exception {
 }

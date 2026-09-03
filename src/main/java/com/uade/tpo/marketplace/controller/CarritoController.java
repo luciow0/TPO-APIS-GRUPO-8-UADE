@@ -18,11 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.marketplace.dto.CarritoRequest;
 import com.uade.tpo.marketplace.entity.Carrito;
 import com.uade.tpo.marketplace.entity.Reserva;
-import com.uade.tpo.marketplace.exceptions.CarritoDuplicateException;
-import com.uade.tpo.marketplace.exceptions.CarritoInvalidException;
-import com.uade.tpo.marketplace.exceptions.CarritoNotFoundException;
-import com.uade.tpo.marketplace.exceptions.PublicacionNotFoundException;
-import com.uade.tpo.marketplace.exceptions.ReservaInvalidException;
+import com.uade.tpo.marketplace.exception.CarritoDuplicateException;
+import com.uade.tpo.marketplace.exception.CarritoInvalidException;
+import com.uade.tpo.marketplace.exception.CarritoNotFoundException;
+import com.uade.tpo.marketplace.exception.PublicacionNotFoundException;
+import com.uade.tpo.marketplace.exception.ReservaInvalidException;
+import com.uade.tpo.marketplace.exception.UsuarioNotFoundException;
 import com.uade.tpo.marketplace.service.CarritoService;
 
 @RestController
@@ -37,7 +38,8 @@ public class CarritoController {
             @RequestBody CarritoRequest request)
             throws CarritoInvalidException,
             CarritoDuplicateException,
-            PublicacionNotFoundException {
+            PublicacionNotFoundException,
+            UsuarioNotFoundException {
 
         Carrito carrito = carritoService.crearCarrito(request);
 

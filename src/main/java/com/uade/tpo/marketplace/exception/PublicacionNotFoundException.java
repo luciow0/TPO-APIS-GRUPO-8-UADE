@@ -1,12 +1,12 @@
-package com.uade.tpo.marketplace.exceptions;
+package com.uade.tpo.marketplace.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(
         code = HttpStatus.NOT_FOUND,
-        reason = "Disponibilidad no encontrada"
+        reason = "Publicacion no encontrada"
 )
-public class DisponibilidadNotFoundException extends Exception {
+public class PublicacionNotFoundException extends Exception {
 
 }

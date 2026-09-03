@@ -15,8 +15,8 @@ import com.uade.tpo.marketplace.entity.Publicacion;
 import com.uade.tpo.marketplace.entity.Ubicacion;
 import com.uade.tpo.marketplace.entity.Vehiculo;
 import com.uade.tpo.marketplace.Enum.EstadoPublicacion;
-import com.uade.tpo.marketplace.exceptions.PublicacionDuplicateException;
-import com.uade.tpo.marketplace.exceptions.PublicacionNotFoundException;
+import com.uade.tpo.marketplace.exception.PublicacionDuplicateException;
+import com.uade.tpo.marketplace.exception.PublicacionNotFoundException;
 import com.uade.tpo.marketplace.repository.PublicacionRepository;
 
 @Service

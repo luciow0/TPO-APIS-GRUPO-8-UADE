@@ -1,8 +1,8 @@
 package com.uade.tpo.marketplace.controller;
 
 import com.uade.tpo.marketplace.entity.Reserva;
-import com.uade.tpo.marketplace.exceptions.ReservaInvalidException;
-import com.uade.tpo.marketplace.exceptions.ReservaNotFoundException;
+import com.uade.tpo.marketplace.exception.ReservaInvalidException;
+import com.uade.tpo.marketplace.exception.ReservaNotFoundException;
 import com.uade.tpo.marketplace.service.ReservaService;
 
 import java.util.Optional;

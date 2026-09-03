@@ -1,11 +1,12 @@
-package com.uade.tpo.marketplace.exceptions;
+package com.uade.tpo.marketplace.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(
         code = HttpStatus.NOT_FOUND,
-        reason = "Carrito no encontrado"
+        reason = "Disponibilidad no encontrada"
 )
-public class CarritoNotFoundException extends Exception {
+public class DisponibilidadNotFoundException extends Exception {
+
 }

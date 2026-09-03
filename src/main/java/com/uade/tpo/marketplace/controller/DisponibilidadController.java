@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplace.dto.DisponibilidadRequest;
 import com.uade.tpo.marketplace.entity.Disponibilidad;
-import com.uade.tpo.marketplace.exceptions.DisponibilidadNotFoundException;
-import com.uade.tpo.marketplace.exceptions.PublicacionNotFoundException;
+import com.uade.tpo.marketplace.exception.DisponibilidadNotFoundException;
+import com.uade.tpo.marketplace.exception.PublicacionNotFoundException;
 import com.uade.tpo.marketplace.service.DisponibilidadService;
 
 @RestController

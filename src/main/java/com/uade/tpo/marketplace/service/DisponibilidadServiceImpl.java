@@ -11,8 +11,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.uade.tpo.marketplace.dto.DisponibilidadRequest;
 import com.uade.tpo.marketplace.entity.Disponibilidad;
 import com.uade.tpo.marketplace.entity.Publicacion;
-import com.uade.tpo.marketplace.exceptions.DisponibilidadNotFoundException;
-import com.uade.tpo.marketplace.exceptions.PublicacionNotFoundException;
+import com.uade.tpo.marketplace.exception.DisponibilidadNotFoundException;
+import com.uade.tpo.marketplace.exception.PublicacionNotFoundException;
 import com.uade.tpo.marketplace.repository.DisponibilidadRepository;
 
 @Service

@@ -4,8 +4,8 @@ import com.uade.tpo.marketplace.entity.Carrito;
 import com.uade.tpo.marketplace.entity.Reserva;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import com.uade.tpo.marketplace.exceptions.ReservaInvalidException;
-import com.uade.tpo.marketplace.exceptions.ReservaNotFoundException;
+import com.uade.tpo.marketplace.exception.ReservaInvalidException;
+import com.uade.tpo.marketplace.exception.ReservaNotFoundException;
 
 import java.time.LocalDate;
 import java.util.Optional;

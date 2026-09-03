@@ -1,12 +1,11 @@
-package com.uade.tpo.marketplace.exceptions;
+package com.uade.tpo.marketplace.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(
         code = HttpStatus.BAD_REQUEST,
-        reason = "La operacion sobre la reserva no es valida"
+        reason = "La operacion sobre el carrito no es valida"
 )
-public class ReservaInvalidException extends Exception {
-
+public class CarritoInvalidException extends Exception {
 }

@@ -16,11 +16,12 @@ import com.uade.tpo.marketplace.entity.Disponibilidad;
 import com.uade.tpo.marketplace.entity.Publicacion;
 import com.uade.tpo.marketplace.entity.Reserva;
 import com.uade.tpo.marketplace.entity.Usuario;
-import com.uade.tpo.marketplace.exceptions.CarritoDuplicateException;
-import com.uade.tpo.marketplace.exceptions.CarritoInvalidException;
-import com.uade.tpo.marketplace.exceptions.CarritoNotFoundException;
-import com.uade.tpo.marketplace.exceptions.PublicacionNotFoundException;
-import com.uade.tpo.marketplace.exceptions.ReservaInvalidException;
+import com.uade.tpo.marketplace.exception.CarritoDuplicateException;
+import com.uade.tpo.marketplace.exception.CarritoInvalidException;
+import com.uade.tpo.marketplace.exception.CarritoNotFoundException;
+import com.uade.tpo.marketplace.exception.PublicacionNotFoundException;
+import com.uade.tpo.marketplace.exception.ReservaInvalidException;
+import com.uade.tpo.marketplace.exception.UsuarioNotFoundException;
 import com.uade.tpo.marketplace.repository.CarritoRepository;
 
 @Service
@@ -45,7 +46,8 @@ public class CarritoServiceImpl implements CarritoService {
     public Carrito crearCarrito(CarritoRequest request)
             throws CarritoInvalidException,
             CarritoDuplicateException,
-            PublicacionNotFoundException {
+            PublicacionNotFoundException,
+            UsuarioNotFoundException {
 
         validarRequest(request);
 
