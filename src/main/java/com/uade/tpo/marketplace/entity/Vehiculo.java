@@ -72,6 +72,10 @@ public class Vehiculo {
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario propietario;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_tipo_vehiculo")
+    private TipoVehiculo tipoVehiculo;
+
     @OneToMany(mappedBy = "vehiculo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImagenVehiculo> imagenes = new ArrayList<>();
 }

@@ -56,6 +56,7 @@ public class VehiculoServiceImpl implements VehiculoService {
         vehiculoExistente.setColor(vehiculo.getColor());
         vehiculoExistente.setCantidadAsientos(vehiculo.getCantidadAsientos());
         vehiculoExistente.setPropietario(vehiculo.getPropietario());
+        vehiculoExistente.setTipoVehiculo(vehiculo.getTipoVehiculo());
 
         return vehiculoRepository.save(vehiculoExistente);
     }
