@@ -5,10 +5,12 @@ import java.util.Optional;
 
 import com.uade.tpo.marketplace.dto.CarritoRequest;
 import com.uade.tpo.marketplace.entity.Carrito;
+import com.uade.tpo.marketplace.entity.Reserva;
 import com.uade.tpo.marketplace.exceptions.CarritoDuplicateException;
 import com.uade.tpo.marketplace.exceptions.CarritoInvalidException;
 import com.uade.tpo.marketplace.exceptions.CarritoNotFoundException;
 import com.uade.tpo.marketplace.exceptions.PublicacionNotFoundException;
+import com.uade.tpo.marketplace.exceptions.ReservaInvalidException;
 
 public interface CarritoService {
 
@@ -25,9 +27,16 @@ public interface CarritoService {
             LocalDate fechaInicio,
             LocalDate fechaFin)
             throws CarritoNotFoundException,
-            CarritoInvalidException;
+            CarritoInvalidException,
+            PublicacionNotFoundException;
 
     void eliminarCarrito(Long idCarrito, Long idUsuario)
             throws CarritoNotFoundException,
             CarritoInvalidException;
+
+    Reserva continuarReserva(Long idCarrito, Long idUsuario)
+            throws CarritoNotFoundException,
+            CarritoInvalidException,
+            PublicacionNotFoundException,
+            ReservaInvalidException;
 }

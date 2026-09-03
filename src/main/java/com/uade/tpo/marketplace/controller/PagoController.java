@@ -55,9 +55,17 @@ public class PagoController {
 
     @PostMapping
     public ResponseEntity<Object> crearPago(@RequestBody PagoRequest pagoRequest)
-            throws ReservaNotFoundException, PagoDuplicateException {
+            throws ReservaNotFoundException,
+            PagoDuplicateException,
+            PagoInvalidException {
 
-        Pago result = pagoService.crearPago(pagoRequest.getIdReserva(),pagoRequest.getMetodoPago());
+        if (pagoRequest == null) {
+            throw new PagoInvalidException();
+        }
+
+        Pago result = pagoService.crearPago(
+                pagoRequest.getIdReserva(),
+                pagoRequest.getMetodoPago());
 
         return ResponseEntity.created(URI.create("/pagos/" + result.getIdPago())).body(result);
     }

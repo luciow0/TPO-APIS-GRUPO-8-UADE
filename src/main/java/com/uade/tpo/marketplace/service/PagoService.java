@@ -16,7 +16,9 @@ public interface PagoService {
     Optional<Pago> getPagoByReserva(Long idReserva);
 
     Pago crearPago(Long idReserva, MetodoPago metodoPago)
-            throws ReservaNotFoundException, PagoDuplicateException;
+            throws ReservaNotFoundException,
+            PagoDuplicateException,
+            PagoInvalidException;
 
     Pago aprobarPago(Long idPago)
             throws PagoNotFoundException, PagoInvalidException,

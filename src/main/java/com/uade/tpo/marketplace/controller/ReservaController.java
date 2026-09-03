@@ -1,12 +1,10 @@
 package com.uade.tpo.marketplace.controller;
 
-import com.uade.tpo.marketplace.dto.ReservaRequest;
 import com.uade.tpo.marketplace.entity.Reserva;
 import com.uade.tpo.marketplace.exceptions.ReservaInvalidException;
 import com.uade.tpo.marketplace.exceptions.ReservaNotFoundException;
 import com.uade.tpo.marketplace.service.ReservaService;
 
-import java.net.URI;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,25 +58,6 @@ public class ReservaController {
 
         return ResponseEntity.ok(result);
     }
-
-
-    @PostMapping
-    public ResponseEntity<Object> crearReserva(
-            @RequestBody ReservaRequest reservaRequest)
-            throws ReservaInvalidException {
-
-        Reserva result = reservaService.crearReserva(
-                reservaRequest.getIdUsuario(),
-                reservaRequest.getIdPublicacion(),
-                reservaRequest.getFechaInicio(),
-                reservaRequest.getFechaFin()
-        );
-
-        return ResponseEntity
-                .created(URI.create("/reservas/" + result.getIdReserva()))
-                .body(result);
-    }
-
 
     @PutMapping("/{idReserva}/cancelar")
     public ResponseEntity<Reserva> cancelarReserva(

@@ -1,5 +1,6 @@
 package com.uade.tpo.marketplace.service;
 
+import com.uade.tpo.marketplace.entity.Carrito;
 import com.uade.tpo.marketplace.entity.Reserva;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,7 +14,8 @@ public interface ReservaService {
 
         Optional<Reserva> getReservaById(Long idReserva);
 
-        Reserva crearReserva(Long idUsuario, Long idPublicacion,LocalDate fechaInicio,LocalDate fechaFin)throws ReservaInvalidException;
+        Reserva crearReservaDesdeCarrito(Carrito carrito)
+                throws ReservaInvalidException;
 
         Page<Reserva> getReservasByUsuario(Long idUsuario,PageRequest pageRequest);
 
@@ -22,4 +24,10 @@ public interface ReservaService {
         Reserva confirmarReserva(Long idReserva)throws ReservaNotFoundException, ReservaInvalidException;
 
         Reserva rechazarReserva(Long idReserva)throws ReservaNotFoundException, ReservaInvalidException;
+
+        void validarSolapamiento(
+                Long idPublicacion,
+                LocalDate fechaInicio,
+                LocalDate fechaFin)
+                throws ReservaInvalidException;
 }

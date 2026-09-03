@@ -1,5 +1,6 @@
 package com.uade.tpo.marketplace.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.tpo.marketplace.Enum.EstadoPago;
+import com.uade.tpo.marketplace.Enum.EstadoReserva;
 import com.uade.tpo.marketplace.Enum.MetodoPago;
 import com.uade.tpo.marketplace.entity.Pago;
 import com.uade.tpo.marketplace.entity.Reserva;
@@ -18,17 +20,12 @@ import com.uade.tpo.marketplace.exceptions.PagoNotFoundException;
 import com.uade.tpo.marketplace.exceptions.ReservaInvalidException;
 import com.uade.tpo.marketplace.exceptions.ReservaNotFoundException;
 import com.uade.tpo.marketplace.repository.PagoRepository;
-import com.uade.tpo.marketplace.repository.ReservaRepository;
-import com.uade.tpo.marketplace.service.ReservaService;
 
 @Service
 public class PagoServiceImpl implements PagoService {
     
     @Autowired
     private PagoRepository pagoRepository;
-
-    @Autowired
-    private ReservaRepository reservaRepository;
 
     @Autowired
     private ReservaService reservaService;
@@ -61,8 +58,16 @@ public class PagoServiceImpl implements PagoService {
 
     @Override
     public Pago crearPago(Long idReserva, MetodoPago metodoPago)
-            throws ReservaNotFoundException, PagoDuplicateException {
-        Optional<Reserva> reservaOptional = reservaRepository.findById(idReserva);
+            throws ReservaNotFoundException,
+            PagoDuplicateException,
+            PagoInvalidException {
+
+        if (idReserva == null || metodoPago == null) {
+            throw new PagoInvalidException();
+        }
+
+        Optional<Reserva> reservaOptional =
+                reservaService.getReservaById(idReserva);
 
         if (reservaOptional.isEmpty()) {
             throw new ReservaNotFoundException();
@@ -77,13 +82,17 @@ public class PagoServiceImpl implements PagoService {
             throw new PagoDuplicateException();
         }
 
-        double monto = calcularMonto(reserva);
+        if (reserva.getEstado() != EstadoReserva.PENDIENTE) {
+            throw new PagoInvalidException();
+        }
+
+        BigDecimal monto = calcularMonto(reserva);
 
         Pago pago = new Pago();
 
         pago.setReserva(reserva);
         pago.setFecha(LocalDate.now());
-        pago.setMonto((float) monto);
+        pago.setMonto(monto);
         pago.setMetodo(metodoPago);
         pago.setEstado(EstadoPago.PENDIENTE);
 
@@ -127,10 +136,26 @@ public class PagoServiceImpl implements PagoService {
         return pagoRepository.save(pago);
     }
 
-    private double calcularMonto(Reserva reserva) {
-        long cantidadDias = ChronoUnit.DAYS.between(reserva.getFechaInicio(),reserva.getFechaFin());
+    private BigDecimal calcularMonto(Reserva reserva)
+            throws PagoInvalidException {
 
-        return cantidadDias * reserva.getPrecioDiaAplicado();
+        if (reserva.getFechaInicio() == null
+                || reserva.getFechaFin() == null
+                || reserva.getPrecioDiaAplicado() == null) {
+
+            throw new PagoInvalidException();
+        }
+
+        long cantidadDias = ChronoUnit.DAYS.between(
+                reserva.getFechaInicio(),
+                reserva.getFechaFin());
+
+        if (cantidadDias <= 0) {
+            throw new PagoInvalidException();
+        }
+
+        return reserva.getPrecioDiaAplicado()
+                .multiply(BigDecimal.valueOf(cantidadDias));
     }
 
 }

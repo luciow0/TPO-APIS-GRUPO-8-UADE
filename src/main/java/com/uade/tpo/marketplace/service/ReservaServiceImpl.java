@@ -1,6 +1,7 @@
 package com.uade.tpo.marketplace.service;
 
 import com.uade.tpo.marketplace.Enum.EstadoReserva;
+import com.uade.tpo.marketplace.entity.Carrito;
 import com.uade.tpo.marketplace.entity.Reserva;
 import com.uade.tpo.marketplace.exceptions.ReservaInvalidException;
 import com.uade.tpo.marketplace.exceptions.ReservaNotFoundException;
@@ -14,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,7 +73,8 @@ public class ReservaServiceImpl implements ReservaService {
         validarSolapamiento(
             reserva.getPublicacion().getIdPublicacion(),
             reserva.getFechaInicio(),
-            reserva.getFechaFin()
+            reserva.getFechaFin(),
+            reserva.getIdReserva()
         );
 
         reserva.setEstado(EstadoReserva.CONFIRMADA);
@@ -101,15 +105,53 @@ public class ReservaServiceImpl implements ReservaService {
     }
     
     @Override
-    public Reserva crearReserva(Long idUsuario, Long idPublicacion, LocalDate fechaInicio, LocalDate fechaFin) {
-        // TODO: buscar Usuario cuando exista UsuarioRepository
-        // TODO: buscar Publicacion cuando exista PublicacionRepository
-        // TODO: validar que la Publicacion esté activa
-        // TODO: validar que las fechas estén dentro de una Disponibilidad
-        // TODO: crear la Reserva con estado PENDIENTE
-        // TODO: guardar con reservaRepository.save()
+    public Reserva crearReservaDesdeCarrito(Carrito carrito)
+            throws ReservaInvalidException {
 
-        throw new UnsupportedOperationException("Crear reserva todavía no implementado");
+        if (carrito == null
+                || carrito.getUsuario() == null
+                || carrito.getPublicacion() == null
+                || carrito.getFechaInicio() == null
+                || carrito.getFechaFin() == null
+                || carrito.getFechaExpiracion() == null
+                || carrito.getPrecioDiaAplicado() == null) {
+
+            throw new ReservaInvalidException();
+        }
+
+        if (!carrito.getFechaExpiracion().isAfter(LocalDateTime.now())) {
+            throw new ReservaInvalidException();
+        }
+
+        boolean tieneReservaPendiente =
+                reservaRepository.existsByClienteIdUsuarioAndEstado(
+                        carrito.getUsuario().getIdUsuario(),
+                        EstadoReserva.PENDIENTE);
+
+        if (tieneReservaPendiente) {
+            throw new ReservaInvalidException();
+        }
+
+        validarFechas(
+                carrito.getFechaInicio(),
+                carrito.getFechaFin());
+
+        validarSolapamiento(
+                carrito.getPublicacion().getIdPublicacion(),
+                carrito.getFechaInicio(),
+                carrito.getFechaFin());
+
+        Reserva reserva = new Reserva();
+
+        reserva.setFechaInicio(carrito.getFechaInicio());
+        reserva.setFechaFin(carrito.getFechaFin());
+        reserva.setFechaCreacion(LocalDateTime.now());
+        reserva.setEstado(EstadoReserva.PENDIENTE);
+        reserva.setPrecioDiaAplicado(carrito.getPrecioDiaAplicado());
+        reserva.setCliente(carrito.getUsuario());
+        reserva.setPublicacion(carrito.getPublicacion());
+
+        return reservaRepository.save(reserva);
     }
 
     @Override
@@ -134,17 +176,47 @@ public class ReservaServiceImpl implements ReservaService {
         return ChronoUnit.DAYS.between(fechaInicio, fechaFin);
     }
 
-    private void validarSolapamiento(Long idPublicacion,LocalDate fechaInicio,LocalDate fechaFin) throws ReservaInvalidException {
+    @Override
+    public void validarSolapamiento(Long idPublicacion,LocalDate fechaInicio,LocalDate fechaFin) throws ReservaInvalidException {
 
-        List<Reserva> reservasConfirmadas =
+        validarSolapamiento(
+                idPublicacion,
+                fechaInicio,
+                fechaFin,
+                null);
+    }
+
+    private void validarSolapamiento(
+            Long idPublicacion,
+            LocalDate fechaInicio,
+            LocalDate fechaFin,
+            Long idReservaIgnorada)
+            throws ReservaInvalidException {
+
+        List<Reserva> reservasBloqueantes =
+            new ArrayList<>(
+                reservaRepository.findByPublicacionIdPublicacionAndEstado(
+                        idPublicacion,
+                        EstadoReserva.PENDIENTE
+                )
+            );
+
+        reservasBloqueantes.addAll(
             reservaRepository.findByPublicacionIdPublicacionAndEstado(
                     idPublicacion,
                     EstadoReserva.CONFIRMADA
-            );
+            )
+        );
 
         LocalDate finBloqueadoNuevaReserva = fechaFin.plusDays(1);
 
-        for (Reserva reservaExistente : reservasConfirmadas) {
+        for (Reserva reservaExistente : reservasBloqueantes) {
+
+            if (idReservaIgnorada != null
+                    && reservaExistente.getIdReserva()
+                            .equals(idReservaIgnorada)) {
+                continue;
+            }
 
             LocalDate finBloqueadoExistente =
                 reservaExistente.getFechaFin().plusDays(1);

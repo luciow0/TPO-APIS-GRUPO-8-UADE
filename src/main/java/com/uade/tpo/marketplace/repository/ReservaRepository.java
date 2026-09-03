@@ -14,5 +14,6 @@ import com.uade.tpo.marketplace.entity.Reserva;
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
         Page<Reserva> findByClienteIdUsuario(Long idUsuario, Pageable pageable);
         List<Reserva> findByPublicacionIdPublicacionAndEstado(Long idPublicacion,EstadoReserva estado);
+        boolean existsByClienteIdUsuarioAndEstado(Long idUsuario, EstadoReserva estado);
 
 }

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -19,14 +20,15 @@ public class Pago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idPago;
     private LocalDate fecha;
-    private float monto;
+    @Column(precision = 12, scale = 2)
+    private BigDecimal monto;
     @Enumerated(EnumType.STRING)
     private EstadoPago estado;
     @Enumerated(EnumType.STRING)
     private MetodoPago metodo;
 
     @OneToOne
-    @JoinColumn(name = "id_reserva")
+    @JoinColumn(name = "id_reserva", nullable = false, unique = true)
     private Reserva reserva;
 
 }

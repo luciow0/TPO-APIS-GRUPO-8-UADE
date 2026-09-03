@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -36,8 +37,8 @@ public class Reserva {
     private EstadoReserva estado;
 
 
-    @Column(name = "precio_dia_aplicado")
-    private Double precioDiaAplicado;
+    @Column(name = "precio_dia_aplicado", precision = 12, scale = 2)
+    private BigDecimal precioDiaAplicado;
 
    @ManyToOne
    @JoinColumn(name = "id_usuario")
