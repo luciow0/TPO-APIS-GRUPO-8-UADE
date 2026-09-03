@@ -5,3 +5,9 @@ spring.datasource.username=root
 
 spring.datasource.password=TU_PASSWORD_AQUI
 spring.jpa.hibernate.ddl-auto=update
+
+# JWT
+# La clave debe tener MIN 32 caracteres (256 bits) por usar HMAC-SHA256.
+jwt.secret-key=CAMBIAR_POR_UNA_CLAVE_DE_AL_MENOS_32_CARACTERES
+# Duracion del token en milisegundos (86400000 = 24 horas)
+jwt.expiration=86400000
