@@ -5,4 +5,5 @@ import java.util.List;
 
 public interface TipoVehiculoService {
     List<TipoVehiculo> getTiposVehiculo();
+    TipoVehiculo crearTipoVehiculo(TipoVehiculo tipoVehiculo);
 }

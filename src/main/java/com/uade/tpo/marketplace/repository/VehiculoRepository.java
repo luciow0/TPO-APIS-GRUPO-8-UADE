@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository; // Para marcar la clase como u
 
 import com.uade.tpo.marketplace.entity.Vehiculo; // Para importar la clase Vehiculo, que es la entidad que se va a manejar en este repositorio
 
-@Repository // Marca la interfacz como un repositorio de Spring
+@Repository
 public interface VehiculoRepository extends JpaRepository<Vehiculo, Long> { // Se define la interfaz que extiende jpaRepository
     Optional<Vehiculo> findByPatente(String patente); // Es un query method que busca un vehiculo por su pantente
     boolean existsByPatente(String patente); // Es un query method que verifica si existe un vehiculo con la patente dada
