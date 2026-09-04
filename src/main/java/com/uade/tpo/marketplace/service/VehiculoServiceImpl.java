@@ -11,19 +11,18 @@ import com.uade.tpo.marketplace.dto.VehiculoDTO;
 import com.uade.tpo.marketplace.entity.TipoVehiculo;
 import com.uade.tpo.marketplace.entity.Vehiculo;
 import com.uade.tpo.marketplace.exception.EntityNotFoundException;
-import com.uade.tpo.marketplace.repository.TipoVehiculoRepository;
 import com.uade.tpo.marketplace.repository.VehiculoRepository;
 
 @Service
 public class VehiculoServiceImpl implements VehiculoService {
 
     private final VehiculoRepository vehiculoRepository;
-    private final TipoVehiculoRepository tipoVehiculoRepository;
+    private final TipoVehiculoService tipoVehiculoService;
 
     public VehiculoServiceImpl(VehiculoRepository vehiculoRepository,
-            TipoVehiculoRepository tipoVehiculoRepository) {
+            TipoVehiculoService tipoVehiculoService) {
         this.vehiculoRepository = vehiculoRepository;
-        this.tipoVehiculoRepository = tipoVehiculoRepository;
+        this.tipoVehiculoService = tipoVehiculoService;
     }
 
     @Override
@@ -104,7 +103,7 @@ public class VehiculoServiceImpl implements VehiculoService {
         if (tipoVehiculo == null || tipoVehiculo.getIdTipoVehiculo() == null) {
             return null;
         }
-        return tipoVehiculoRepository.findById(tipoVehiculo.getIdTipoVehiculo())
+        return tipoVehiculoService.obtenerTipoVehiculoPorId(tipoVehiculo.getIdTipoVehiculo())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Tipo de vehiculo no encontrado con id: " + tipoVehiculo.getIdTipoVehiculo()));
     }

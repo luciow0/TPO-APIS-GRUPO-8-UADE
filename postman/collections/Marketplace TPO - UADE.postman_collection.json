@@ -63,7 +63,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"pepe\",\n  \"apellido\": \"gomez\",\n  \"email\": \"pepe@mail.com\",\n  \"password\": \"pepe1234\",\n  \"telefono\": \"1122334455\",\n  \"fechaNacimiento\": \"2000-05-10\"\n}",
+              "raw": "{\n  \"nombre\": \"Bautista\",\n  \"apellido\": \"Quesada\",\n  \"email\": \"bauti@test.com\",\n  \"password\": \"123456\",\n  \"telefono\": \"1122334455\",\n  \"fechaNacimiento\": \"2000-05-20\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -341,6 +341,32 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Crear tipo de Vehiculo",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"nombre\": \"SUV\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tipo-vehiculo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tipo-vehiculo"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -436,13 +462,26 @@
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"url\": \"https://misfotos.com/auto1.jpg\",\n  \"orden\": 1,\n  \"vehiculo\": { \"idVehiculo\": 1 }\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [
+                    "/Users/bautistaquesada/Downloads/autoPrueba.jpeg"
+                  ]
+                },
+                {
+                  "key": "idVehiculo",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "orden",
+                  "value": "1",
+                  "type": "text"
                 }
-              }
+              ]
             },
             "url": {
               "raw": "{{baseUrl}}/imagen-vehiculo",

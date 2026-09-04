@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 import com.uade.tpo.marketplace.entity.TipoVehiculo;
 import com.uade.tpo.marketplace.repository.TipoVehiculoRepository;
@@ -17,6 +18,12 @@ public class TipoVehiculoServiceImpl implements TipoVehiculoService {
     @Override
     public List<TipoVehiculo> getTiposVehiculo() {
         return tipoVehiculoRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<TipoVehiculo> obtenerTipoVehiculoPorId(Long idTipoVehiculo) {
+        return tipoVehiculoRepository.findById(idTipoVehiculo);
     }
 
     @Override
