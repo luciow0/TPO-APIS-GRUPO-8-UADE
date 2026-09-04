@@ -1,4 +1,7 @@
 package com.uade.tpo.marketplace.entity;
+
+import java.sql.Blob;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,7 +12,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,9 +30,9 @@ public class ImagenVehiculo {
     @Column(name = "id_imagen")
     private Long idImagen;
 
-    @NotBlank
-    @Column(nullable = false)
-    private String url;
+    // Imagen guardada como binario (Blob) en la BD
+    // Nunca se serializa directo: se devuelve en base64 vía ImagenVehiculoResponse.
+    private Blob imagen;
 
     @NotNull
     @Min(1)

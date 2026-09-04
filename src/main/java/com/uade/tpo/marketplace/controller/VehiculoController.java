@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.uade.tpo.marketplace.dto.VehiculoDTO;
 import com.uade.tpo.marketplace.entity.Vehiculo;
-import com.uade.tpo.marketplace.exception.EntityNotFoundException;
 import com.uade.tpo.marketplace.service.VehiculoService;
 
 import jakarta.validation.Valid;
@@ -25,15 +25,15 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("vehiculo")
 public class VehiculoController {
-    
+
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_SIZE = 10;
-    
+
     @Autowired
     private VehiculoService vehiculoService;
 
     @GetMapping
-    public ResponseEntity<Page<Vehiculo>> getVehiculos(
+    public ResponseEntity<Page<VehiculoDTO>> getVehiculos(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         int pageNum = page != null ? page : DEFAULT_PAGE;
@@ -43,7 +43,7 @@ public class VehiculoController {
     }
 
     @PostMapping
-    public ResponseEntity<Vehiculo> crearVehiculo(@Valid @RequestBody Vehiculo vehiculo) {
+    public ResponseEntity<VehiculoDTO> crearVehiculo(@Valid @RequestBody Vehiculo vehiculo) {
         // Validar que la patente no exista
         if (vehiculoService.existePatente(vehiculo.getPatente())) {
             throw new IllegalArgumentException("La patente " + vehiculo.getPatente() + " ya existe");
@@ -52,29 +52,23 @@ public class VehiculoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Vehiculo> actualizarVehiculo(@PathVariable Long id, @Valid @RequestBody Vehiculo vehiculo) {
+    public ResponseEntity<VehiculoDTO> actualizarVehiculo(@PathVariable Long id, @Valid @RequestBody Vehiculo vehiculo) {
         return ResponseEntity.ok(vehiculoService.actualizar(id, vehiculo));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarVehiculo(@PathVariable Long id) {
-        vehiculoService.buscarPorId(id)
-            .orElseThrow(() -> new EntityNotFoundException("Vehículo no encontrado con id: " + id));
         vehiculoService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Vehiculo> obtenerVehiculo(@PathVariable Long id) {
-        return vehiculoService.buscarPorId(id)
-            .map(ResponseEntity::ok)
-            .orElseThrow(() -> new EntityNotFoundException("Vehículo no encontrado con id: " + id));
+    public ResponseEntity<VehiculoDTO> obtenerVehiculo(@PathVariable Long id) {
+        return ResponseEntity.ok(vehiculoService.buscarPorId(id));
     }
 
     @GetMapping("/patente/{patente}")
-    public ResponseEntity<Vehiculo> buscarPorPatente(@PathVariable String patente) {
-        return vehiculoService.buscarPorPatente(patente)
-            .map(ResponseEntity::ok)
-            .orElseThrow(() -> new EntityNotFoundException("Vehículo con patente " + patente + " no encontrado"));
+    public ResponseEntity<VehiculoDTO> buscarPorPatente(@PathVariable String patente) {
+        return ResponseEntity.ok(vehiculoService.buscarPorPatente(patente));
     }
 }

@@ -38,7 +38,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                 validarRequest(request);
 
                 Vehiculo vehiculo = vehiculoService
-                                .buscarPorId(request.getIdVehiculo())
+                                .obtenerVehiculoPorId(request.getIdVehiculo())
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
                                                 "Vehiculo no encontrado"));
@@ -98,7 +98,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                 validarRequest(request);
 
                 Vehiculo vehiculo = vehiculoService
-                                .buscarPorId(request.getIdVehiculo())
+                                .obtenerVehiculoPorId(request.getIdVehiculo())
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
                                                 "Vehiculo no encontrado"));

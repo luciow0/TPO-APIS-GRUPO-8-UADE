@@ -1,20 +1,22 @@
 package com.uade.tpo.marketplace.service;
 
-import java.util.Optional; // Importación de la clase Optional para manejar valores que pueden ser nulos
+import java.util.Optional;
 
-import org.springframework.data.domain.Page; // Importación de la clase Page para manejar paginación de resultados
-import org.springframework.data.domain.Pageable; // Importación de la clase Pageable para manejar la información de paginación
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import com.uade.tpo.marketplace.dto.VehiculoDTO;
 import com.uade.tpo.marketplace.entity.Vehiculo;
 
 public interface VehiculoService {
 
-    public Page<Vehiculo> listar(Pageable pageable);
-    public Optional<Vehiculo> buscarPorId(Long id);
-    public Optional<Vehiculo> buscarPorPatente(String patente);
-    public Vehiculo guardar(Vehiculo vehiculo);
-    public Vehiculo actualizar(Long id, Vehiculo vehiculo);
+    public Page<VehiculoDTO> listar(Pageable pageable);
+    public VehiculoDTO buscarPorId(Long id);
+    public VehiculoDTO buscarPorPatente(String patente);
+    public VehiculoDTO guardar(Vehiculo vehiculo);
+    public VehiculoDTO actualizar(Long id, Vehiculo vehiculo);
     public void eliminar(Long id);
     public boolean existePatente(String patente);
 
+    public Optional<Vehiculo> obtenerVehiculoPorId(Long id);
 }
