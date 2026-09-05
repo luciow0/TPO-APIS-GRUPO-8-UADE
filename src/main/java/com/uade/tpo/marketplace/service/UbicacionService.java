@@ -12,5 +12,4 @@ public interface UbicacionService {
     Optional<Ubicacion> obtenerUbicacionPorId(Long id);
     Ubicacion updateUbicacion(Long id, UbicacionRequest req)
             throws UbicacionNotFoundException;
-    void eliminar(Long id);
 }

@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,9 +39,7 @@ public class ApplicationConfig {
                 .map(usuario -> User.builder()
                         .username(usuario.getEmail())
                         .password(usuario.getPassword())
-                        // TODO (roles - HACER): cuando el Usuario tenga rol, mapearlo aca.
-                        //   Ej: .authorities(new SimpleGrantedAuthority("ROLE_" + usuario.getRole().name()))
-                        .authorities(Collections.emptyList())
+                        .authorities(new SimpleGrantedAuthority("ROLE_" + usuario.getRole().name()))
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
     }

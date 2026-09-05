@@ -18,7 +18,7 @@ public class UbicacionController {
     @Autowired
     private UbicacionService ubicacionService;
 
-    @PostMapping   // PASO 2 del flujo: crea y devuelve el id
+    @PostMapping
     public ResponseEntity<Ubicacion> crear(@Valid @RequestBody UbicacionRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ubicacionService.crear(req));
     }

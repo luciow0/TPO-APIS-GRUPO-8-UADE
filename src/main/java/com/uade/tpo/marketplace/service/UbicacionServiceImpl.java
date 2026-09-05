@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.uade.tpo.marketplace.dto.UbicacionRequest;
 import com.uade.tpo.marketplace.exception.UbicacionNotFoundException;
-import com.uade.tpo.marketplace.repository.PublicacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
