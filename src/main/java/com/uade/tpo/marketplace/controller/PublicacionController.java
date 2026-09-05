@@ -211,4 +211,12 @@ public class PublicacionController {
                                 localidad,
                                 pageable));
     }
+
+    @GetMapping("/filtros/zona")
+    public ResponseEntity<Page<Publicacion>> obtenerPublicacionesPorZona(
+            @RequestParam String zona, Pageable pageable) {
+        return ResponseEntity.ok(
+                publicacionService.obtenerPublicacionesPorZona(zona, pageable));
+    }
+
 }

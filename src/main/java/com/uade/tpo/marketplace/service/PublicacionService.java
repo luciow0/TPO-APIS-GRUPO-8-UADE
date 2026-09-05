@@ -67,4 +67,6 @@ public interface PublicacionService {
                         String ciudad,
                         String localidad,
                         Pageable pageable);
+
+        Page<Publicacion> obtenerPublicacionesPorZona(String zona, Pageable pageable);
 }

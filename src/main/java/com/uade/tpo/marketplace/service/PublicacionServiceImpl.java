@@ -397,4 +397,15 @@ public class PublicacionServiceImpl implements PublicacionService {
                                         "La ubicacion es obligatoria");
                 }
         }
+
+        @Override
+        public Page<Publicacion> obtenerPublicacionesPorZona(String zona, Pageable pageable) {
+                if (zona == null || zona.isBlank()) {
+                        throw new IllegalArgumentException("La zona es obligatoria");
+                }
+                return publicacionRepository
+                        .findByUbicacion_LocalidadIgnoreCaseAndEstado(
+                                zona.trim(), EstadoPublicacion.ACTIVA, pageable);
+        }
+
 }
