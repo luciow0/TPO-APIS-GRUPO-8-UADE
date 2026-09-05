@@ -19,6 +19,7 @@ public class Ubicacion {
     @NotBlank private String ciudad;
     @NotBlank private String provincia;
     @NotBlank private String localidad;
+    @NotBlank private String zona;
     @NotBlank
     @Column(name = "codigo_postal")
     private String codigoPostal;

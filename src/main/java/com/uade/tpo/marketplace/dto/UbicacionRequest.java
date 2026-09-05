@@ -10,4 +10,5 @@ public class UbicacionRequest {
     @NotBlank private String provincia;
     @NotBlank private String localidad;
     @NotBlank private String codigoPostal;
+    @NotBlank private String zona;
 }

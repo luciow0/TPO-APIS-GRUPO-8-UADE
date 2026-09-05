@@ -49,8 +49,8 @@ public interface PublicacionRepository extends JpaRepository<Publicacion, Long> 
                         EstadoPublicacion estado,
                         Pageable pageable);
 
-        Page<Publicacion> findByUbicacion_LocalidadIgnoreCaseAndEstado(
-                String localidad,
+        Page<Publicacion> findByUbicacion_ZonaIgnoreCaseAndEstado(
+                String zona,
                 EstadoPublicacion estado,
                 Pageable pageable);
 

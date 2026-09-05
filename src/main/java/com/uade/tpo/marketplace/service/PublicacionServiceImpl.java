@@ -404,7 +404,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                         throw new IllegalArgumentException("La zona es obligatoria");
                 }
                 return publicacionRepository
-                        .findByUbicacion_LocalidadIgnoreCaseAndEstado(
+                        .findByUbicacion_ZonaIgnoreCaseAndEstado(
                                 zona.trim(), EstadoPublicacion.ACTIVA, pageable);
         }
 

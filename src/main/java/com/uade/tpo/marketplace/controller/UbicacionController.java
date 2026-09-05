@@ -41,9 +41,4 @@ public class UbicacionController {
         return ResponseEntity.ok(ubicacionService.updateUbicacion(id, req));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        ubicacionService.eliminar(id);
-        return ResponseEntity.noContent().build();
-    }
 }
