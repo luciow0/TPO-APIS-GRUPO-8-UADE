@@ -2,6 +2,7 @@ package com.uade.tpo.marketplace.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Getter
@@ -14,11 +15,11 @@ public class Ubicacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idUbicacion;
 
-    private String direccion;
-    private String ciudad;
-    private String provincia;
-    private String localidad;
-
+    @NotBlank private String direccion;
+    @NotBlank private String ciudad;
+    @NotBlank private String provincia;
+    @NotBlank private String localidad;
+    @NotBlank
     @Column(name = "codigo_postal")
     private String codigoPostal;
 
