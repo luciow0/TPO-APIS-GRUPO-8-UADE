@@ -57,7 +57,7 @@ public class ImagenVehiculoServiceImpl implements ImagenVehiculoService {
 
     @Transactional
     @Override
-    @PreAuthorize("@seguridadDominio.esDueñoDeVehiculo(authentication, #idVehiculo) or hasRole('ADMIN')")
+    @PreAuthorize("@seguridadDominio.esDuenioDeVehiculo(authentication, #idVehiculo) or hasRole('ADMIN')")
     public ImagenVehiculoResponse guardar(Long idVehiculo, Integer orden, MultipartFile file) {
         Vehiculo vehiculo = vehiculoRepository.findById(idVehiculo)
                 .orElseThrow(() -> new EntityNotFoundException("Vehiculo no encontrado con id: " + idVehiculo));
@@ -72,7 +72,7 @@ public class ImagenVehiculoServiceImpl implements ImagenVehiculoService {
 
     @Transactional
     @Override
-    @PreAuthorize("@seguridadDominio.esDueñoDeImagen(authentication, #id) or hasRole('ADMIN')")
+    @PreAuthorize("@seguridadDominio.esDuenioDeImagen(authentication, #id) or hasRole('ADMIN')")
     public ImagenVehiculoResponse actualizar(Long id, Integer orden, MultipartFile file) {
         ImagenVehiculo imagen = obtener(id);
 
@@ -89,7 +89,7 @@ public class ImagenVehiculoServiceImpl implements ImagenVehiculoService {
 
     @Transactional
     @Override
-    @PreAuthorize("@seguridadDominio.esDueñoDeImagen(authentication, #id) or hasRole('ADMIN')")
+    @PreAuthorize("@seguridadDominio.esDuenioDeImagen(authentication, #id) or hasRole('ADMIN')")
     public void eliminar(Long id) {
         if (!imagenVehiculoRepository.existsById(id)) {
             throw new EntityNotFoundException("Imagen de vehiculo no encontrada con id: " + id);

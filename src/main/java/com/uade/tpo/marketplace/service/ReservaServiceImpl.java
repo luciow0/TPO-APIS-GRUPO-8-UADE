@@ -28,7 +28,7 @@ public class ReservaServiceImpl implements ReservaService {
     @Autowired
     private ReservaRepository reservaRepository;
 
-    @PreAuthorize("@seguridadDominio.esDueñoDeReserva(authentication, #idReserva)")
+    @PreAuthorize("@seguridadDominio.esDuenioDeReserva(authentication, #idReserva)")
     @Override
     public Reserva cancelarReserva(Long idReserva, Long idUsuario)throws ReservaNotFoundException, ReservaInvalidException {
         Optional<Reserva> reservaOptional = reservaRepository.findById(idReserva);
@@ -157,7 +157,7 @@ public class ReservaServiceImpl implements ReservaService {
     }
 
     @Override
-    @PreAuthorize("@seguridadDominio.esDueñoDeReserva(authentication, #idReserva) or hasRole('ADMIN')")
+    @PreAuthorize("@seguridadDominio.esDuenioDeReserva(authentication, #idReserva) or hasRole('ADMIN')")
     public Optional<Reserva> getReservaById(Long idReserva) {
         return reservaRepository.findById(idReserva);
     }

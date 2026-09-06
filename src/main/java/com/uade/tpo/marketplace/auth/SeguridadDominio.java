@@ -26,43 +26,43 @@ public class SeguridadDominio {
         return usuario.getEmail().equals(auth.getName());
     }
 
-    public boolean esDueñoDeCarrito(Authentication auth, Long idCarrito) throws CarritoNotFoundException {
+    public boolean esDuenioDeCarrito(Authentication auth, Long idCarrito) throws CarritoNotFoundException {
         Carrito carrito = carritoRepository.findById(idCarrito)
                 .orElseThrow(CarritoNotFoundException::new);
         return carrito.getUsuario().getEmail().equals(auth.getName());
     }
 
-    public boolean esDueñoDeReserva(Authentication auth, Long idReserva) throws ReservaNotFoundException {
+    public boolean esDuenioDeReserva(Authentication auth, Long idReserva) throws ReservaNotFoundException {
         Reserva reserva = reservaRepository.findById(idReserva)
                 .orElseThrow(ReservaNotFoundException::new);
         return reserva.getCliente().getEmail().equals(auth.getName());
     }
 
-    public boolean esDueñoDePublicacion(Authentication auth, Long idPublicacion) throws PublicacionNotFoundException {
+    public boolean esDuenioDePublicacion(Authentication auth, Long idPublicacion) throws PublicacionNotFoundException {
         Publicacion publicacion = publicacionRepository.findById(idPublicacion)
                 .orElseThrow(PublicacionNotFoundException::new);
         return publicacion.getVehiculo().getPropietario().getEmail().equals(auth.getName());
     }
 
-    public boolean esDueñoDeVehiculo(Authentication auth, Long idVehiculo) {
+    public boolean esDuenioDeVehiculo(Authentication auth, Long idVehiculo) {
         Vehiculo vehiculo = vehiculoRepository.findById(idVehiculo)
                 .orElseThrow(() -> new EntityNotFoundException("Vehículo no encontrado con id: " + idVehiculo));
         return vehiculo.getPropietario().getEmail().equals(auth.getName());
     }
 
-    public boolean esDueñoDePago(Authentication auth, Long idPago) throws PagoNotFoundException {
+    public boolean esDuenioDePago(Authentication auth, Long idPago) throws PagoNotFoundException {
         Pago pago = pagoRepository.findById(idPago)
                 .orElseThrow(PagoNotFoundException::new);
         return pago.getReserva().getCliente().getEmail().equals(auth.getName());
     }
 
-    public boolean esDueñoDeDisponibilidad(Authentication auth, Long idDisponibilidad) throws DisponibilidadNotFoundException {
+    public boolean esDuenioDeDisponibilidad(Authentication auth, Long idDisponibilidad) throws DisponibilidadNotFoundException {
         Disponibilidad disp = disponibilidadRepository.findById(idDisponibilidad)
                 .orElseThrow(DisponibilidadNotFoundException::new);
         return disp.getPublicacion().getVehiculo().getPropietario().getEmail().equals(auth.getName());
     }
 
-    public boolean esDueñoDeImagen(Authentication auth, Long idImagen) {
+    public boolean esDuenioDeImagen(Authentication auth, Long idImagen) {
         ImagenVehiculo img = imagenVehiculoRepository.findById(idImagen)
                 .orElseThrow(() -> new EntityNotFoundException("Imagen no encontrada con id: " + idImagen));
         return img.getVehiculo().getPropietario().getEmail().equals(auth.getName());

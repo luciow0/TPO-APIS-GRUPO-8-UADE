@@ -32,7 +32,7 @@ public class PublicacionServiceImpl implements PublicacionService {
         @Autowired
         private UbicacionService ubicacionService;
 
-        @PreAuthorize("@seguridadDominio.esDueñoDeVehiculo(authentication, #request.idVehiculo) or hasRole('ADMIN')")
+        @PreAuthorize("@seguridadDominio.esDuenioDeVehiculo(authentication, #request.idVehiculo) or hasRole('ADMIN')")
         @Override
         public Publicacion crearPublicacion(PublicacionRequest request)
                         throws PublicacionDuplicateException {
@@ -88,8 +88,8 @@ public class PublicacionServiceImpl implements PublicacionService {
         }
 
         @PreAuthorize(
-        "(@seguridadDominio.esDueñoDePublicacion(authentication, #id) " +
-        "and @seguridadDominio.esDueñoDeVehiculo(authentication, #request.idVehiculo)) " +
+        "(@seguridadDominio.esDuenioDePublicacion(authentication, #id) " +
+        "and @seguridadDominio.esDuenioDeVehiculo(authentication, #request.idVehiculo)) " +
         "or hasRole('ADMIN')"
 )
         @Override
@@ -143,7 +143,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                 return publicacionRepository.save(publicacion);
         }
 
-        @PreAuthorize("@seguridadDominio.esDueñoDePublicacion(authentication, #id) or hasRole('ADMIN')")
+        @PreAuthorize("@seguridadDominio.esDuenioDePublicacion(authentication, #id) or hasRole('ADMIN')")
         @Override
         public void eliminarPublicacion(Long id)
                         throws PublicacionNotFoundException {
@@ -156,7 +156,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                 publicacionRepository.save(publicacion);
         }
 
-        @PreAuthorize("@seguridadDominio.esDueñoDePublicacion(authentication, #id) or hasRole('ADMIN')")
+        @PreAuthorize("@seguridadDominio.esDuenioDePublicacion(authentication, #id) or hasRole('ADMIN')")
         @Override
         public Publicacion pausarPublicacion(Long id)
                         throws PublicacionNotFoundException {
@@ -176,7 +176,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                 return publicacionRepository.save(publicacion);
         }
 
-        @PreAuthorize("@seguridadDominio.esDueñoDePublicacion(authentication, #id) or hasRole('ADMIN')")
+        @PreAuthorize("@seguridadDominio.esDuenioDePublicacion(authentication, #id) or hasRole('ADMIN')")
         @Override
         public Publicacion reactivarPublicacion(Long id)
                         throws PublicacionNotFoundException {

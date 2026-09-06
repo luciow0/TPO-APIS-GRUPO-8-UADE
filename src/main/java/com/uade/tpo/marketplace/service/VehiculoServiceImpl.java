@@ -60,7 +60,7 @@ public class VehiculoServiceImpl implements VehiculoService {
         return convertirADTO(vehiculoRepository.save(vehiculo));
     }
 
-    @PreAuthorize("@seguridadDominio.esDueñoDeVehiculo(authentication, #id) or hasRole('ADMIN')")
+    @PreAuthorize("@seguridadDominio.esDuenioDeVehiculo(authentication, #id) or hasRole('ADMIN')")
     @Override
     @Transactional
     public VehiculoDTO actualizar(Long id, Vehiculo vehiculo) {
@@ -79,7 +79,7 @@ public class VehiculoServiceImpl implements VehiculoService {
 
     @Override
     @Transactional
-    @PreAuthorize("@seguridadDominio.esDueñoDeVehiculo(authentication, #id) or hasRole('ADMIN')")
+    @PreAuthorize("@seguridadDominio.esDuenioDeVehiculo(authentication, #id) or hasRole('ADMIN')")
     public void eliminar(Long id) {
         vehiculoRepository.delete(obtenerVehiculo(id));
     }

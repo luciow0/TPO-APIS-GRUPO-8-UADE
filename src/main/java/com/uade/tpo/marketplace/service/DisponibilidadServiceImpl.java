@@ -26,7 +26,7 @@ public class DisponibilidadServiceImpl implements DisponibilidadService {
     private PublicacionService publicacionService;
 
     @Override
-    @PreAuthorize("@seguridadDominio.esDueñoDePublicacion(authentication, #request.idPublicacion) or hasRole('ADMIN')")
+    @PreAuthorize("@seguridadDominio.esDuenioDePublicacion(authentication, #request.idPublicacion) or hasRole('ADMIN')")
     public Disponibilidad crearDisponibilidad(DisponibilidadRequest request)
             throws PublicacionNotFoundException {
 
@@ -69,7 +69,7 @@ public class DisponibilidadServiceImpl implements DisponibilidadService {
     }
 
     @Override
-    @PreAuthorize("@seguridadDominio.esDueñoDeDisponibilidad(authentication, #id) and @seguridadDominio.esDueñoDePublicacion(authentication, #request.idPublicacion) or hasRole('ADMIN')")
+    @PreAuthorize("@seguridadDominio.esDuenioDeDisponibilidad(authentication, #id) and @seguridadDominio.esDuenioDePublicacion(authentication, #request.idPublicacion) or hasRole('ADMIN')")
     public Disponibilidad modificarDisponibilidad(
             Long id,
             DisponibilidadRequest request)
@@ -99,7 +99,7 @@ public class DisponibilidadServiceImpl implements DisponibilidadService {
     }
 
     @Override
-    @PreAuthorize("@seguridadDominio.esDueñoDeDisponibilidad(authentication, #id) or hasRole('ADMIN')")
+    @PreAuthorize("@seguridadDominio.esDuenioDeDisponibilidad(authentication, #id) or hasRole('ADMIN')")
     public void eliminarDisponibilidad(Long id)
             throws DisponibilidadNotFoundException {
 

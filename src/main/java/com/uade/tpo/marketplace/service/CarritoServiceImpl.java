@@ -118,7 +118,7 @@ public class CarritoServiceImpl implements CarritoService {
         return Optional.of(carrito);
     }
 
-    @PreAuthorize("@seguridadDominio.esDueñoDeCarrito(authentication, #idCarrito) and @seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
+    @PreAuthorize("@seguridadDominio.esDuenioDeCarrito(authentication, #idCarrito) and @seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
     @Override
     public Carrito modificarFechas(
             Long idCarrito,
@@ -180,7 +180,7 @@ public class CarritoServiceImpl implements CarritoService {
         return carritoRepository.save(carrito);
     }
 
-    @PreAuthorize("@seguridadDominio.esDueñoDeCarrito(authentication, #idCarrito) and @seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
+    @PreAuthorize("@seguridadDominio.esDuenioDeCarrito(authentication, #idCarrito) and @seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
     @Override
     public void eliminarCarrito(Long idCarrito, Long idUsuario) throws CarritoNotFoundException {
 
@@ -194,7 +194,7 @@ public class CarritoServiceImpl implements CarritoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @PreAuthorize("@seguridadDominio.esDueñoDeCarrito(authentication, #idCarrito) and @seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
+    @PreAuthorize("@seguridadDominio.esDuenioDeCarrito(authentication, #idCarrito) and @seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
     public Reserva continuarReserva(Long idCarrito, Long idUsuario)
             throws CarritoNotFoundException,
             CarritoInvalidException,
