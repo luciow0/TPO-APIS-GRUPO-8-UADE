@@ -6,6 +6,10 @@ spring.datasource.username=root
 spring.datasource.password=TU_PASSWORD_AQUI
 spring.jpa.hibernate.ddl-auto=update
 
+# Subida de archivos (imagenes de vehiculo). El default de Spring es 1MB.
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+
 # JWT
 # La clave debe tener MIN 32 caracteres (256 bits) por usar HMAC-SHA256.
 jwt.secret-key=CAMBIAR_POR_UNA_CLAVE_DE_AL_MENOS_32_CARACTERES
