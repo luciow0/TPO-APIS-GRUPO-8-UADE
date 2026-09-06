@@ -8,7 +8,83 @@
   },
   "item": [
     {
-      "name": "Usuario",
+      "name": "Seguridad",
+      "item": [
+        {
+          "name": "Register (USER)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombre\": \"Juan\",\n    \"apellido\": \"Perez\",\n    \"email\": \"juan@example.com\",\n    \"password\": \"12345678\",\n    \"telefono\": \"1122334455\",\n    \"fechaNacimiento\": \"1990-05-20\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan@example.com\",\n    \"password\": \"12345678\"\n\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Registro y login. El login/registro devuelven un JWT que el script de test guarda en la variable de coleccion {{token}}, usada por el Bearer de toda la coleccion. El registro siempre crea rol USER; para ADMIN, cambiar el rol en la BD."
+    },
+    {
+      "name": "Usuario (ADMIN)",
       "item": [
         {
           "name": "Listar usuarios",
@@ -44,39 +120,8 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": ""
                 }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Crear usuario",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Bautista\",\n  \"apellido\": \"Quesada\",\n  \"email\": \"bauti@test.com\",\n  \"password\": \"123456\",\n  \"telefono\": \"1122334455\",\n  \"fechaNacimiento\": \"2000-05-20\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/usuarios",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "usuarios"
               ]
             }
           },
@@ -102,19 +147,13 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/usuarios/:id",
+              "raw": "{{baseUrl}}/usuarios/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "usuarios",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -126,25 +165,123 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/usuarios/:id",
+              "raw": "{{baseUrl}}/usuarios/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "usuarios",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
           "response": []
         }
       ]
+    },
+    {
+      "name": "Ubicacion",
+      "item": [
+        {
+          "name": "Crear ubicacion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"direccion\": \"Av. Siempre Viva 742\",\n    \"ciudad\": \"Cordoba\",\n    \"provincia\": \"Cordoba\",\n    \"localidad\": \"Centro\",\n    \"codigoPostal\": \"1423\",\n    \"zona\": \"centro\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ubicaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ubicaciones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar ubicaciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ubicaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ubicaciones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar ubicacion por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ubicaciones/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ubicaciones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar ubicacion",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"direccion\": \"Av. Siempre Viva 742 actualizada\",\n    \"ciudad\": \"La Plata\",\n    \"provincia\": \"Buenos Aires\",\n    \"localidad\": \"Centro\",\n    \"codigoPostal\": \"1900\",\n    \"zona\": \"Sur\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ubicaciones/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ubicaciones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD de ubicaciones. Crear/listar/obtener requieren usuario autenticado; actualizar requiere rol ADMIN."
     },
     {
       "name": "Vehiculo",
@@ -155,7 +292,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/vehiculo",
+              "raw": "{{baseUrl}}/vehiculo?page=0&size=10",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -165,13 +302,11 @@
               "query": [
                 {
                   "key": "page",
-                  "value": "0",
-                  "disabled": true
+                  "value": "0"
                 },
                 {
                   "key": "size",
-                  "value": "10",
-                  "disabled": true
+                  "value": "10"
                 }
               ]
             }
@@ -184,19 +319,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/vehiculo/:id",
+              "raw": "{{baseUrl}}/vehiculo/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "vehiculo",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -208,20 +337,14 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/vehiculo/patente/:patente",
+              "raw": "{{baseUrl}}/vehiculo/patente/AB123C",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "vehiculo",
                 "patente",
-                ":patente"
-              ],
-              "variable": [
-                {
-                  "key": "patente",
-                  "value": "AB123C"
-                }
+                "AB123C"
               ]
             }
           },
@@ -239,7 +362,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"patente\": \"AB123C\",\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"anio\": 2020,\n  \"color\": \"Negro\",\n  \"cantidadAsientos\": 5,\n  \"propietario\": { \"idUsuario\": 1 },\n  \"tipoVehiculo\": { \"idTipoVehiculo\": 1 }\n}",
+              "raw": "{\n  \"patente\": \"XY456Z\", \n  \"marca\": \"Ford\", \n  \"modelo\": \"Territory\",\n  \"anio\": 2022, \n  \"color\": \"Blanco\", \n  \"cantidadAsientos\": 5,\n  \"propietario\": { \"idUsuario\": 2 },\n  \"tipoVehiculo\": { \"idTipoVehiculo\": 1 }\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -278,19 +401,13 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/vehiculo/:id",
+              "raw": "{{baseUrl}}/vehiculo/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "vehiculo",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -302,19 +419,13 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/vehiculo/:id",
+              "raw": "{{baseUrl}}/vehiculo/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "vehiculo",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -330,6 +441,15 @@
           "request": {
             "method": "GET",
             "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/tipo-vehiculo",
               "host": [
@@ -343,7 +463,7 @@
           "response": []
         },
         {
-          "name": "Crear tipo de Vehiculo",
+          "name": "Crear tipo de Vehiculo(ADMIN)",
           "request": {
             "method": "POST",
             "header": [],
@@ -379,7 +499,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/imagen-vehiculo",
+              "raw": "{{baseUrl}}/imagen-vehiculo?page=0&size=10",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -389,13 +509,11 @@
               "query": [
                 {
                   "key": "page",
-                  "value": "0",
-                  "disabled": true
+                  "value": "0"
                 },
                 {
                   "key": "size",
-                  "value": "10",
-                  "disabled": true
+                  "value": "10"
                 }
               ]
             }
@@ -408,19 +526,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/imagen-vehiculo/:id",
+              "raw": "{{baseUrl}}/imagen-vehiculo/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "imagen-vehiculo",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -432,20 +544,14 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/imagen-vehiculo/por-vehiculo/:idVehiculo",
+              "raw": "{{baseUrl}}/imagen-vehiculo/por-vehiculo/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "imagen-vehiculo",
                 "por-vehiculo",
-                ":idVehiculo"
-              ],
-              "variable": [
-                {
-                  "key": "idVehiculo",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -458,7 +564,8 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/json",
+                "disabled": true
               }
             ],
             "body": {
@@ -473,7 +580,7 @@
                 },
                 {
                   "key": "idVehiculo",
-                  "value": "1",
+                  "value": "4",
                   "type": "text"
                 },
                 {
@@ -515,19 +622,13 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/imagen-vehiculo/:id",
+              "raw": "{{baseUrl}}/imagen-vehiculo/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "imagen-vehiculo",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -539,19 +640,13 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/imagen-vehiculo/:id",
+              "raw": "{{baseUrl}}/imagen-vehiculo/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "imagen-vehiculo",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -585,19 +680,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/publicaciones/:id",
+              "raw": "{{baseUrl}}/publicaciones/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "publicaciones",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -615,7 +704,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"precioDia\": 15000.00,\n  \"descuentoPorcentaje\": 10.0,\n  \"descripcion\": \"Auto en excelente estado\",\n  \"horaRetiroDevolucion\": \"10:00:00\",\n  \"idVehiculo\": 1,\n  \"idUbicacion\": 1\n}",
+              "raw": "{\n  \"precioDia\": 15000.00,\n  \"descuentoPorcentaje\": 10.0,\n  \"descripcion\": \"Auto en excelente estado\",\n  \"horaRetiroDevolucion\": \"10:00:00\",\n  \"idVehiculo\": 2,\n  \"idUbicacion\": 2\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -654,19 +743,13 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/publicaciones/:id",
+              "raw": "{{baseUrl}}/publicaciones/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "publicaciones",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -678,19 +761,13 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/publicaciones/:id",
+              "raw": "{{baseUrl}}/publicaciones/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "publicaciones",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -702,20 +779,14 @@
             "method": "PUT",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/publicaciones/:id/pausar",
+              "raw": "{{baseUrl}}/publicaciones/1/pausar",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "publicaciones",
-                ":id",
+                "1",
                 "pausar"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
               ]
             }
           },
@@ -727,20 +798,14 @@
             "method": "PUT",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/publicaciones/:id/reactivar",
+              "raw": "{{baseUrl}}/publicaciones/1/reactivar",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "publicaciones",
-                ":id",
+                "1",
                 "reactivar"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
               ]
             }
           },
@@ -764,8 +829,7 @@
               "query": [
                 {
                   "key": "estado",
-                  "value": "ACTIVA",
-                  "description": "ACTIVA | PAUSADA | DESACTIVADA"
+                  "value": "ACTIVA"
                 }
               ]
             }
@@ -882,7 +946,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/publicaciones/filtros/provincia?provincia=Buenos Aires",
+              "raw": "{{baseUrl}}/publicaciones/filtros/provincia?provincia=Cordoba&page=0&size=10",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -894,17 +958,15 @@
               "query": [
                 {
                   "key": "provincia",
-                  "value": "Buenos Aires"
+                  "value": "Cordoba"
                 },
                 {
                   "key": "page",
-                  "value": "0",
-                  "disabled": true
+                  "value": "0"
                 },
                 {
                   "key": "size",
-                  "value": "10",
-                  "disabled": true
+                  "value": "10"
                 }
               ]
             }
@@ -917,7 +979,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/publicaciones/filtros/provincia-ciudad?provincia=Buenos Aires&ciudad=La Plata",
+              "raw": "{{baseUrl}}/publicaciones/filtros/provincia-ciudad?provincia=Cordoba&ciudad=Cordoba&page=0&size=10",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -929,21 +991,19 @@
               "query": [
                 {
                   "key": "provincia",
-                  "value": "Buenos Aires"
+                  "value": "Cordoba"
                 },
                 {
                   "key": "ciudad",
-                  "value": "La Plata"
+                  "value": "Cordoba"
                 },
                 {
                   "key": "page",
-                  "value": "0",
-                  "disabled": true
+                  "value": "0"
                 },
                 {
                   "key": "size",
-                  "value": "10",
-                  "disabled": true
+                  "value": "10"
                 }
               ]
             }
@@ -956,7 +1016,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/publicaciones/filtros/provincia-ciudad-localidad?provincia=Buenos Aires&ciudad=La Plata&localidad=Centro",
+              "raw": "{{baseUrl}}/publicaciones/filtros/provincia-ciudad-localidad?provincia=Cordoba&ciudad=Cordoba&localidad=Centro&page=0&size=10",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -968,11 +1028,11 @@
               "query": [
                 {
                   "key": "provincia",
-                  "value": "Buenos Aires"
+                  "value": "Cordoba"
                 },
                 {
                   "key": "ciudad",
-                  "value": "La Plata"
+                  "value": "Cordoba"
                 },
                 {
                   "key": "localidad",
@@ -980,13 +1040,11 @@
                 },
                 {
                   "key": "page",
-                  "value": "0",
-                  "disabled": true
+                  "value": "0"
                 },
                 {
                   "key": "size",
-                  "value": "10",
-                  "disabled": true
+                  "value": "10"
                 }
               ]
             }
@@ -1021,19 +1079,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/disponibilidades/:id",
+              "raw": "{{baseUrl}}/disponibilidades/2",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "disponibilidades",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "2"
               ]
             }
           },
@@ -1045,20 +1097,14 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/disponibilidades/publicacion/:idPublicacion",
+              "raw": "{{baseUrl}}/disponibilidades/publicacion/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "disponibilidades",
                 "publicacion",
-                ":idPublicacion"
-              ],
-              "variable": [
-                {
-                  "key": "idPublicacion",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -1076,7 +1122,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fechaInicio\": \"2026-06-01\",\n  \"fechaFin\": \"2026-06-30\",\n  \"idPublicacion\": 1\n}",
+              "raw": "{\n  \"fechaInicio\": \"2026-09-06\",\n  \"fechaFin\": \"2026-09-30\",\n  \"idPublicacion\": 1\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1115,19 +1161,13 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/disponibilidades/:id",
+              "raw": "{{baseUrl}}/disponibilidades/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "disponibilidades",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -1139,19 +1179,13 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/disponibilidades/:id",
+              "raw": "{{baseUrl}}/disponibilidades/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "disponibilidades",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -1174,7 +1208,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"idUsuario\": 1,\n  \"idPublicacion\": 1,\n  \"fechaInicio\": \"2026-06-05\",\n  \"fechaFin\": \"2026-06-10\"\n}",
+              "raw": "{\n  \"idUsuario\": 4,\n  \"idPublicacion\": 1,\n  \"fechaInicio\": \"2026-09-06\",\n  \"fechaFin\": \"2026-09-30\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1199,20 +1233,14 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/carritos/usuario/:idUsuario",
+              "raw": "{{baseUrl}}/carritos/usuario/4",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "carritos",
                 "usuario",
-                ":idUsuario"
-              ],
-              "variable": [
-                {
-                  "key": "idUsuario",
-                  "value": "1"
-                }
+                "4"
               ]
             }
           },
@@ -1238,20 +1266,14 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/carritos/:idCarrito/fechas",
+              "raw": "{{baseUrl}}/carritos/1/fechas",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "carritos",
-                ":idCarrito",
+                "1",
                 "fechas"
-              ],
-              "variable": [
-                {
-                  "key": "idCarrito",
-                  "value": "1"
-                }
               ]
             }
           },
@@ -1263,23 +1285,17 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/carritos/:idCarrito?idUsuario=1",
+              "raw": "{{baseUrl}}/carritos/1?idUsuario=1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "carritos",
-                ":idCarrito"
+                "1"
               ],
               "query": [
                 {
                   "key": "idUsuario",
-                  "value": "1"
-                }
-              ],
-              "variable": [
-                {
-                  "key": "idCarrito",
                   "value": "1"
                 }
               ]
@@ -1293,25 +1309,19 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/carritos/:idCarrito/continuar?idUsuario=1",
+              "raw": "{{baseUrl}}/carritos/3/continuar?idUsuario=4",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "carritos",
-                ":idCarrito",
+                "3",
                 "continuar"
               ],
               "query": [
                 {
                   "key": "idUsuario",
-                  "value": "1"
-                }
-              ],
-              "variable": [
-                {
-                  "key": "idCarrito",
-                  "value": "1"
+                  "value": "4"
                 }
               ]
             }
@@ -1329,19 +1339,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/reservas/:idReserva",
+              "raw": "{{baseUrl}}/reservas/2",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "reservas",
-                ":idReserva"
-              ],
-              "variable": [
-                {
-                  "key": "idReserva",
-                  "value": "1"
-                }
+                "2"
               ]
             }
           },
@@ -1353,31 +1357,23 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/reservas/usuario/:idUsuario",
+              "raw": "{{baseUrl}}/reservas/usuario/1?page=0&size=10",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "reservas",
                 "usuario",
-                ":idUsuario"
+                "1"
               ],
               "query": [
                 {
                   "key": "page",
-                  "value": "0",
-                  "disabled": true
+                  "value": "0"
                 },
                 {
                   "key": "size",
-                  "value": "10",
-                  "disabled": true
-                }
-              ],
-              "variable": [
-                {
-                  "key": "idUsuario",
-                  "value": "1"
+                  "value": "10"
                 }
               ]
             }
@@ -1390,24 +1386,18 @@
             "method": "PUT",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/reservas/:idReserva/cancelar?idUsuario=1",
+              "raw": "{{baseUrl}}/reservas/1/cancelar?idUsuario=1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "reservas",
-                ":idReserva",
+                "1",
                 "cancelar"
               ],
               "query": [
                 {
                   "key": "idUsuario",
-                  "value": "1"
-                }
-              ],
-              "variable": [
-                {
-                  "key": "idReserva",
                   "value": "1"
                 }
               ]
@@ -1426,19 +1416,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/pagos/:idPago",
+              "raw": "{{baseUrl}}/pagos/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "pagos",
-                ":idPago"
-              ],
-              "variable": [
-                {
-                  "key": "idPago",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -1450,20 +1434,14 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/pagos/reserva/:idReserva",
+              "raw": "{{baseUrl}}/pagos/reserva/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "pagos",
                 "reserva",
-                ":idReserva"
-              ],
-              "variable": [
-                {
-                  "key": "idReserva",
-                  "value": "1"
-                }
+                "1"
               ]
             }
           },
@@ -1481,7 +1459,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"idReserva\": 1,\n  \"metodoPago\": \"MERCADO_PAGO\"\n}",
+              "raw": "{\n  \"idReserva\": 2,\n  \"metodoPago\": \"MERCADO_PAGO\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1506,20 +1484,14 @@
             "method": "PUT",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/pagos/:idPago/aprobar",
+              "raw": "{{baseUrl}}/pagos/1/aprobar",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "pagos",
-                ":idPago",
+                "1",
                 "aprobar"
-              ],
-              "variable": [
-                {
-                  "key": "idPago",
-                  "value": "1"
-                }
               ]
             }
           },
@@ -1531,20 +1503,14 @@
             "method": "PUT",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/pagos/:idPago/rechazar",
+              "raw": "{{baseUrl}}/pagos/1/rechazar",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "pagos",
-                ":idPago",
+                "1",
                 "rechazar"
-              ],
-              "variable": [
-                {
-                  "key": "idPago",
-                  "value": "1"
-                }
               ]
             }
           },
