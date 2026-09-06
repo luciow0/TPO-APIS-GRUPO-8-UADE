@@ -400,9 +400,8 @@ public class PublicacionServiceImpl implements PublicacionService {
 
         @Override
         public Page<Publicacion> obtenerPublicacionesPorZona(String zona, Pageable pageable) {
-                if (zona == null || zona.isBlank()) {
-                        throw new IllegalArgumentException("La zona es obligatoria");
-                }
+                validarTextoFiltro(zona, "La zona es obligatoria");
+
                 return publicacionRepository
                         .findByUbicacion_ZonaIgnoreCaseAndEstado(
                                 zona.trim(), EstadoPublicacion.ACTIVA, pageable);

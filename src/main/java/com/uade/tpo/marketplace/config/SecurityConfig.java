@@ -44,8 +44,15 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/publicaciones/**", "/vehiculos/**", "/tipos-vehiculo/**").permitAll()
-                        .requestMatchers("/tipos-vehiculo/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/publicaciones/**",
+                                "/vehiculo",
+                                "/vehiculo/**",
+                                "/tipo-vehiculo",
+                                "/tipo-vehiculo/**")
+                        .permitAll()
+                        .requestMatchers("/tipo-vehiculo", "/tipo-vehiculo/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/usuarios").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/usuarios/**").hasRole("ADMIN")
                         .anyRequest().authenticated()

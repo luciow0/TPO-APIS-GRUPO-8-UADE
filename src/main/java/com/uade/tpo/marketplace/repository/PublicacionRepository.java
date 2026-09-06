@@ -53,7 +53,4 @@ public interface PublicacionRepository extends JpaRepository<Publicacion, Long> 
                 String zona,
                 EstadoPublicacion estado,
                 Pageable pageable);
-
-
-        boolean existsByUbicacion_IdUbicacion(Long id);
 }
