@@ -1,5 +1,7 @@
 package com.uade.tpo.marketplace.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -91,7 +93,8 @@ public class CarritoServiceImpl implements CarritoService {
         carrito.setFechaFin(request.getFechaFin());
         carrito.setFechaCreacion(fechaCreacion);
         carrito.setFechaExpiracion(fechaCreacion.plusMinutes(15));
-        carrito.setPrecioDiaAplicado(publicacion.getPrecioDia());
+        carrito.setPrecioDiaAplicado(
+                calcularPrecioDiaConDescuento(publicacion));
 
         return carritoRepository.save(carrito);
     }
@@ -405,5 +408,25 @@ public class CarritoServiceImpl implements CarritoService {
         validarFechas(
                 request.getFechaInicio(),
                 request.getFechaFin());
+    }
+
+    private BigDecimal calcularPrecioDiaConDescuento(
+            Publicacion publicacion) {
+
+        BigDecimal porcentaje =
+                publicacion.getDescuentoPorcentaje();
+
+        if (porcentaje == null) {
+            porcentaje = BigDecimal.ZERO;
+        }
+
+        BigDecimal porcentajeDecimal =
+                porcentaje.movePointLeft(2);
+
+        return publicacion.getPrecioDia()
+                .multiply(
+                        BigDecimal.ONE.subtract(
+                                porcentajeDecimal))
+                .setScale(2, RoundingMode.HALF_UP);
     }
 }

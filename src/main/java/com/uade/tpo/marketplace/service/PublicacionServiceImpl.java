@@ -370,11 +370,11 @@ public class PublicacionServiceImpl implements PublicacionService {
                                                 .compareTo(BigDecimal.ZERO) < 0
                                                 || request.getDescuentoPorcentaje()
                                                                 .compareTo(
-                                                                                new BigDecimal("100")) > 0)) {
+                                                                                new BigDecimal("90")) > 0)) {
 
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,
-                                        "El descuento debe estar entre 0 y 100");
+                                        "El descuento debe estar entre 0 y 90");
                 }
 
                 if (request.getDescripcion() == null
