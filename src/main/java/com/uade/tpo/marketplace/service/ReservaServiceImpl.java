@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -174,10 +173,6 @@ public class ReservaServiceImpl implements ReservaService {
         if (!fechaFin.isAfter(fechaInicio)) {
             throw new ReservaInvalidException();
         }
-    }
-
-    private long calcularCantidadDias(LocalDate fechaInicio, LocalDate fechaFin) {
-        return ChronoUnit.DAYS.between(fechaInicio, fechaFin);
     }
 
     @Override
