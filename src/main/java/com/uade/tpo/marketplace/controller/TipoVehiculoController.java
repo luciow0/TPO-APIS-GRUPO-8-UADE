@@ -24,8 +24,6 @@ public class TipoVehiculoController {
         return ResponseEntity.ok(tipoVehiculoService.getTiposVehiculo());
     }
 
-    //TODO: Alta de un tipo de vehiculo. Pensado para el ADMIN (a proteger con rol cuando
-    // este la seguridad): .requestMatchers(HttpMethod.POST, "/tipo-vehiculo").hasAuthority(Role.ADMIN.name())
     @PostMapping
     public ResponseEntity<TipoVehiculo> crearTipoVehiculo(@RequestBody TipoVehiculo tipoVehiculo) {
         return ResponseEntity.status(HttpStatus.CREATED)
