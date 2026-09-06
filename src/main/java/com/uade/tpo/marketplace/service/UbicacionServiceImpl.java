@@ -6,6 +6,7 @@ import java.util.List;
 import com.uade.tpo.marketplace.dto.UbicacionRequest;
 import com.uade.tpo.marketplace.exception.UbicacionNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.marketplace.entity.Ubicacion;
@@ -40,6 +41,7 @@ public class UbicacionServiceImpl implements UbicacionService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public Ubicacion updateUbicacion(Long id, UbicacionRequest request)
             throws UbicacionNotFoundException {
         Ubicacion u = ubicacionRepository.findById(id)

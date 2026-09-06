@@ -54,12 +54,13 @@ public class VehiculoServiceImpl implements VehiculoService {
 
     @Override
     @Transactional
+    @PreAuthorize("@seguridadDominio.esMismoUsuario(authentication, #vehiculo.propietario.idUsuario) or hasRole('ADMIN')")
     public VehiculoDTO guardar(Vehiculo vehiculo) {
         vehiculo.setTipoVehiculo(resolverTipoVehiculo(vehiculo.getTipoVehiculo()));
         return convertirADTO(vehiculoRepository.save(vehiculo));
     }
 
-    @PreAuthorize("@seguridadDominio.esDueñoDeVehiculo(authentication, #id)")
+    @PreAuthorize("@seguridadDominio.esDueñoDeVehiculo(authentication, #id) or hasRole('ADMIN')")
     @Override
     @Transactional
     public VehiculoDTO actualizar(Long id, Vehiculo vehiculo) {
@@ -78,7 +79,7 @@ public class VehiculoServiceImpl implements VehiculoService {
 
     @Override
     @Transactional
-    @PreAuthorize("@seguridadDominio.esDueñoDeVehiculo(authentication, #id)")
+    @PreAuthorize("@seguridadDominio.esDueñoDeVehiculo(authentication, #id) or hasRole('ADMIN')")
     public void eliminar(Long id) {
         vehiculoRepository.delete(obtenerVehiculo(id));
     }

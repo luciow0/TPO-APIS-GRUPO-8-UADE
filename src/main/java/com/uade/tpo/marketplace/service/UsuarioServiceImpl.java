@@ -36,6 +36,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("@seguridadDominio.esMismoUsuario(authentication, #id) or hasRole('ADMIN')")
     public UsuarioDTO buscarPorId(Long id) throws UsuarioNotFoundException {
         return convertirADTO(obtenerUsuario(id));
     }

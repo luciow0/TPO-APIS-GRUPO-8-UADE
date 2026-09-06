@@ -152,6 +152,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                 publicacionRepository.save(publicacion);
         }
 
+        @PreAuthorize("@seguridadDominio.esDueñoDePublicacion(authentication, #id) or hasRole('ADMIN')")
         @Override
         public Publicacion pausarPublicacion(Long id)
                         throws PublicacionNotFoundException {
@@ -171,6 +172,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                 return publicacionRepository.save(publicacion);
         }
 
+        @PreAuthorize("@seguridadDominio.esDueñoDePublicacion(authentication, #id) or hasRole('ADMIN')")
         @Override
         public Publicacion reactivarPublicacion(Long id)
                         throws PublicacionNotFoundException {
