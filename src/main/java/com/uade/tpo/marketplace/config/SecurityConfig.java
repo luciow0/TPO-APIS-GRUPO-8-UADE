@@ -18,9 +18,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * Configuración central de Spring Security.
- * Depende de:
- *   - JwtAuthenticationFilter (este paquete)
- *   - un bean AuthenticationProvider (ARMARLO CONUserDetailsService)
  */
 @Configuration
 @EnableWebSecurity
