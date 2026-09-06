@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,6 +26,7 @@ public class DisponibilidadServiceImpl implements DisponibilidadService {
     private PublicacionService publicacionService;
 
     @Override
+    @PreAuthorize("@seguridadDominio.esDueñoDePublicacion(authentication, #request.idPublicacion) or hasRole('ADMIN')")
     public Disponibilidad crearDisponibilidad(DisponibilidadRequest request)
             throws PublicacionNotFoundException {
 
@@ -67,6 +69,7 @@ public class DisponibilidadServiceImpl implements DisponibilidadService {
     }
 
     @Override
+    @PreAuthorize("@seguridadDominio.esDueñoDeDisponibilidad(authentication, #id) and @seguridadDominio.esDueñoDePublicacion(authentication, #request.idPublicacion) or hasRole('ADMIN')")
     public Disponibilidad modificarDisponibilidad(
             Long id,
             DisponibilidadRequest request)
@@ -96,6 +99,7 @@ public class DisponibilidadServiceImpl implements DisponibilidadService {
     }
 
     @Override
+    @PreAuthorize("@seguridadDominio.esDueñoDeDisponibilidad(authentication, #id) or hasRole('ADMIN')")
     public void eliminarDisponibilidad(Long id)
             throws DisponibilidadNotFoundException {
 

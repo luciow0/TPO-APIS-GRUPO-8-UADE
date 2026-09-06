@@ -10,6 +10,7 @@ import javax.sql.rowset.serial.SerialBlob;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,6 +57,7 @@ public class ImagenVehiculoServiceImpl implements ImagenVehiculoService {
 
     @Transactional
     @Override
+    @PreAuthorize("@seguridadDominio.esDueñoDeVehiculo(authentication, #idVehiculo) or hasRole('ADMIN')")
     public ImagenVehiculoResponse guardar(Long idVehiculo, Integer orden, MultipartFile file) {
         Vehiculo vehiculo = vehiculoRepository.findById(idVehiculo)
                 .orElseThrow(() -> new EntityNotFoundException("Vehiculo no encontrado con id: " + idVehiculo));
@@ -70,6 +72,7 @@ public class ImagenVehiculoServiceImpl implements ImagenVehiculoService {
 
     @Transactional
     @Override
+    @PreAuthorize("@seguridadDominio.esDueñoDeImagen(authentication, #id) or hasRole('ADMIN')")
     public ImagenVehiculoResponse actualizar(Long id, Integer orden, MultipartFile file) {
         ImagenVehiculo imagen = obtener(id);
 
@@ -86,6 +89,7 @@ public class ImagenVehiculoServiceImpl implements ImagenVehiculoService {
 
     @Transactional
     @Override
+    @PreAuthorize("@seguridadDominio.esDueñoDeImagen(authentication, #id) or hasRole('ADMIN')")
     public void eliminar(Long id) {
         if (!imagenVehiculoRepository.existsById(id)) {
             throw new EntityNotFoundException("Imagen de vehiculo no encontrada con id: " + id);

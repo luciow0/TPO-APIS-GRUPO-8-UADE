@@ -1,22 +1,12 @@
 package com.uade.tpo.marketplace.auth;
 
-import java.util.Optional;
-
-import com.uade.tpo.marketplace.exception.CarritoNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import com.uade.tpo.marketplace.entity.Carrito;
-import com.uade.tpo.marketplace.entity.Publicacion;
-import com.uade.tpo.marketplace.entity.Reserva;
-import com.uade.tpo.marketplace.entity.Usuario;
-import com.uade.tpo.marketplace.entity.Vehiculo;
-import com.uade.tpo.marketplace.repository.CarritoRepository;
-import com.uade.tpo.marketplace.repository.PublicacionRepository;
-import com.uade.tpo.marketplace.repository.ReservaRepository;
-import com.uade.tpo.marketplace.repository.UsuarioRepository;
-import com.uade.tpo.marketplace.repository.VehiculoRepository;
+import com.uade.tpo.marketplace.entity.*;
+import com.uade.tpo.marketplace.exception.*;
+import com.uade.tpo.marketplace.repository.*;
 
 @Component("seguridadDominio")
 public class SeguridadDominio {
@@ -26,34 +16,55 @@ public class SeguridadDominio {
     @Autowired private ReservaRepository reservaRepository;
     @Autowired private PublicacionRepository publicacionRepository;
     @Autowired private VehiculoRepository vehiculoRepository;
+    @Autowired private PagoRepository pagoRepository;
+    @Autowired private DisponibilidadRepository disponibilidadRepository;
+    @Autowired private ImagenVehiculoRepository imagenVehiculoRepository;
 
-    public boolean esMismoUsuario(Authentication auth, Long idUsuarioRequest) {
-        Optional<Usuario> usuario = usuarioRepository.findById(idUsuarioRequest);
-        return usuario.isPresent() && usuario.get().getEmail().equals(auth.getName());
+    public boolean esMismoUsuario(Authentication auth, Long idUsuarioRequest) throws UsuarioNotFoundException {
+        Usuario usuario = usuarioRepository.findById(idUsuarioRequest)
+                .orElseThrow(UsuarioNotFoundException::new);
+        return usuario.getEmail().equals(auth.getName());
     }
 
     public boolean esDueñoDeCarrito(Authentication auth, Long idCarrito) throws CarritoNotFoundException {
-        // 1. Validar existencia: Si no existe, rompemos el flujo con tu excepción (genera un 404)
         Carrito carrito = carritoRepository.findById(idCarrito)
-                .orElseThrow(() -> new CarritoNotFoundException());
-
-        // 2. Validar propiedad: Si existe, evaluamos la autorización (false genera un 403)
+                .orElseThrow(CarritoNotFoundException::new);
         return carrito.getUsuario().getEmail().equals(auth.getName());
     }
 
-    public boolean esDueñoDeReserva(Authentication auth, Long idReserva) {
-        Optional<Reserva> reserva = reservaRepository.findById(idReserva);
-        return reserva.isPresent() && reserva.get().getCliente().getEmail().equals(auth.getName());
+    public boolean esDueñoDeReserva(Authentication auth, Long idReserva) throws ReservaNotFoundException {
+        Reserva reserva = reservaRepository.findById(idReserva)
+                .orElseThrow(ReservaNotFoundException::new);
+        return reserva.getCliente().getEmail().equals(auth.getName());
     }
 
-    public boolean esDueñoDePublicacion(Authentication auth, Long idPublicacion) {
-        Optional<Publicacion> publicacion = publicacionRepository.findById(idPublicacion);
-        return publicacion.isPresent()
-                && publicacion.get().getVehiculo().getPropietario().getEmail().equals(auth.getName());
+    public boolean esDueñoDePublicacion(Authentication auth, Long idPublicacion) throws PublicacionNotFoundException {
+        Publicacion publicacion = publicacionRepository.findById(idPublicacion)
+                .orElseThrow(PublicacionNotFoundException::new);
+        return publicacion.getVehiculo().getPropietario().getEmail().equals(auth.getName());
     }
 
     public boolean esDueñoDeVehiculo(Authentication auth, Long idVehiculo) {
-        Optional<Vehiculo> vehiculo = vehiculoRepository.findById(idVehiculo);
-        return vehiculo.isPresent() && vehiculo.get().getPropietario().getEmail().equals(auth.getName());
+        Vehiculo vehiculo = vehiculoRepository.findById(idVehiculo)
+                .orElseThrow(() -> new EntityNotFoundException("Vehículo no encontrado con id: " + idVehiculo));
+        return vehiculo.getPropietario().getEmail().equals(auth.getName());
+    }
+
+    public boolean esDueñoDePago(Authentication auth, Long idPago) throws PagoNotFoundException {
+        Pago pago = pagoRepository.findById(idPago)
+                .orElseThrow(PagoNotFoundException::new);
+        return pago.getReserva().getCliente().getEmail().equals(auth.getName());
+    }
+
+    public boolean esDueñoDeDisponibilidad(Authentication auth, Long idDisponibilidad) throws DisponibilidadNotFoundException {
+        Disponibilidad disp = disponibilidadRepository.findById(idDisponibilidad)
+                .orElseThrow(DisponibilidadNotFoundException::new);
+        return disp.getPublicacion().getVehiculo().getPropietario().getEmail().equals(auth.getName());
+    }
+
+    public boolean esDueñoDeImagen(Authentication auth, Long idImagen) {
+        ImagenVehiculo img = imagenVehiculoRepository.findById(idImagen)
+                .orElseThrow(() -> new EntityNotFoundException("Imagen no encontrada con id: " + idImagen));
+        return img.getVehiculo().getPropietario().getEmail().equals(auth.getName());
     }
 }

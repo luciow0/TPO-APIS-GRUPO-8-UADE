@@ -1,6 +1,7 @@
 package com.uade.tpo.marketplace.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -28,6 +29,7 @@ public class TipoVehiculoServiceImpl implements TipoVehiculoService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public TipoVehiculo crearTipoVehiculo(TipoVehiculo tipoVehiculo) {
         if (tipoVehiculo.getNombre() == null || tipoVehiculo.getNombre().isBlank()) {
             throw new IllegalArgumentException("El nombre del tipo de vehiculo es requerido");

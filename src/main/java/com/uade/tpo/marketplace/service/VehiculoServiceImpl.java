@@ -71,7 +71,6 @@ public class VehiculoServiceImpl implements VehiculoService {
         vehiculoExistente.setAnio(vehiculo.getAnio());
         vehiculoExistente.setColor(vehiculo.getColor());
         vehiculoExistente.setCantidadAsientos(vehiculo.getCantidadAsientos());
-        vehiculoExistente.setPropietario(vehiculo.getPropietario());
         vehiculoExistente.setTipoVehiculo(resolverTipoVehiculo(vehiculo.getTipoVehiculo()));
 
         return convertirADTO(vehiculoRepository.save(vehiculoExistente));
@@ -79,6 +78,7 @@ public class VehiculoServiceImpl implements VehiculoService {
 
     @Override
     @Transactional
+    @PreAuthorize("@seguridadDominio.esDueñoDeVehiculo(authentication, #id)")
     public void eliminar(Long id) {
         vehiculoRepository.delete(obtenerVehiculo(id));
     }

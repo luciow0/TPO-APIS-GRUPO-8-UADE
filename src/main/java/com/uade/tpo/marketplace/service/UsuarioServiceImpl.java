@@ -27,6 +27,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UsuarioDTO> listar() {
         return usuarioRepository.findAll().stream()
                 .map(this::convertirADTO)
@@ -79,6 +80,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public void eliminar(Long id) throws UsuarioNotFoundException {
         usuarioRepository.delete(obtenerUsuario(id));
     }

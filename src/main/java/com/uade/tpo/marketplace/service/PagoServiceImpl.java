@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class PagoServiceImpl implements PagoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("@seguridadDominio.esDueñoDePago(authentication, #idPago) or hasRole('ADMIN')")
     public Pago aprobarPago(Long idPago)
             throws PagoNotFoundException, PagoInvalidException,
             ReservaNotFoundException, ReservaInvalidException {
@@ -57,6 +59,7 @@ public class PagoServiceImpl implements PagoService {
     }
 
     @Override
+    @PreAuthorize("@seguridadDominio.esDueñoDeReserva(authentication, #idReserva) or hasRole('ADMIN')")
     public Pago crearPago(Long idReserva, MetodoPago metodoPago)
             throws ReservaNotFoundException,
             PagoDuplicateException,
@@ -100,11 +103,13 @@ public class PagoServiceImpl implements PagoService {
     }
 
     @Override
+    @PreAuthorize("@seguridadDominio.esDueñoDePago(authentication, #idPago) or hasRole('ADMIN')")
     public Optional<Pago> getPagoById(Long idPago) {
         return pagoRepository.findById(idPago);
     }
 
     @Override
+    @PreAuthorize("@seguridadDominio.esDueñoDeReserva(authentication, #idReserva) or hasRole('ADMIN')")
     public Optional<Pago> getPagoByReserva(Long idReserva) {
         return pagoRepository.findByReservaIdReserva(idReserva);
 
@@ -112,6 +117,7 @@ public class PagoServiceImpl implements PagoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("@seguridadDominio.esDueñoDePago(authentication, #idPago) or hasRole('ADMIN')")
     public Pago rechazarPago(Long idPago)
             throws PagoNotFoundException, PagoInvalidException,
             ReservaNotFoundException, ReservaInvalidException {

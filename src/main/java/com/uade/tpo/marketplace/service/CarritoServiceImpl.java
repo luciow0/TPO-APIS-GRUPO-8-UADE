@@ -191,6 +191,7 @@ public class CarritoServiceImpl implements CarritoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("@seguridadDominio.esDueñoDeCarrito(authentication, #idCarrito) and @seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
     public Reserva continuarReserva(Long idCarrito, Long idUsuario)
             throws CarritoNotFoundException,
             CarritoInvalidException,
