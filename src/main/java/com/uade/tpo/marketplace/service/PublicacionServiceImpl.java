@@ -87,7 +87,11 @@ public class PublicacionServiceImpl implements PublicacionService {
                                 .orElseThrow(PublicacionNotFoundException::new);
         }
 
-        @PreAuthorize("@seguridadDominio.esDueñoDePublicacion(authentication, #id) or hasRole('ADMIN')")
+        @PreAuthorize(
+        "(@seguridadDominio.esDueñoDePublicacion(authentication, #id) " +
+        "and @seguridadDominio.esDueñoDeVehiculo(authentication, #request.idVehiculo)) " +
+        "or hasRole('ADMIN')"
+)
         @Override
         public Publicacion modificarPublicacion(
                         Long id,
@@ -409,8 +413,8 @@ public class PublicacionServiceImpl implements PublicacionService {
                 validarTextoFiltro(zona, "La zona es obligatoria");
 
                 return publicacionRepository
-                        .findByUbicacion_ZonaIgnoreCaseAndEstado(
-                                zona.trim(), EstadoPublicacion.ACTIVA, pageable);
+                                .findByUbicacion_ZonaIgnoreCaseAndEstado(
+                                                zona.trim(), EstadoPublicacion.ACTIVA, pageable);
         }
 
 }
