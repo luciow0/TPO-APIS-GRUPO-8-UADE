@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -31,6 +32,7 @@ public class PublicacionServiceImpl implements PublicacionService {
         @Autowired
         private UbicacionService ubicacionService;
 
+        @PreAuthorize("@seguridadDominio.esDueñoDeVehiculo(authentication, #request.idVehiculo) or hasRole('ADMIN')")
         @Override
         public Publicacion crearPublicacion(PublicacionRequest request)
                         throws PublicacionDuplicateException {
@@ -85,6 +87,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                                 .orElseThrow(PublicacionNotFoundException::new);
         }
 
+        @PreAuthorize("@seguridadDominio.esDueñoDePublicacion(authentication, #id) or hasRole('ADMIN')")
         @Override
         public Publicacion modificarPublicacion(
                         Long id,
@@ -136,6 +139,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                 return publicacionRepository.save(publicacion);
         }
 
+        @PreAuthorize("@seguridadDominio.esDueñoDePublicacion(authentication, #id) or hasRole('ADMIN')")
         @Override
         public void eliminarPublicacion(Long id)
                         throws PublicacionNotFoundException {

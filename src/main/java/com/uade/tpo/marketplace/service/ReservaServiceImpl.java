@@ -11,6 +11,7 @@ import com.uade.tpo.marketplace.service.ReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 
@@ -27,6 +28,7 @@ public class ReservaServiceImpl implements ReservaService {
     @Autowired
     private ReservaRepository reservaRepository;
 
+    @PreAuthorize("@seguridadDominio.esDueñoDeReserva(authentication, #idReserva)")
     @Override
     public Reserva cancelarReserva(Long idReserva, Long idUsuario)throws ReservaNotFoundException, ReservaInvalidException {
         Optional<Reserva> reservaOptional = reservaRepository.findById(idReserva);
@@ -159,6 +161,7 @@ public class ReservaServiceImpl implements ReservaService {
         return reservaRepository.findById(idReserva);
     }
 
+    @PreAuthorize("@seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
     @Override
     public Page<Reserva> getReservasByUsuario(Long idUsuario, PageRequest pageRequest) {
         

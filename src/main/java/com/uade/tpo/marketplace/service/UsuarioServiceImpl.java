@@ -3,6 +3,7 @@ package com.uade.tpo.marketplace.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +56,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         return convertirADTO(usuarioRepository.save(usuario));
     }
 
+    @PreAuthorize("@seguridadDominio.esMismoUsuario(authentication, #id) or hasRole('ADMIN')")
     @Override
     @Transactional
     public UsuarioDTO actualizar(Long id, UsuarioDTO usuarioDTO)

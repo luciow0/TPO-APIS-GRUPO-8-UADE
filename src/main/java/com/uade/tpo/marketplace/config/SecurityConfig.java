@@ -52,9 +52,6 @@ public class SecurityConfig {
                                 "/tipo-vehiculo",
                                 "/tipo-vehiculo/**")
                         .permitAll()
-                        .requestMatchers("/tipo-vehiculo", "/tipo-vehiculo/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/usuarios").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/usuarios/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
 
                 )

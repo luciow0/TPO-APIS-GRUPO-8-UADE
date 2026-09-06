@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,7 @@ public class CarritoServiceImpl implements CarritoService {
     @Autowired
     private ReservaService reservaService;
 
+    @PreAuthorize("@seguridadDominio.esMismoUsuario(authentication, #request.idUsuario)")
     @Override
     public Carrito crearCarrito(CarritoRequest request)
             throws CarritoInvalidException,
@@ -94,6 +96,7 @@ public class CarritoServiceImpl implements CarritoService {
         return carritoRepository.save(carrito);
     }
 
+    @PreAuthorize("@seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
     @Override
     public Optional<Carrito> obtenerCarritoPorUsuario(Long idUsuario) {
         Optional<Carrito> carritoOptional =
@@ -112,6 +115,7 @@ public class CarritoServiceImpl implements CarritoService {
         return Optional.of(carrito);
     }
 
+    @PreAuthorize("@seguridadDominio.esDueñoDeCarrito(authentication, #idCarrito) and @seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
     @Override
     public Carrito modificarFechas(
             Long idCarrito,
@@ -173,27 +177,15 @@ public class CarritoServiceImpl implements CarritoService {
         return carritoRepository.save(carrito);
     }
 
+    @PreAuthorize("@seguridadDominio.esDueñoDeCarrito(authentication, #idCarrito) and @seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
     @Override
-    public void eliminarCarrito(Long idCarrito, Long idUsuario)
-            throws CarritoNotFoundException,
-            CarritoInvalidException {
+    public void eliminarCarrito(Long idCarrito, Long idUsuario) throws CarritoNotFoundException {
 
-        Optional<Carrito> carritoOptional =
-                carritoRepository.findById(idCarrito);
+        Carrito carrito = carritoRepository.findById(idCarrito)
+                .orElseThrow(CarritoNotFoundException::new);
 
-        if (carritoOptional.isEmpty()) {
-            throw new CarritoNotFoundException();
-        }
-
-        Carrito carrito = carritoOptional.get();
-
-        if (!carrito.getUsuario()
-                .getIdUsuario()
-                .equals(idUsuario)) {
-
-            throw new CarritoInvalidException();
-        }
-
+        // La validación de idUsuario vs dueño del carrito ya la hizo @PreAuthorize
+        // Si la ejecución llegó hasta aquí, es seguro borrar.
         carritoRepository.delete(carrito);
     }
 

@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +59,7 @@ public class VehiculoServiceImpl implements VehiculoService {
         return convertirADTO(vehiculoRepository.save(vehiculo));
     }
 
+    @PreAuthorize("@seguridadDominio.esDueñoDeVehiculo(authentication, #id)")
     @Override
     @Transactional
     public VehiculoDTO actualizar(Long id, Vehiculo vehiculo) {
