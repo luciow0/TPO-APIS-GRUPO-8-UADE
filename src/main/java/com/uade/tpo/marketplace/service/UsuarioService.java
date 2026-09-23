@@ -12,6 +12,7 @@ public interface UsuarioService  {
     List<UsuarioDTO> listar();
     UsuarioDTO buscarPorId(Long id) throws UsuarioNotFoundException;
     Usuario obtenerUsuarioPorId(Long idUsuario) throws UsuarioNotFoundException;
+    Usuario obtenerUsuarioPorEmail(String email) throws UsuarioNotFoundException;
     UsuarioDTO crear(UsuarioDTO usuarioDTO) throws UsuarioDuplicateException;
     UsuarioDTO actualizar(Long id, UsuarioDTO usuarioDTO) throws UsuarioNotFoundException, UsuarioDuplicateException;
     void eliminar(Long id) throws UsuarioNotFoundException;

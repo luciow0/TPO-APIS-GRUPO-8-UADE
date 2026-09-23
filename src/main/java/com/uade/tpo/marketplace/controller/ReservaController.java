@@ -1,10 +1,14 @@
 package com.uade.tpo.marketplace.controller;
 
 import com.uade.tpo.marketplace.entity.Reserva;
+import com.uade.tpo.marketplace.dto.ReservaResponse;
 import com.uade.tpo.marketplace.exception.ReservaInvalidException;
 import com.uade.tpo.marketplace.exception.ReservaNotFoundException;
 import com.uade.tpo.marketplace.service.ReservaService;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +31,12 @@ public class ReservaController {
 
 
     @GetMapping("/{idReserva}")
-    public ResponseEntity<Reserva> getReservaById(@PathVariable Long idReserva) {
+    public ResponseEntity<ReservaResponse> getReservaById(@PathVariable Long idReserva) {
 
         Optional<Reserva> result = reservaService.getReservaById(idReserva);
 
         if (result.isPresent()) {
-            return ResponseEntity.ok(result.get());
+            return ResponseEntity.ok(convertirAResponse(result.get()));
         }
 
         return ResponseEntity.noContent().build();
@@ -40,7 +44,7 @@ public class ReservaController {
 
 
     @GetMapping("/usuario/{idUsuario}")
-    public ResponseEntity<Page<Reserva>> getReservasByUsuario(
+    public ResponseEntity<Page<ReservaResponse>> getReservasByUsuario(
             @PathVariable Long idUsuario,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
@@ -53,14 +57,16 @@ public class ReservaController {
             pageRequest = PageRequest.of(page, size);
         }
 
-        Page<Reserva> result =
-                reservaService.getReservasByUsuario(idUsuario, pageRequest);
+        Page<ReservaResponse> result =
+                reservaService
+                        .getReservasByUsuario(idUsuario, pageRequest)
+                        .map(this::convertirAResponse);
 
         return ResponseEntity.ok(result);
     }
 
     @PutMapping("/{idReserva}/cancelar")
-    public ResponseEntity<Reserva> cancelarReserva(
+    public ResponseEntity<ReservaResponse> cancelarReserva(
             @PathVariable Long idReserva,
             @RequestParam Long idUsuario)
             throws ReservaNotFoundException, ReservaInvalidException {
@@ -68,6 +74,29 @@ public class ReservaController {
         Reserva result =
                 reservaService.cancelarReserva(idReserva, idUsuario);
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(convertirAResponse(result));
+    }
+
+    private ReservaResponse convertirAResponse(Reserva reserva) {
+
+        long cantidadDias = ChronoUnit.DAYS.between(
+                reserva.getFechaInicio(),
+                reserva.getFechaFin());
+
+        BigDecimal precioTotal =
+                reserva.getPrecioDiaAplicado()
+                        .multiply(BigDecimal.valueOf(cantidadDias))
+                        .setScale(2, RoundingMode.HALF_UP);
+
+        return new ReservaResponse(
+                reserva.getIdReserva(),
+                reserva.getPublicacion().getIdPublicacion(),
+                reserva.getFechaInicio(),
+                reserva.getFechaFin(),
+                reserva.getFechaCreacion(),
+                reserva.getEstado(),
+                reserva.getPrecioDiaAplicado(),
+                cantidadDias,
+                precioTotal);
     }
 }

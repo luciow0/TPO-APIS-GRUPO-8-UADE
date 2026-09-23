@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,17 +14,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.tpo.marketplace.Enum.EstadoPublicacion;
-import com.uade.tpo.marketplace.dto.CarritoRequest;
+import com.uade.tpo.marketplace.Enum.MetodoPago;
+import com.uade.tpo.marketplace.dto.AgregarCarritoRequest;
+import com.uade.tpo.marketplace.dto.CarritoResponse;
+import com.uade.tpo.marketplace.dto.ConfirmacionCarritoResponse;
+import com.uade.tpo.marketplace.dto.ModificarFechasCarritoRequest;
 import com.uade.tpo.marketplace.entity.Carrito;
 import com.uade.tpo.marketplace.entity.Disponibilidad;
+import com.uade.tpo.marketplace.entity.Pago;
 import com.uade.tpo.marketplace.entity.Publicacion;
 import com.uade.tpo.marketplace.entity.Reserva;
 import com.uade.tpo.marketplace.entity.Usuario;
 import com.uade.tpo.marketplace.exception.CarritoDuplicateException;
 import com.uade.tpo.marketplace.exception.CarritoInvalidException;
 import com.uade.tpo.marketplace.exception.CarritoNotFoundException;
+import com.uade.tpo.marketplace.exception.PagoDuplicateException;
+import com.uade.tpo.marketplace.exception.PagoInvalidException;
 import com.uade.tpo.marketplace.exception.PublicacionNotFoundException;
 import com.uade.tpo.marketplace.exception.ReservaInvalidException;
+import com.uade.tpo.marketplace.exception.ReservaNotFoundException;
 import com.uade.tpo.marketplace.exception.UsuarioNotFoundException;
 import com.uade.tpo.marketplace.repository.CarritoRepository;
 
@@ -45,25 +54,31 @@ public class CarritoServiceImpl implements CarritoService {
     @Autowired
     private ReservaService reservaService;
 
-    @PreAuthorize("@seguridadDominio.esMismoUsuario(authentication, #request.idUsuario)")
+    @Autowired
+    private PagoService pagoService;
+
+    @PreAuthorize("isAuthenticated()")
     @Override
-    public Carrito crearCarrito(CarritoRequest request)
+    public CarritoResponse agregarPublicacionAlCarrito(
+            Long idPublicacion,
+            String emailUsuario,
+            AgregarCarritoRequest request)
             throws CarritoInvalidException,
             CarritoDuplicateException,
             PublicacionNotFoundException,
             UsuarioNotFoundException {
 
-        validarRequest(request);
+        validarRequest(idPublicacion, request);
 
         Usuario usuario =
-                usuarioService.obtenerUsuarioPorId(
-                        request.getIdUsuario());
+                usuarioService.obtenerUsuarioPorEmail(
+                        emailUsuario);
 
-        validarCarritoDelUsuario(request.getIdUsuario());
+        validarCarritoDelUsuario(usuario.getIdUsuario());
 
         Publicacion publicacion =
                 publicacionService.obtenerPublicacionPorId(
-                        request.getIdPublicacion());
+                        idPublicacion);
 
         validarPublicacionActiva(publicacion);
 
@@ -96,14 +111,21 @@ public class CarritoServiceImpl implements CarritoService {
         carrito.setPrecioDiaAplicado(
                 calcularPrecioDiaConDescuento(publicacion));
 
-        return carritoRepository.save(carrito);
+        return convertirAResponse(
+                carritoRepository.save(carrito));
     }
 
-    @PreAuthorize("@seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
+    @PreAuthorize("isAuthenticated()")
     @Override
-    public Optional<Carrito> obtenerCarritoPorUsuario(Long idUsuario) {
+    public Optional<CarritoResponse> obtenerMiCarrito(String emailUsuario)
+            throws UsuarioNotFoundException {
+
+        Usuario usuario =
+                usuarioService.obtenerUsuarioPorEmail(emailUsuario);
+
         Optional<Carrito> carritoOptional =
-                carritoRepository.findByUsuario_IdUsuario(idUsuario);
+                carritoRepository.findByUsuario_IdUsuario(
+                        usuario.getIdUsuario());
 
         if (carritoOptional.isEmpty()) {
             return Optional.empty();
@@ -112,19 +134,18 @@ public class CarritoServiceImpl implements CarritoService {
         Carrito carrito = carritoOptional.get();
 
         if (!carrito.getFechaExpiracion().isAfter(LocalDateTime.now())) {
+            carritoRepository.delete(carrito);
             return Optional.empty();
         }
 
-        return Optional.of(carrito);
+        return Optional.of(convertirAResponse(carrito));
     }
 
-    @PreAuthorize("@seguridadDominio.esDuenioDeCarrito(authentication, #idCarrito) and @seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
+    @PreAuthorize("@seguridadDominio.esDuenioDeCarrito(authentication, #idCarrito)")
     @Override
-    public Carrito modificarFechas(
+    public CarritoResponse modificarFechas(
             Long idCarrito,
-            Long idUsuario,
-            LocalDate fechaInicio,
-            LocalDate fechaFin)
+            ModificarFechasCarritoRequest request)
             throws CarritoNotFoundException,
             CarritoInvalidException,
             PublicacionNotFoundException {
@@ -138,10 +159,7 @@ public class CarritoServiceImpl implements CarritoService {
 
         Carrito carrito = carritoOptional.get();
 
-        if (!carrito.getUsuario()
-                .getIdUsuario()
-                .equals(idUsuario)) {
-
+        if (request == null) {
             throw new CarritoInvalidException();
         }
 
@@ -152,7 +170,9 @@ public class CarritoServiceImpl implements CarritoService {
             throw new CarritoNotFoundException();
         }
 
-        validarFechas(fechaInicio, fechaFin);
+        validarFechas(
+                request.getFechaInicio(),
+                request.getFechaFin());
 
         Publicacion publicacion = carrito.getPublicacion();
 
@@ -160,46 +180,56 @@ public class CarritoServiceImpl implements CarritoService {
 
         validarDisponibilidad(
                 publicacion,
-                fechaInicio,
-                fechaFin);
+                request.getFechaInicio(),
+                request.getFechaFin());
 
         validarReservasBloqueantes(
                 publicacion.getIdPublicacion(),
-                fechaInicio,
-                fechaFin);
+                request.getFechaInicio(),
+                request.getFechaFin());
 
         validarSolapamientoCarritos(
                 publicacion.getIdPublicacion(),
-                fechaInicio,
-                fechaFin,
+                request.getFechaInicio(),
+                request.getFechaFin(),
                 idCarrito);
 
-        carrito.setFechaInicio(fechaInicio);
-        carrito.setFechaFin(fechaFin);
+        carrito.setFechaInicio(request.getFechaInicio());
+        carrito.setFechaFin(request.getFechaFin());
 
-        return carritoRepository.save(carrito);
+        return convertirAResponse(
+                carritoRepository.save(carrito));
     }
 
-    @PreAuthorize("@seguridadDominio.esDuenioDeCarrito(authentication, #idCarrito) and @seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
+    @PreAuthorize("@seguridadDominio.esDuenioDeCarrito(authentication, #idCarrito)")
     @Override
-    public void eliminarCarrito(Long idCarrito, Long idUsuario) throws CarritoNotFoundException {
+    public void eliminarCarrito(Long idCarrito)
+            throws CarritoNotFoundException {
 
         Carrito carrito = carritoRepository.findById(idCarrito)
                 .orElseThrow(CarritoNotFoundException::new);
 
-        // La validación de idUsuario vs dueño del carrito ya la hizo @PreAuthorize
-        // Si la ejecución llegó hasta aquí, es seguro borrar.
+        // La propiedad del carrito ya fue validada por @PreAuthorize.
         carritoRepository.delete(carrito);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @PreAuthorize("@seguridadDominio.esDuenioDeCarrito(authentication, #idCarrito) and @seguridadDominio.esMismoUsuario(authentication, #idUsuario)")
-    public Reserva continuarReserva(Long idCarrito, Long idUsuario)
+    @PreAuthorize("@seguridadDominio.esDuenioDeCarrito(authentication, #idCarrito)")
+    public ConfirmacionCarritoResponse confirmarCarrito(
+            Long idCarrito,
+            MetodoPago metodoPago)
             throws CarritoNotFoundException,
             CarritoInvalidException,
             PublicacionNotFoundException,
-            ReservaInvalidException {
+            ReservaInvalidException,
+            ReservaNotFoundException,
+            PagoDuplicateException,
+            PagoInvalidException {
+
+        if (metodoPago == null) {
+            throw new PagoInvalidException();
+        }
 
         Optional<Carrito> carritoOptional =
                 carritoRepository.findById(idCarrito);
@@ -209,13 +239,6 @@ public class CarritoServiceImpl implements CarritoService {
         }
 
         Carrito carrito = carritoOptional.get();
-
-        if (!carrito.getUsuario()
-                .getIdUsuario()
-                .equals(idUsuario)) {
-
-            throw new CarritoInvalidException();
-        }
 
         if (!carrito.getFechaExpiracion()
                 .isAfter(LocalDateTime.now())) {
@@ -250,9 +273,19 @@ public class CarritoServiceImpl implements CarritoService {
         Reserva reserva =
                 reservaService.crearReservaDesdeCarrito(carrito);
 
+        Pago pago =
+                pagoService.crearPago(
+                        reserva.getIdReserva(),
+                        metodoPago);
+
         carritoRepository.delete(carrito);
 
-        return reserva;
+        return new ConfirmacionCarritoResponse(
+                reserva.getIdReserva(),
+                reserva.getEstado(),
+                pago.getIdPago(),
+                pago.getEstado(),
+                pago.getMonto());
     }
 
     private void validarFechas(
@@ -390,24 +423,44 @@ public class CarritoServiceImpl implements CarritoService {
         }
     }
 
-    private void validarRequest(CarritoRequest request)
+    private void validarRequest(
+            Long idPublicacion,
+            AgregarCarritoRequest request)
             throws CarritoInvalidException {
 
         if (request == null) {
             throw new CarritoInvalidException();
         }
 
-        if (request.getIdUsuario() == null) {
-            throw new CarritoInvalidException();
-        }
-
-        if (request.getIdPublicacion() == null) {
+        if (idPublicacion == null) {
             throw new CarritoInvalidException();
         }
 
         validarFechas(
                 request.getFechaInicio(),
                 request.getFechaFin());
+    }
+
+    private CarritoResponse convertirAResponse(Carrito carrito) {
+
+        long cantidadDias = ChronoUnit.DAYS.between(
+                carrito.getFechaInicio(),
+                carrito.getFechaFin());
+
+        BigDecimal precioTotal =
+                carrito.getPrecioDiaAplicado()
+                        .multiply(BigDecimal.valueOf(cantidadDias))
+                        .setScale(2, RoundingMode.HALF_UP);
+
+        return new CarritoResponse(
+                carrito.getIdCarrito(),
+                carrito.getPublicacion().getIdPublicacion(),
+                carrito.getFechaInicio(),
+                carrito.getFechaFin(),
+                carrito.getFechaExpiracion(),
+                carrito.getPrecioDiaAplicado(),
+                cantidadDias,
+                precioTotal);
     }
 
     private BigDecimal calcularPrecioDiaConDescuento(

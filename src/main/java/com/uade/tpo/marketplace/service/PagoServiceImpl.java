@@ -33,7 +33,7 @@ public class PagoServiceImpl implements PagoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @PreAuthorize("@seguridadDominio.esDuenioDePago(authentication, #idPago) or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public Pago aprobarPago(Long idPago)
             throws PagoNotFoundException, PagoInvalidException,
             ReservaNotFoundException, ReservaInvalidException {
@@ -117,7 +117,7 @@ public class PagoServiceImpl implements PagoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @PreAuthorize("@seguridadDominio.esDuenioDePago(authentication, #idPago) or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public Pago rechazarPago(Long idPago)
             throws PagoNotFoundException, PagoInvalidException,
             ReservaNotFoundException, ReservaInvalidException {

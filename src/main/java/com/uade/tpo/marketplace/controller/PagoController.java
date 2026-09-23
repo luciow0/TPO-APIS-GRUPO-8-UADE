@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplace.dto.PagoRequest;
+import com.uade.tpo.marketplace.dto.PagoResponse;
 import com.uade.tpo.marketplace.entity.Pago;
 import com.uade.tpo.marketplace.exception.PagoDuplicateException;
 import com.uade.tpo.marketplace.exception.PagoInvalidException;
@@ -30,31 +31,31 @@ public class PagoController {
     private PagoService pagoService;
 
     @GetMapping("/{idPago}")
-    public ResponseEntity<Pago> getPagoById(@PathVariable Long idPago) {
+    public ResponseEntity<PagoResponse> getPagoById(@PathVariable Long idPago) {
 
         Optional<Pago> result = pagoService.getPagoById(idPago);
 
         if (result.isPresent()) {
-            return ResponseEntity.ok(result.get());
+            return ResponseEntity.ok(convertirAResponse(result.get()));
         }
 
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/reserva/{idReserva}")
-    public ResponseEntity<Pago> getPagoByReserva(@PathVariable Long idReserva) {
+    public ResponseEntity<PagoResponse> getPagoByReserva(@PathVariable Long idReserva) {
 
         Optional<Pago> result = pagoService.getPagoByReserva(idReserva);
 
         if (result.isPresent()) {
-            return ResponseEntity.ok(result.get());
+            return ResponseEntity.ok(convertirAResponse(result.get()));
         }
 
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping
-    public ResponseEntity<Object> crearPago(@RequestBody PagoRequest pagoRequest)
+    public ResponseEntity<PagoResponse> crearPago(@RequestBody PagoRequest pagoRequest)
             throws ReservaNotFoundException,
             PagoDuplicateException,
             PagoInvalidException {
@@ -67,27 +68,39 @@ public class PagoController {
                 pagoRequest.getIdReserva(),
                 pagoRequest.getMetodoPago());
 
-        return ResponseEntity.created(URI.create("/pagos/" + result.getIdPago())).body(result);
+        return ResponseEntity
+                .created(URI.create("/pagos/" + result.getIdPago()))
+                .body(convertirAResponse(result));
     }
 
     @PutMapping("/{idPago}/aprobar")
-    public ResponseEntity<Pago> aprobarPago(@PathVariable Long idPago)
+    public ResponseEntity<PagoResponse> aprobarPago(@PathVariable Long idPago)
             throws PagoNotFoundException, PagoInvalidException,
             ReservaNotFoundException, ReservaInvalidException {
 
         Pago result = pagoService.aprobarPago(idPago);
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(convertirAResponse(result));
     }
 
     @PutMapping("/{idPago}/rechazar")
-    public ResponseEntity<Pago> rechazarPago(@PathVariable Long idPago)
+    public ResponseEntity<PagoResponse> rechazarPago(@PathVariable Long idPago)
             throws PagoNotFoundException, PagoInvalidException,
             ReservaNotFoundException, ReservaInvalidException {
 
         Pago result = pagoService.rechazarPago(idPago);
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(convertirAResponse(result));
+    }
+
+    private PagoResponse convertirAResponse(Pago pago) {
+        return new PagoResponse(
+                pago.getIdPago(),
+                pago.getReserva().getIdReserva(),
+                pago.getFecha(),
+                pago.getMonto(),
+                pago.getEstado(),
+                pago.getMetodo());
     }
 
 }

@@ -48,6 +48,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Usuario obtenerUsuarioPorEmail(String email) throws UsuarioNotFoundException {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(UsuarioNotFoundException::new);
+    }
+
+    @Override
     @Transactional
     public UsuarioDTO crear(UsuarioDTO usuarioDTO) throws UsuarioDuplicateException {
         if (usuarioRepository.existsByEmail(usuarioDTO.getEmail())) {
