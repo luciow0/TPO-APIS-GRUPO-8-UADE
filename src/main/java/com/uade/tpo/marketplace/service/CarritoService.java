@@ -13,6 +13,7 @@ import com.uade.tpo.marketplace.exception.CarritoNotFoundException;
 import com.uade.tpo.marketplace.exception.PagoDuplicateException;
 import com.uade.tpo.marketplace.exception.PagoInvalidException;
 import com.uade.tpo.marketplace.exception.PublicacionNotFoundException;
+import com.uade.tpo.marketplace.exception.PublicacionNoDisponibleException;
 import com.uade.tpo.marketplace.exception.ReservaInvalidException;
 import com.uade.tpo.marketplace.exception.ReservaNotFoundException;
 import com.uade.tpo.marketplace.exception.UsuarioNotFoundException;
@@ -26,16 +27,19 @@ public interface CarritoService {
             throws CarritoInvalidException,
             CarritoDuplicateException,
             PublicacionNotFoundException,
+            PublicacionNoDisponibleException,
             UsuarioNotFoundException;
 
     Optional<CarritoResponse> obtenerMiCarrito(String emailUsuario)
-            throws UsuarioNotFoundException;
+            throws UsuarioNotFoundException,
+            PublicacionNoDisponibleException;
 
     CarritoResponse modificarFechas(
             Long idCarrito,
             ModificarFechasCarritoRequest request)
             throws CarritoNotFoundException,
             CarritoInvalidException,
+            PublicacionNoDisponibleException,
             PublicacionNotFoundException;
 
     void eliminarCarrito(Long idCarrito)
@@ -46,6 +50,7 @@ public interface CarritoService {
             MetodoPago metodoPago)
             throws CarritoNotFoundException,
             CarritoInvalidException,
+            PublicacionNoDisponibleException,
             PublicacionNotFoundException,
             ReservaInvalidException,
             ReservaNotFoundException,

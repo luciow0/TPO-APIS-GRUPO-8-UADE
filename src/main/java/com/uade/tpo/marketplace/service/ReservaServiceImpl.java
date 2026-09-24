@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,8 +70,8 @@ public class ReservaServiceImpl implements ReservaService {
             throw new ReservaInvalidException();
         }
 
-        validarSolapamiento(
-            reserva.getPublicacion().getIdPublicacion(),
+        validarSolapamientoPorVehiculo(
+            reserva.getPublicacion().getVehiculo().getIdVehiculo(),
             reserva.getFechaInicio(),
             reserva.getFechaFin(),
             reserva.getIdReserva()
@@ -137,8 +136,8 @@ public class ReservaServiceImpl implements ReservaService {
                 carrito.getFechaInicio(),
                 carrito.getFechaFin());
 
-        validarSolapamiento(
-                carrito.getPublicacion().getIdPublicacion(),
+        validarSolapamientoPorVehiculo(
+                carrito.getPublicacion().getVehiculo().getIdVehiculo(),
                 carrito.getFechaInicio(),
                 carrito.getFechaFin());
 
@@ -176,36 +175,33 @@ public class ReservaServiceImpl implements ReservaService {
     }
 
     @Override
-    public void validarSolapamiento(Long idPublicacion,LocalDate fechaInicio,LocalDate fechaFin) throws ReservaInvalidException {
+    public void validarSolapamientoPorVehiculo(
+            Long idVehiculo,
+            LocalDate fechaInicio,
+            LocalDate fechaFin)
+            throws ReservaInvalidException {
 
-        validarSolapamiento(
-                idPublicacion,
+        validarSolapamientoPorVehiculo(
+                idVehiculo,
                 fechaInicio,
                 fechaFin,
                 null);
     }
 
-    private void validarSolapamiento(
-            Long idPublicacion,
+    private void validarSolapamientoPorVehiculo(
+            Long idVehiculo,
             LocalDate fechaInicio,
             LocalDate fechaFin,
             Long idReservaIgnorada)
             throws ReservaInvalidException {
 
         List<Reserva> reservasBloqueantes =
-            new ArrayList<>(
-                reservaRepository.findByPublicacionIdPublicacionAndEstado(
-                        idPublicacion,
-                        EstadoReserva.PENDIENTE
-                )
-            );
-
-        reservasBloqueantes.addAll(
-            reservaRepository.findByPublicacionIdPublicacionAndEstado(
-                    idPublicacion,
-                    EstadoReserva.CONFIRMADA
-            )
-        );
+                reservaRepository
+                        .findByPublicacion_Vehiculo_IdVehiculoAndEstadoIn(
+                                idVehiculo,
+                                List.of(
+                                        EstadoReserva.PENDIENTE,
+                                        EstadoReserva.CONFIRMADA));
 
         LocalDate finBloqueadoNuevaReserva = fechaFin.plusDays(1);
 

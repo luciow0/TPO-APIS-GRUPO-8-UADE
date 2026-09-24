@@ -1,6 +1,7 @@
 package com.uade.tpo.marketplace.repository;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,9 @@ import com.uade.tpo.marketplace.Enum.EstadoPublicacion;
 @Repository
 public interface PublicacionRepository extends JpaRepository<Publicacion, Long> {
 
-        boolean existsByVehiculo_IdVehiculo(Long idVehiculo);
+        boolean existsByVehiculo_IdVehiculoAndEstadoIn(
+                        Long idVehiculo,
+                        Collection<EstadoPublicacion> estados);
 
         @EntityGraph(attributePaths = {"vehiculo", "vehiculo.tipoVehiculo", "ubicacion"})
         Page<Publicacion> findByEstado(EstadoPublicacion estado, Pageable pageable);

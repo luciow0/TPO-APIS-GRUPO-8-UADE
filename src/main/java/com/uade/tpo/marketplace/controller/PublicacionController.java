@@ -87,8 +87,7 @@ public class PublicacionController {
     public ResponseEntity<PublicacionResponse> modificarPublicacion(
             @PathVariable Long id,
             @RequestBody PublicacionRequest request)
-            throws PublicacionNotFoundException,
-            PublicacionDuplicateException {
+            throws PublicacionNotFoundException {
 
         Publicacion publicacion =
                 publicacionService.modificarPublicacion(

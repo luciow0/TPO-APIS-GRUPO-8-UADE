@@ -31,6 +31,7 @@ import com.uade.tpo.marketplace.exception.CarritoNotFoundException;
 import com.uade.tpo.marketplace.exception.PagoDuplicateException;
 import com.uade.tpo.marketplace.exception.PagoInvalidException;
 import com.uade.tpo.marketplace.exception.PublicacionNotFoundException;
+import com.uade.tpo.marketplace.exception.PublicacionNoDisponibleException;
 import com.uade.tpo.marketplace.exception.ReservaInvalidException;
 import com.uade.tpo.marketplace.exception.ReservaNotFoundException;
 import com.uade.tpo.marketplace.exception.UsuarioNotFoundException;
@@ -66,6 +67,7 @@ public class CarritoServiceImpl implements CarritoService {
             throws CarritoInvalidException,
             CarritoDuplicateException,
             PublicacionNotFoundException,
+            PublicacionNoDisponibleException,
             UsuarioNotFoundException {
 
         validarRequest(idPublicacion, request);
@@ -88,7 +90,7 @@ public class CarritoServiceImpl implements CarritoService {
                 request.getFechaFin());
 
         validarReservasBloqueantes(
-                publicacion.getIdPublicacion(),
+                publicacion.getVehiculo().getIdVehiculo(),
                 request.getFechaInicio(),
                 request.getFechaFin());
 
@@ -118,7 +120,8 @@ public class CarritoServiceImpl implements CarritoService {
     @PreAuthorize("isAuthenticated()")
     @Override
     public Optional<CarritoResponse> obtenerMiCarrito(String emailUsuario)
-            throws UsuarioNotFoundException {
+            throws UsuarioNotFoundException,
+            PublicacionNoDisponibleException {
 
         Usuario usuario =
                 usuarioService.obtenerUsuarioPorEmail(emailUsuario);
@@ -138,6 +141,8 @@ public class CarritoServiceImpl implements CarritoService {
             return Optional.empty();
         }
 
+        validarPublicacionDelCarrito(carrito);
+
         return Optional.of(convertirAResponse(carrito));
     }
 
@@ -148,6 +153,7 @@ public class CarritoServiceImpl implements CarritoService {
             ModificarFechasCarritoRequest request)
             throws CarritoNotFoundException,
             CarritoInvalidException,
+            PublicacionNoDisponibleException,
             PublicacionNotFoundException {
 
         Optional<Carrito> carritoOptional =
@@ -176,7 +182,7 @@ public class CarritoServiceImpl implements CarritoService {
 
         Publicacion publicacion = carrito.getPublicacion();
 
-        validarPublicacionActiva(publicacion);
+        validarPublicacionDelCarrito(carrito);
 
         validarDisponibilidad(
                 publicacion,
@@ -184,7 +190,7 @@ public class CarritoServiceImpl implements CarritoService {
                 request.getFechaFin());
 
         validarReservasBloqueantes(
-                publicacion.getIdPublicacion(),
+                publicacion.getVehiculo().getIdVehiculo(),
                 request.getFechaInicio(),
                 request.getFechaFin());
 
@@ -214,13 +220,16 @@ public class CarritoServiceImpl implements CarritoService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(
+            rollbackFor = Exception.class,
+            noRollbackFor = PublicacionNoDisponibleException.class)
     @PreAuthorize("@seguridadDominio.esDuenioDeCarrito(authentication, #idCarrito)")
     public ConfirmacionCarritoResponse confirmarCarrito(
             Long idCarrito,
             MetodoPago metodoPago)
             throws CarritoNotFoundException,
             CarritoInvalidException,
+            PublicacionNoDisponibleException,
             PublicacionNotFoundException,
             ReservaInvalidException,
             ReservaNotFoundException,
@@ -252,7 +261,7 @@ public class CarritoServiceImpl implements CarritoService {
 
         Publicacion publicacion = carrito.getPublicacion();
 
-        validarPublicacionActiva(publicacion);
+        validarPublicacionDelCarrito(carrito);
 
         validarDisponibilidad(
                 publicacion,
@@ -260,7 +269,7 @@ public class CarritoServiceImpl implements CarritoService {
                 carrito.getFechaFin());
 
         validarReservasBloqueantes(
-                publicacion.getIdPublicacion(),
+                publicacion.getVehiculo().getIdVehiculo(),
                 carrito.getFechaInicio(),
                 carrito.getFechaFin());
 
@@ -342,10 +351,21 @@ public class CarritoServiceImpl implements CarritoService {
     }
 
     private void validarPublicacionActiva(Publicacion publicacion)
-            throws CarritoInvalidException {
+            throws PublicacionNoDisponibleException {
 
         if (publicacion.getEstado() != EstadoPublicacion.ACTIVA) {
-            throw new CarritoInvalidException();
+            throw new PublicacionNoDisponibleException();
+        }
+    }
+
+    private void validarPublicacionDelCarrito(Carrito carrito)
+            throws PublicacionNoDisponibleException {
+
+        if (carrito.getPublicacion().getEstado()
+                != EstadoPublicacion.ACTIVA) {
+
+            carritoRepository.delete(carrito);
+            throw new PublicacionNoDisponibleException();
         }
     }
 
@@ -361,13 +381,20 @@ public class CarritoServiceImpl implements CarritoService {
 
         Carrito carritoExistente = carritoOptional.get();
 
-        if (carritoExistente.getFechaExpiracion()
-                .isAfter(LocalDateTime.now())) {
+        boolean carritoExpirado =
+                !carritoExistente.getFechaExpiracion()
+                        .isAfter(LocalDateTime.now());
 
-            throw new CarritoDuplicateException();
+        boolean publicacionNoDisponible =
+                carritoExistente.getPublicacion().getEstado()
+                        != EstadoPublicacion.ACTIVA;
+
+        if (carritoExpirado || publicacionNoDisponible) {
+            carritoRepository.delete(carritoExistente);
+            return;
         }
 
-        carritoRepository.delete(carritoExistente);
+        throw new CarritoDuplicateException();
     }
 
     private void validarSolapamientoCarritos(
@@ -408,14 +435,14 @@ public class CarritoServiceImpl implements CarritoService {
     }
 
     private void validarReservasBloqueantes(
-            Long idPublicacion,
+            Long idVehiculo,
             LocalDate fechaInicio,
             LocalDate fechaFin)
             throws CarritoInvalidException {
 
         try {
-            reservaService.validarSolapamiento(
-                    idPublicacion,
+            reservaService.validarSolapamientoPorVehiculo(
+                    idVehiculo,
                     fechaInicio,
                     fechaFin);
         } catch (ReservaInvalidException exception) {

@@ -26,8 +26,7 @@ public interface PublicacionService {
         Publicacion modificarPublicacion(
                         Long id,
                         PublicacionRequest request)
-                        throws PublicacionNotFoundException,
-                        PublicacionDuplicateException;
+                        throws PublicacionNotFoundException;
 
         void eliminarPublicacion(Long id)
                         throws PublicacionNotFoundException;

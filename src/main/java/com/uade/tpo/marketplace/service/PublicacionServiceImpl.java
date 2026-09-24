@@ -1,6 +1,7 @@
 package com.uade.tpo.marketplace.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -51,7 +52,11 @@ public class PublicacionServiceImpl implements PublicacionService {
                                                 "Ubicacion no encontrada"));
 
                 if (publicacionRepository
-                                .existsByVehiculo_IdVehiculo(request.getIdVehiculo())) {
+                                .existsByVehiculo_IdVehiculoAndEstadoIn(
+                                                request.getIdVehiculo(),
+                                                List.of(
+                                                                EstadoPublicacion.ACTIVA,
+                                                                EstadoPublicacion.PAUSADA))) {
 
                         throw new PublicacionDuplicateException();
                 }
@@ -92,44 +97,32 @@ public class PublicacionServiceImpl implements PublicacionService {
                                 .orElseThrow(PublicacionNotFoundException::new);
         }
 
-        @PreAuthorize(
-        "(@seguridadDominio.esDuenioDePublicacion(authentication, #id) " +
-        "and @seguridadDominio.esDuenioDeVehiculo(authentication, #request.idVehiculo)) " +
-        "or hasRole('ADMIN')"
-)
+        @PreAuthorize("@seguridadDominio.esDuenioDePublicacion(authentication, #id) or hasRole('ADMIN')")
         @Override
         public Publicacion modificarPublicacion(
                         Long id,
                         PublicacionRequest request)
-                        throws PublicacionNotFoundException,
-                        PublicacionDuplicateException {
+                        throws PublicacionNotFoundException {
 
                 Publicacion publicacion = publicacionRepository.findById(id)
                                 .orElseThrow(PublicacionNotFoundException::new);
 
                 validarRequest(request);
 
-                Vehiculo vehiculo = vehiculoService
-                                .obtenerVehiculoPorId(request.getIdVehiculo())
-                                .orElseThrow(() -> new ResponseStatusException(
-                                                HttpStatus.NOT_FOUND,
-                                                "Vehiculo no encontrado"));
+                if (!publicacion.getVehiculo()
+                                .getIdVehiculo()
+                                .equals(request.getIdVehiculo())) {
+
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "No se puede cambiar el vehiculo de una publicacion");
+                }
 
                 Ubicacion ubicacion = ubicacionService
                                 .obtenerUbicacionPorId(request.getIdUbicacion())
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
                                                 "Ubicacion no encontrada"));
-
-                if (!publicacion.getVehiculo()
-                                .getIdVehiculo()
-                                .equals(request.getIdVehiculo())
-                                && publicacionRepository
-                                                .existsByVehiculo_IdVehiculo(
-                                                                request.getIdVehiculo())) {
-
-                        throw new PublicacionDuplicateException();
-                }
 
                 BigDecimal descuento = request.getDescuentoPorcentaje();
 
@@ -142,7 +135,6 @@ public class PublicacionServiceImpl implements PublicacionService {
                 publicacion.setDescripcion(request.getDescripcion());
                 publicacion.setHoraRetiroDevolucion(
                                 request.getHoraRetiroDevolucion());
-                publicacion.setVehiculo(vehiculo);
                 publicacion.setUbicacion(ubicacion);
 
                 return publicacionRepository.save(publicacion);

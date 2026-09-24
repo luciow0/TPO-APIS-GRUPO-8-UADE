@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(
         code = HttpStatus.BAD_REQUEST,
-        reason = "El vehiculo ya posee una publicacion"
+        reason = "El vehiculo ya posee una publicacion activa o pausada"
 )
 public class PublicacionDuplicateException extends Exception {
 

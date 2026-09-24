@@ -26,6 +26,7 @@ import com.uade.tpo.marketplace.exception.CarritoNotFoundException;
 import com.uade.tpo.marketplace.exception.PagoDuplicateException;
 import com.uade.tpo.marketplace.exception.PagoInvalidException;
 import com.uade.tpo.marketplace.exception.PublicacionNotFoundException;
+import com.uade.tpo.marketplace.exception.PublicacionNoDisponibleException;
 import com.uade.tpo.marketplace.exception.ReservaInvalidException;
 import com.uade.tpo.marketplace.exception.ReservaNotFoundException;
 import com.uade.tpo.marketplace.exception.UsuarioNotFoundException;
@@ -48,6 +49,7 @@ public class CarritoController {
             throws CarritoInvalidException,
             CarritoDuplicateException,
             PublicacionNotFoundException,
+            PublicacionNoDisponibleException,
             UsuarioNotFoundException {
 
         CarritoResponse carrito =
@@ -64,7 +66,8 @@ public class CarritoController {
     @GetMapping("/mio")
     public ResponseEntity<CarritoResponse> obtenerMiCarrito(
             Authentication authentication)
-            throws UsuarioNotFoundException {
+            throws UsuarioNotFoundException,
+            PublicacionNoDisponibleException {
 
         Optional<CarritoResponse> carritoOptional =
                 carritoService.obtenerMiCarrito(
@@ -83,6 +86,7 @@ public class CarritoController {
             @Valid @RequestBody ModificarFechasCarritoRequest request)
             throws CarritoNotFoundException,
             CarritoInvalidException,
+            PublicacionNoDisponibleException,
             PublicacionNotFoundException {
 
         CarritoResponse carrito = carritoService.modificarFechas(
@@ -108,6 +112,7 @@ public class CarritoController {
             @Valid @RequestBody ConfirmarCarritoRequest request)
             throws CarritoNotFoundException,
             CarritoInvalidException,
+            PublicacionNoDisponibleException,
             PublicacionNotFoundException,
             ReservaInvalidException,
             ReservaNotFoundException,

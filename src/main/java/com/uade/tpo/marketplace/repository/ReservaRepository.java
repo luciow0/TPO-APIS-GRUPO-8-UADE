@@ -1,5 +1,6 @@
 package com.uade.tpo.marketplace.repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -13,7 +14,9 @@ import com.uade.tpo.marketplace.entity.Reserva;
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
         Page<Reserva> findByClienteIdUsuario(Long idUsuario, Pageable pageable);
-        List<Reserva> findByPublicacionIdPublicacionAndEstado(Long idPublicacion,EstadoReserva estado);
+        List<Reserva> findByPublicacion_Vehiculo_IdVehiculoAndEstadoIn(
+                        Long idVehiculo,
+                        Collection<EstadoReserva> estados);
         boolean existsByClienteIdUsuarioAndEstado(Long idUsuario, EstadoReserva estado);
 
 }

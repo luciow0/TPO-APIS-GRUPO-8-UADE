@@ -25,8 +25,8 @@ public interface ReservaService {
 
         Reserva rechazarReserva(Long idReserva)throws ReservaNotFoundException, ReservaInvalidException;
 
-        void validarSolapamiento(
-                Long idPublicacion,
+        void validarSolapamientoPorVehiculo(
+                Long idVehiculo,
                 LocalDate fechaInicio,
                 LocalDate fechaFin)
                 throws ReservaInvalidException;
