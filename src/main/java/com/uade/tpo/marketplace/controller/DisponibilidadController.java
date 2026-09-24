@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplace.dto.DisponibilidadRequest;
+import com.uade.tpo.marketplace.dto.DisponibilidadResponse;
 import com.uade.tpo.marketplace.entity.Disponibilidad;
 import com.uade.tpo.marketplace.exception.DisponibilidadNotFoundException;
 import com.uade.tpo.marketplace.exception.PublicacionNotFoundException;
@@ -28,25 +31,26 @@ public class DisponibilidadController {
     private DisponibilidadService disponibilidadService;
 
     @GetMapping
-    public ResponseEntity<List<Disponibilidad>> obtenerDisponibilidades() {
+    public ResponseEntity<Page<DisponibilidadResponse>> obtenerDisponibilidades(Pageable pageable) {
 
         return ResponseEntity.ok(
-                disponibilidadService.obtenerDisponibilidades());
+                disponibilidadService.obtenerDisponibilidades(pageable)
+                        .map(this::convertirAResponse));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Disponibilidad> obtenerDisponibilidadPorId(
+    public ResponseEntity<DisponibilidadResponse> obtenerDisponibilidadPorId(
             @PathVariable Long id)
             throws DisponibilidadNotFoundException {
 
         Disponibilidad disponibilidad =
                 disponibilidadService.obtenerDisponibilidadPorId(id);
 
-        return ResponseEntity.ok(disponibilidad);
+        return ResponseEntity.ok(convertirAResponse(disponibilidad));
     }
 
     @GetMapping("/publicacion/{idPublicacion}")
-    public ResponseEntity<List<Disponibilidad>>
+    public ResponseEntity<List<DisponibilidadResponse>>
             obtenerDisponibilidadesPorPublicacion(
                     @PathVariable Long idPublicacion)
                     throws PublicacionNotFoundException {
@@ -54,11 +58,14 @@ public class DisponibilidadController {
         return ResponseEntity.ok(
                 disponibilidadService
                         .obtenerDisponibilidadesPorPublicacion(
-                                idPublicacion));
+                                idPublicacion)
+                        .stream()
+                        .map(this::convertirAResponse)
+                        .toList());
     }
 
     @PostMapping
-    public ResponseEntity<Disponibilidad> crearDisponibilidad(
+    public ResponseEntity<DisponibilidadResponse> crearDisponibilidad(
             @RequestBody DisponibilidadRequest request)
             throws PublicacionNotFoundException {
 
@@ -70,11 +77,11 @@ public class DisponibilidadController {
                         URI.create(
                                 "/disponibilidades/"
                                         + disponibilidad.getIdDisponibilidad()))
-                .body(disponibilidad);
+                .body(convertirAResponse(disponibilidad));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Disponibilidad> modificarDisponibilidad(
+    public ResponseEntity<DisponibilidadResponse> modificarDisponibilidad(
             @PathVariable Long id,
             @RequestBody DisponibilidadRequest request)
             throws DisponibilidadNotFoundException,
@@ -85,7 +92,7 @@ public class DisponibilidadController {
                         id,
                         request);
 
-        return ResponseEntity.ok(disponibilidad);
+        return ResponseEntity.ok(convertirAResponse(disponibilidad));
     }
 
     @DeleteMapping("/{id}")
@@ -96,5 +103,13 @@ public class DisponibilidadController {
         disponibilidadService.eliminarDisponibilidad(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    private DisponibilidadResponse convertirAResponse(Disponibilidad disponibilidad) {
+        return new DisponibilidadResponse(
+                disponibilidad.getIdDisponibilidad(),
+                disponibilidad.getFechaInicio(),
+                disponibilidad.getFechaFin(),
+                disponibilidad.getPublicacion().getIdPublicacion());
     }
 }

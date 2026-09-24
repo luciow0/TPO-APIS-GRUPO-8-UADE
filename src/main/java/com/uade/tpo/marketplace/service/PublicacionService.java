@@ -1,7 +1,6 @@
 package com.uade.tpo.marketplace.service;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +16,9 @@ public interface PublicacionService {
         Publicacion crearPublicacion(PublicacionRequest request)
                         throws PublicacionDuplicateException;
 
-        List<Publicacion> obtenerPublicaciones();
+        Page<Publicacion> obtenerPublicaciones(Pageable pageable);
+
+        Page<Publicacion> obtenerMisPublicaciones(String emailUsuario, Pageable pageable);
 
         Publicacion obtenerPublicacionPorId(Long id)
                         throws PublicacionNotFoundException;
@@ -37,21 +38,26 @@ public interface PublicacionService {
         Publicacion reactivarPublicacion(Long id)
                         throws PublicacionNotFoundException;
 
-        List<Publicacion> obtenerPublicacionesPorEstado(
-                        EstadoPublicacion estado);
+        Page<Publicacion> obtenerPublicacionesPorEstado(
+                        EstadoPublicacion estado,
+                        Pageable pageable);
 
-        List<Publicacion> obtenerPublicacionesPorPrecio(
+        Page<Publicacion> obtenerPublicacionesPorPrecio(
                         BigDecimal precioMin,
-                        BigDecimal precioMax);
+                        BigDecimal precioMax,
+                        Pageable pageable);
 
-        List<Publicacion> obtenerPublicacionesPorTipoVehiculo(
-                        Long idTipoVehiculo);
+        Page<Publicacion> obtenerPublicacionesPorTipoVehiculo(
+                        Long idTipoVehiculo,
+                        Pageable pageable);
 
-        List<Publicacion> obtenerPublicacionesPorMarca(
-                        String marca);
+        Page<Publicacion> obtenerPublicacionesPorMarca(
+                        String marca,
+                        Pageable pageable);
 
-        List<Publicacion> obtenerPublicacionesPorModelo(
-                        String modelo);
+        Page<Publicacion> obtenerPublicacionesPorModelo(
+                        String modelo,
+                        Pageable pageable);
 
         Page<Publicacion> obtenerPublicacionesPorProvincia(
                         String provincia,

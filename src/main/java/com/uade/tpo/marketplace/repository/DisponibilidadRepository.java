@@ -11,6 +11,6 @@ import com.uade.tpo.marketplace.entity.Disponibilidad;
 public interface DisponibilidadRepository
         extends JpaRepository<Disponibilidad, Long> {
 
-    List<Disponibilidad> findByPublicacion_IdPublicacion(
+    List<Disponibilidad> findByPublicacion_IdPublicacionOrderByFechaInicioAsc(
             Long idPublicacion);
 }

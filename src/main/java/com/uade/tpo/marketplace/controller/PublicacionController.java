@@ -2,12 +2,13 @@ package com.uade.tpo.marketplace.controller;
 
 import java.math.BigDecimal;
 import java.net.URI;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +20,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplace.dto.PublicacionRequest;
+import com.uade.tpo.marketplace.dto.PublicacionResponse;
 import com.uade.tpo.marketplace.entity.Publicacion;
+import com.uade.tpo.marketplace.entity.TipoVehiculo;
+import com.uade.tpo.marketplace.entity.Ubicacion;
+import com.uade.tpo.marketplace.entity.Vehiculo;
 import com.uade.tpo.marketplace.Enum.EstadoPublicacion;
 import com.uade.tpo.marketplace.exception.PublicacionDuplicateException;
 import com.uade.tpo.marketplace.exception.PublicacionNotFoundException;
@@ -33,25 +38,36 @@ public class PublicacionController {
     private PublicacionService publicacionService;
 
     @GetMapping
-    public ResponseEntity<List<Publicacion>> obtenerPublicaciones() {
+    public ResponseEntity<Page<PublicacionResponse>> obtenerPublicaciones(Pageable pageable) {
 
         return ResponseEntity.ok(
-                publicacionService.obtenerPublicaciones());
+                publicacionService.obtenerPublicaciones(pageable)
+                        .map(this::convertirAResponse));
+    }
+
+    @GetMapping("/mias")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Page<PublicacionResponse>> obtenerMisPublicaciones(
+            Authentication authentication, Pageable pageable) {
+
+        return ResponseEntity.ok(
+                publicacionService.obtenerMisPublicaciones(authentication.getName(), pageable)
+                        .map(this::convertirAResponse));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Publicacion> obtenerPublicacionPorId(
+    public ResponseEntity<PublicacionResponse> obtenerPublicacionPorId(
             @PathVariable Long id)
             throws PublicacionNotFoundException {
 
         Publicacion publicacion =
                 publicacionService.obtenerPublicacionPorId(id);
 
-        return ResponseEntity.ok(publicacion);
+        return ResponseEntity.ok(convertirAResponse(publicacion));
     }
 
     @PostMapping
-    public ResponseEntity<Publicacion> crearPublicacion(
+    public ResponseEntity<PublicacionResponse> crearPublicacion(
             @RequestBody PublicacionRequest request)
             throws PublicacionDuplicateException {
 
@@ -63,11 +79,11 @@ public class PublicacionController {
                         URI.create(
                                 "/publicaciones/"
                                         + publicacion.getIdPublicacion()))
-                .body(publicacion);
+                .body(convertirAResponse(publicacion));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Publicacion> modificarPublicacion(
+    public ResponseEntity<PublicacionResponse> modificarPublicacion(
             @PathVariable Long id,
             @RequestBody PublicacionRequest request)
             throws PublicacionNotFoundException,
@@ -78,7 +94,7 @@ public class PublicacionController {
                         id,
                         request);
 
-        return ResponseEntity.ok(publicacion);
+        return ResponseEntity.ok(convertirAResponse(publicacion));
     }
 
     @DeleteMapping("/{id}")
@@ -92,83 +108,95 @@ public class PublicacionController {
     }
 
     @PutMapping("/{id}/pausar")
-    public ResponseEntity<Publicacion> pausarPublicacion(
+    public ResponseEntity<PublicacionResponse> pausarPublicacion(
             @PathVariable Long id)
             throws PublicacionNotFoundException {
 
         Publicacion publicacion =
                 publicacionService.pausarPublicacion(id);
 
-        return ResponseEntity.ok(publicacion);
+        return ResponseEntity.ok(convertirAResponse(publicacion));
     }
 
     @PutMapping("/{id}/reactivar")
-    public ResponseEntity<Publicacion> reactivarPublicacion(
+    public ResponseEntity<PublicacionResponse> reactivarPublicacion(
             @PathVariable Long id)
             throws PublicacionNotFoundException {
 
         Publicacion publicacion =
                 publicacionService.reactivarPublicacion(id);
 
-        return ResponseEntity.ok(publicacion);
+        return ResponseEntity.ok(convertirAResponse(publicacion));
     }
 
     @GetMapping("/filtros/estado")
-    public ResponseEntity<List<Publicacion>>
+    public ResponseEntity<Page<PublicacionResponse>>
             obtenerPublicacionesPorEstado(
-                    @RequestParam EstadoPublicacion estado) {
+                    @RequestParam EstadoPublicacion estado,
+                    Pageable pageable) {
 
         return ResponseEntity.ok(
                 publicacionService
-                        .obtenerPublicacionesPorEstado(estado));
+                        .obtenerPublicacionesPorEstado(estado, pageable)
+                        .map(this::convertirAResponse));
     }
 
     @GetMapping("/filtros/precio")
-    public ResponseEntity<List<Publicacion>>
+    public ResponseEntity<Page<PublicacionResponse>>
             obtenerPublicacionesPorPrecio(
                     @RequestParam BigDecimal precioMin,
-                    @RequestParam BigDecimal precioMax) {
+                    @RequestParam BigDecimal precioMax,
+                    Pageable pageable) {
 
         return ResponseEntity.ok(
                 publicacionService
                         .obtenerPublicacionesPorPrecio(
                                 precioMin,
-                                precioMax));
+                                precioMax,
+                                pageable)
+                        .map(this::convertirAResponse));
     }
 
     @GetMapping("/filtros/tipo")
-    public ResponseEntity<List<Publicacion>>
+    public ResponseEntity<Page<PublicacionResponse>>
             obtenerPublicacionesPorTipoVehiculo(
-                    @RequestParam Long idTipoVehiculo) {
+                    @RequestParam Long idTipoVehiculo,
+                    Pageable pageable) {
 
         return ResponseEntity.ok(
                 publicacionService
                         .obtenerPublicacionesPorTipoVehiculo(
-                                idTipoVehiculo));
+                                idTipoVehiculo,
+                                pageable)
+                        .map(this::convertirAResponse));
     }
 
     @GetMapping("/filtros/marca")
-    public ResponseEntity<List<Publicacion>>
+    public ResponseEntity<Page<PublicacionResponse>>
             obtenerPublicacionesPorMarca(
-                    @RequestParam String marca) {
+                    @RequestParam String marca,
+                    Pageable pageable) {
 
         return ResponseEntity.ok(
                 publicacionService
-                        .obtenerPublicacionesPorMarca(marca));
+                        .obtenerPublicacionesPorMarca(marca, pageable)
+                        .map(this::convertirAResponse));
     }
 
     @GetMapping("/filtros/modelo")
-    public ResponseEntity<List<Publicacion>>
+    public ResponseEntity<Page<PublicacionResponse>>
             obtenerPublicacionesPorModelo(
-                    @RequestParam String modelo) {
+                    @RequestParam String modelo,
+                    Pageable pageable) {
 
         return ResponseEntity.ok(
                 publicacionService
-                        .obtenerPublicacionesPorModelo(modelo));
+                        .obtenerPublicacionesPorModelo(modelo, pageable)
+                        .map(this::convertirAResponse));
     }
 
     @GetMapping("/filtros/provincia")
-    public ResponseEntity<Page<Publicacion>>
+    public ResponseEntity<Page<PublicacionResponse>>
             obtenerPublicacionesPorProvincia(
                     @RequestParam String provincia,
                     Pageable pageable) {
@@ -177,11 +205,12 @@ public class PublicacionController {
                 publicacionService
                         .obtenerPublicacionesPorProvincia(
                                 provincia,
-                                pageable));
+                                pageable)
+                        .map(this::convertirAResponse));
     }
 
     @GetMapping("/filtros/provincia-ciudad")
-    public ResponseEntity<Page<Publicacion>>
+    public ResponseEntity<Page<PublicacionResponse>>
             obtenerPublicacionesPorProvinciaYCiudad(
                     @RequestParam String provincia,
                     @RequestParam String ciudad,
@@ -192,11 +221,12 @@ public class PublicacionController {
                         .obtenerPublicacionesPorProvinciaYCiudad(
                                 provincia,
                                 ciudad,
-                                pageable));
+                                pageable)
+                        .map(this::convertirAResponse));
     }
 
     @GetMapping("/filtros/provincia-ciudad-localidad")
-    public ResponseEntity<Page<Publicacion>>
+    public ResponseEntity<Page<PublicacionResponse>>
             obtenerPublicacionesPorProvinciaCiudadYLocalidad(
                     @RequestParam String provincia,
                     @RequestParam String ciudad,
@@ -209,14 +239,45 @@ public class PublicacionController {
                                 provincia,
                                 ciudad,
                                 localidad,
-                                pageable));
+                                pageable)
+                        .map(this::convertirAResponse));
     }
 
     @GetMapping("/filtros/zona")
-    public ResponseEntity<Page<Publicacion>> obtenerPublicacionesPorZona(
+    public ResponseEntity<Page<PublicacionResponse>> obtenerPublicacionesPorZona(
             @RequestParam String zona, Pageable pageable) {
         return ResponseEntity.ok(
-                publicacionService.obtenerPublicacionesPorZona(zona, pageable));
+                publicacionService.obtenerPublicacionesPorZona(zona, pageable)
+                        .map(this::convertirAResponse));
+    }
+
+    private PublicacionResponse convertirAResponse(Publicacion publicacion) {
+        Vehiculo vehiculo = publicacion.getVehiculo();
+        TipoVehiculo tipoVehiculo = vehiculo.getTipoVehiculo();
+        Ubicacion ubicacion = publicacion.getUbicacion();
+
+        return new PublicacionResponse(
+                publicacion.getIdPublicacion(),
+                publicacion.getFechaPublicacion(),
+                publicacion.getEstado(),
+                publicacion.getPrecioDia(),
+                publicacion.getDescuentoPorcentaje(),
+                publicacion.getDescripcion(),
+                publicacion.getHoraRetiroDevolucion(),
+                vehiculo.getIdVehiculo(),
+                vehiculo.getPatente(),
+                vehiculo.getMarca(),
+                vehiculo.getModelo(),
+                vehiculo.getAnio(),
+                vehiculo.getColor(),
+                vehiculo.getCantidadAsientos(),
+                tipoVehiculo != null ? tipoVehiculo.getIdTipoVehiculo() : null,
+                tipoVehiculo != null ? tipoVehiculo.getNombre() : null,
+                ubicacion.getIdUbicacion(),
+                ubicacion.getProvincia(),
+                ubicacion.getCiudad(),
+                ubicacion.getLocalidad(),
+                ubicacion.getZona());
     }
 
 }

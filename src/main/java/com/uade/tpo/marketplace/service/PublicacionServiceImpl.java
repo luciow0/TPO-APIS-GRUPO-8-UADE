@@ -1,7 +1,6 @@
 package com.uade.tpo.marketplace.service;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -75,8 +74,14 @@ public class PublicacionServiceImpl implements PublicacionService {
         }
 
         @Override
-        public List<Publicacion> obtenerPublicaciones() {
-                return publicacionRepository.findAll();
+        public Page<Publicacion> obtenerPublicaciones(Pageable pageable) {
+                return publicacionRepository.findByEstado(EstadoPublicacion.ACTIVA, pageable);
+        }
+
+        @PreAuthorize("isAuthenticated()")
+        @Override
+        public Page<Publicacion> obtenerMisPublicaciones(String emailUsuario, Pageable pageable) {
+                return publicacionRepository.findByVehiculo_Propietario_Email(emailUsuario, pageable);
         }
 
         @Override
@@ -190,16 +195,18 @@ public class PublicacionServiceImpl implements PublicacionService {
         }
 
         @Override
-        public List<Publicacion> obtenerPublicacionesPorEstado(
-                        EstadoPublicacion estado) {
+        public Page<Publicacion> obtenerPublicacionesPorEstado(
+                        EstadoPublicacion estado,
+                        Pageable pageable) {
 
-                return publicacionRepository.findByEstado(estado);
+                return publicacionRepository.findByEstado(estado, pageable);
         }
 
         @Override
-        public List<Publicacion> obtenerPublicacionesPorPrecio(
+        public Page<Publicacion> obtenerPublicacionesPorPrecio(
                         BigDecimal precioMin,
-                        BigDecimal precioMax) {
+                        BigDecimal precioMax,
+                        Pageable pageable) {
 
                 if (precioMin == null || precioMax == null) {
                         throw new ResponseStatusException(
@@ -221,15 +228,17 @@ public class PublicacionServiceImpl implements PublicacionService {
                                         "El precio minimo no puede ser mayor al precio maximo");
                 }
 
-                return soloPublicacionesActivas(
-                                publicacionRepository.findByPrecioDiaBetween(
-                                                precioMin,
-                                                precioMax));
+                return publicacionRepository.findByPrecioDiaBetweenAndEstado(
+                                precioMin,
+                                precioMax,
+                                EstadoPublicacion.ACTIVA,
+                                pageable);
         }
 
         @Override
-        public List<Publicacion> obtenerPublicacionesPorTipoVehiculo(
-                        Long idTipoVehiculo) {
+        public Page<Publicacion> obtenerPublicacionesPorTipoVehiculo(
+                        Long idTipoVehiculo,
+                        Pageable pageable) {
 
                 if (idTipoVehiculo == null) {
                         throw new ResponseStatusException(
@@ -237,34 +246,35 @@ public class PublicacionServiceImpl implements PublicacionService {
                                         "El tipo de vehiculo es obligatorio");
                 }
 
-                return soloPublicacionesActivas(
-                                publicacionRepository
-                                                .findByVehiculo_TipoVehiculo_IdTipoVehiculo(
-                                                                idTipoVehiculo));
+                return publicacionRepository
+                                .findByVehiculo_TipoVehiculo_IdTipoVehiculoAndEstado(
+                                                idTipoVehiculo,
+                                                EstadoPublicacion.ACTIVA,
+                                                pageable);
         }
 
         @Override
-        public List<Publicacion> obtenerPublicacionesPorMarca(
-                        String marca) {
+        public Page<Publicacion> obtenerPublicacionesPorMarca(
+                        String marca,
+                        Pageable pageable) {
 
                 validarTextoFiltro(marca, "La marca es obligatoria");
 
-                return soloPublicacionesActivas(
-                                publicacionRepository
-                                                .findByVehiculo_MarcaIgnoreCase(
-                                                                marca.trim()));
+                return publicacionRepository
+                                .findByVehiculo_MarcaIgnoreCaseAndEstado(
+                                                marca.trim(), EstadoPublicacion.ACTIVA, pageable);
         }
 
         @Override
-        public List<Publicacion> obtenerPublicacionesPorModelo(
-                        String modelo) {
+        public Page<Publicacion> obtenerPublicacionesPorModelo(
+                        String modelo,
+                        Pageable pageable) {
 
                 validarTextoFiltro(modelo, "El modelo es obligatorio");
 
-                return soloPublicacionesActivas(
-                                publicacionRepository
-                                                .findByVehiculo_ModeloIgnoreCase(
-                                                                modelo.trim()));
+                return publicacionRepository
+                                .findByVehiculo_ModeloIgnoreCaseAndEstado(
+                                                modelo.trim(), EstadoPublicacion.ACTIVA, pageable);
         }
 
         @Override
@@ -331,14 +341,6 @@ public class PublicacionServiceImpl implements PublicacionService {
                                                 localidad.trim(),
                                                 EstadoPublicacion.ACTIVA,
                                                 pageable);
-        }
-
-        private List<Publicacion> soloPublicacionesActivas(
-                        List<Publicacion> publicaciones) {
-
-                return publicaciones.stream()
-                                .filter(publicacion -> publicacion.getEstado() == EstadoPublicacion.ACTIVA)
-                                .toList();
         }
 
         private void validarTextoFiltro(

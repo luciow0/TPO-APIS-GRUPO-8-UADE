@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -45,8 +47,8 @@ public class DisponibilidadServiceImpl implements DisponibilidadService {
     }
 
     @Override
-    public List<Disponibilidad> obtenerDisponibilidades() {
-        return disponibilidadRepository.findAll();
+    public Page<Disponibilidad> obtenerDisponibilidades(Pageable pageable) {
+        return disponibilidadRepository.findAll(pageable);
     }
 
     @Override
@@ -65,7 +67,7 @@ public class DisponibilidadServiceImpl implements DisponibilidadService {
         publicacionService.obtenerPublicacionPorId(idPublicacion);
 
         return disponibilidadRepository
-                .findByPublicacion_IdPublicacion(idPublicacion);
+                .findByPublicacion_IdPublicacionOrderByFechaInicioAsc(idPublicacion);
     }
 
     @Override

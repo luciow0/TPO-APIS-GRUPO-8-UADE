@@ -8,7 +8,6 @@ import lombok.Data;
 @Data
 public class PublicacionRequest {
 
-    private Long idPublicacion;
     private BigDecimal precioDia;
     private BigDecimal descuentoPorcentaje;
     private String descripcion;
