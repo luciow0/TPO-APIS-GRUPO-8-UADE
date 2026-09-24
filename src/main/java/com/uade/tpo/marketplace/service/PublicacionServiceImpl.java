@@ -189,6 +189,18 @@ public class PublicacionServiceImpl implements PublicacionService {
                 Publicacion publicacion = publicacionRepository.findById(id)
                                 .orElseThrow(PublicacionNotFoundException::new);
 
+                if (publicacion.getEstado() == EstadoPublicacion.DESACTIVADA) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "No se puede reactivar una publicacion desactivada");
+                }
+
+                if (publicacion.getEstado() != EstadoPublicacion.PAUSADA) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Solo se puede reactivar una publicacion pausada");
+                }
+
                 publicacion.setEstado(EstadoPublicacion.ACTIVA);
 
                 return publicacionRepository.save(publicacion);
@@ -376,11 +388,11 @@ public class PublicacionServiceImpl implements PublicacionService {
                                                 .compareTo(BigDecimal.ZERO) < 0
                                                 || request.getDescuentoPorcentaje()
                                                                 .compareTo(
-                                                                                new BigDecimal("90")) > 0)) {
+                                                                                new BigDecimal("50")) > 0)) {
 
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,
-                                        "El descuento debe estar entre 0 y 90");
+                                        "El descuento debe estar entre 0 y 50");
                 }
 
                 if (request.getDescripcion() == null

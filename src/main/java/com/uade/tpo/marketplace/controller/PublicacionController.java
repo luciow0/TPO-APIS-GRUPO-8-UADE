@@ -56,6 +56,7 @@ public class PublicacionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@seguridadDominio.puedeVerPublicacion(authentication, #id)")
     public ResponseEntity<PublicacionResponse> obtenerPublicacionPorId(
             @PathVariable Long id)
             throws PublicacionNotFoundException {
@@ -130,6 +131,7 @@ public class PublicacionController {
     }
 
     @GetMapping("/filtros/estado")
+    @PreAuthorize("#estado == T(com.uade.tpo.marketplace.Enum.EstadoPublicacion).ACTIVA or hasRole('ADMIN')")
     public ResponseEntity<Page<PublicacionResponse>>
             obtenerPublicacionesPorEstado(
                     @RequestParam EstadoPublicacion estado,

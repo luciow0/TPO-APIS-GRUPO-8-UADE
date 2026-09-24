@@ -44,6 +44,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/publicaciones/**",
+                                "/disponibilidades/publicacion/{idPublicacion}",
+                                "/imagen-vehiculo",
+                                "/imagen-vehiculo/**",
                                 "/vehiculo",
                                 "/vehiculo/**",
                                 "/tipo-vehiculo",

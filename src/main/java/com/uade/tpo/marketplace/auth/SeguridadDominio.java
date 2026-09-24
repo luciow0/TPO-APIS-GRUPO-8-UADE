@@ -1,9 +1,11 @@
 package com.uade.tpo.marketplace.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.uade.tpo.marketplace.Enum.EstadoPublicacion;
 import com.uade.tpo.marketplace.entity.*;
 import com.uade.tpo.marketplace.exception.*;
 import com.uade.tpo.marketplace.repository.*;
@@ -42,6 +44,23 @@ public class SeguridadDominio {
         Publicacion publicacion = publicacionRepository.findById(idPublicacion)
                 .orElseThrow(PublicacionNotFoundException::new);
         return publicacion.getVehiculo().getPropietario().getEmail().equals(auth.getName());
+    }
+
+    public boolean puedeVerPublicacion(Authentication auth, Long idPublicacion) throws PublicacionNotFoundException {
+        Publicacion publicacion = publicacionRepository.findById(idPublicacion)
+                .orElseThrow(PublicacionNotFoundException::new);
+
+        if (publicacion.getEstado() == EstadoPublicacion.ACTIVA) {
+            return true;
+        }
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return false;
+        }
+
+        return auth.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))
+                || publicacion.getVehiculo().getPropietario().getEmail().equals(auth.getName());
     }
 
     public boolean esDuenioDeVehiculo(Authentication auth, Long idVehiculo) {
