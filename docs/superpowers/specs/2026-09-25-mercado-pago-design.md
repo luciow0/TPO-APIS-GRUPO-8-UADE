@@ -29,37 +29,51 @@ app, porque Hibernate no puede mapear un valor de enum que ya no existe.
 
 ## Flujo
 
-1. `POST /pagos` (existente, sin cambios) crea el `Pago` en `PENDIENTE` con `metodoPago = MERCADO_PAGO`.
-2. `POST /pagos/{idPago}/checkout` (nuevo, autenticado, dueño de la reserva o admin):
-   - Valida que el pago exista, sea `MERCADO_PAGO` y esté `PENDIENTE`.
-   - Crea una Preference en Mercado Pago con el SDK Java oficial:
+1. El usuario confirma el carrito: `POST /carritos/{idCarrito}/confirmar` con
+   `{ "metodoPago": "MERCADO_PAGO" }` (existente, sin cambios).
+2. El backend crea la `Reserva` en `PENDIENTE` y el `Pago` en `PENDIENTE` con `MERCADO_PAGO`
+   (ya lo hace `CarritoServiceImpl.confirmarCarrito`).
+3. El frontend recibe `idPago` en `ConfirmacionCarritoResponse` (ya viene hoy).
+   Si el método elegido fue `EFECTIVO`, el frontend no sigue con el checkout; ese pago lo resuelve
+   un admin a mano como hoy.
+4. El frontend inicia el checkout: `POST /pagos/{idPago}/checkout` (nuevo, autenticado, dueño del
+   pago o admin).
+5. El backend valida que el pago exista, sea `MERCADO_PAGO` y esté `PENDIENTE`, y crea o recupera
+   la Preference:
+   - Si el `Pago` ya tiene `preferenceId`, la recupera de Mercado Pago y reutiliza su `initPoint`
+     (el usuario cerró la pestaña y vuelve a intentar).
+   - Si no tiene, crea una con el SDK Java oficial:
      - un ítem: título `Reserva #<idReserva>`, cantidad 1, precio unitario `pago.monto`, moneda ARS;
      - `external_reference = idPago`;
      - `back_urls` success / failure / pending hacia el frontend;
      - `auto_return = approved`;
-     - `notification_url` hacia nuestro webhook.
-   - Guarda `preferenceId` en el `Pago`.
-   - Responde `{ idPago, preferenceId, initPoint }`. `initPoint` es la URL del checkout sandbox.
-   - Si ya tenía preferencia, crea una nueva y reemplaza el `preferenceId` (el usuario puede
-     reintentar tras cerrar la pestaña).
-3. El usuario paga en el checkout de Mercado Pago con una tarjeta de prueba o un usuario comprador de prueba.
-4. Mercado Pago redirige el navegador a la `back_url` que corresponda, agregando sus query params
-   (`payment_id`, `status`, `external_reference`, ...). Esto es solo para la UX del frontend y no
-   cambia ningún estado.
-5. Mercado Pago llama a `POST /pagos/webhook/mercadopago` (nuevo, público) con el id del pago de MP
-   (`type=payment` y `data.id`, en query params o en el body).
-6. El backend no confía en el contenido de la notificación: consulta el pago a la API de Mercado Pago
-   con el access token y usa `status` y `external_reference` de esa respuesta.
-7. Se busca el `Pago` local por `external_reference`:
-   - `approved` → `APROBADO` y `reservaService.confirmarReserva(...)`.
-   - `rejected` / `cancelled` → `RECHAZADO` y `reservaService.rechazarReserva(...)`.
-   - cualquier otro estado (`pending`, `in_process`, ...) → no se cambia nada.
-   - Se guarda `mercadoPagoPaymentId`.
-   - Si el pago local ya no está `PENDIENTE`, no se hace nada (MP reintenta notificaciones).
-8. El webhook siempre responde `200` cuando la notificación se procesó o se ignoró a propósito
-   (tipo distinto de `payment`, pago desconocido, ya procesado). Responde `500` solo si falla la
-   consulta a Mercado Pago, para que MP reintente.
-9. El frontend consulta `GET /pagos/reserva/{idReserva}` para mostrar "reserva confirmada" o no.
+     - `notification_url` hacia nuestro webhook;
+     y guarda `preferenceId` en el `Pago`.
+6. El backend responde:
+   ```json
+   { "idPago": 21, "preferenceId": "...", "initPoint": "https://..." }
+   ```
+7. El frontend redirige el navegador a `initPoint`.
+8. El usuario paga en Mercado Pago con una tarjeta de prueba o un usuario comprador de prueba.
+9. Mercado Pago:
+   - redirige el navegador a la `back_url` que corresponda, agregando sus query params
+     (`payment_id`, `status`, `external_reference`, ...). Es solo para la UX del frontend y no
+     cambia ningún estado;
+   - llama a `POST /pagos/webhook/mercadopago` (nuevo, público) con el id del pago de MP
+     (`type=payment` y `data.id`, en query params o en el body).
+10. El webhook no confía en el contenido de la notificación: consulta el pago real a la API de
+    Mercado Pago con el access token y usa `status` y `external_reference` de esa respuesta.
+11. El backend busca el `Pago` local por `external_reference` y actualiza:
+    - `approved` → `Pago APROBADO` y `Reserva CONFIRMADA` (`reservaService.confirmarReserva`).
+    - `rejected` / `cancelled` → `Pago RECHAZADO` y `Reserva RECHAZADA` (`reservaService.rechazarReserva`).
+    - `pending` / `in_process` → ambos siguen `PENDIENTE`.
+    - Guarda `mercadoPagoPaymentId`.
+    - Si el pago local ya no está `PENDIENTE`, no hace nada (Mercado Pago reintenta notificaciones).
+
+    El webhook responde `200` cuando la notificación se procesó o se ignoró a propósito (tipo
+    distinto de `payment`, pago desconocido, ya procesado). Responde `500` solo si falla la consulta
+    a Mercado Pago, para que reintente.
+12. El frontend consulta `GET /pagos/{idPago}` (existente) para mostrar "reserva confirmada" o no.
 
 ## Aprobación manual
 
@@ -81,8 +95,9 @@ app, porque Hibernate no puede mapear un valor de enum que ya no existe.
 - `pom.xml`: dependencia `com.mercadopago:sdk-java`; `spring-boot-starter-test` en scope test.
 - `config/MercadoPagoProperties`: lee la configuración de abajo.
 - `service/MercadoPagoGateway` (interfaz) + `MercadoPagoGatewayImpl`: única clase que usa el SDK.
-  Expone `crearPreferencia(Pago)` → `{ preferenceId, initPoint }` y `obtenerPago(String paymentId)` →
-  `{ status, externalReference }`. Así el servicio se puede testear sin llamar a Mercado Pago.
+  Expone `crearPreferencia(Pago)` → `{ preferenceId, initPoint }`,
+  `obtenerPreferencia(String preferenceId)` → `{ preferenceId, initPoint }` y
+  `obtenerPago(String paymentId)` → `{ status, externalReference }`. Así el servicio se puede testear sin llamar a Mercado Pago.
 - `PagoService` / `PagoServiceImpl`:
   - `crearCheckout(Long idPago)` con `@PreAuthorize` de dueño del pago o admin.
   - `procesarNotificacionMercadoPago(String paymentId)` sin `@PreAuthorize`, porque la llamada viene
@@ -120,7 +135,8 @@ La Public Key no se usa en el backend (Checkout Pro redirige a `initPoint`), as�
 
 Tests unitarios de `PagoServiceImpl` con `MercadoPagoGateway` y repositorios mockeados (Mockito):
 
-- `crearCheckout` guarda `preferenceId` y devuelve `initPoint`.
+- `crearCheckout` sin preferencia previa crea una, guarda `preferenceId` y devuelve `initPoint`.
+- `crearCheckout` con `preferenceId` existente la recupera y no crea otra.
 - `crearCheckout` rechaza pagos `EFECTIVO` y pagos no `PENDIENTE`.
 - Webhook `approved` → `APROBADO` y confirma la reserva.
 - Webhook `rejected` → `RECHAZADO` y rechaza la reserva.
