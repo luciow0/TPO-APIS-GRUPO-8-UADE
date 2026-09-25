@@ -113,6 +113,27 @@ public class PagoController {
         return ResponseEntity.ok(pagoService.crearCheckout(idPago));
     }
 
+    // Mercado Pago avisa server-to-server aunque el usuario cierre la pestaña antes del retorno.
+
+    @PostMapping("/mercadopago/webhook")
+    public ResponseEntity<Void> webhookMercadoPago(
+            @RequestParam(name = "type", required = false) String type,
+            @RequestParam(name = "topic", required = false) String topic,
+            @RequestParam(name = "data.id", required = false) String dataId,
+            @RequestParam(name = "id", required = false) String id)
+            throws MercadoPagoException,
+            ReservaNotFoundException, ReservaInvalidException {
+
+        boolean esPago = "payment".equals(type) || "payment".equals(topic);
+        Long paymentId = parsearId(dataId != null ? dataId : id);
+
+        if (esPago && paymentId != null) {
+            pagoService.procesarPagoMercadoPago(paymentId);
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
     // back_url de la preferencia: Mercado Pago devuelve el navegador aca y lo mandamos a la pantalla de la reserva.
     @GetMapping("/mercadopago/retorno")
     public ResponseEntity<Void> retornoDesdeMercadoPago(

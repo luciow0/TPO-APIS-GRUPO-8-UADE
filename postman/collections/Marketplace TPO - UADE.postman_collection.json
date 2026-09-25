@@ -1572,6 +1572,39 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Webhook Mercado Pago (lo llama Mercado Pago)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "description": "Publico. data.id es el id del pago en Mercado Pago; el backend consulta su estado real a la API de Mercado Pago.",
+            "url": {
+              "raw": "{{baseUrl}}/pagos/mercadopago/webhook?type=payment&data.id=123456789",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos",
+                "mercadopago",
+                "webhook"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "payment"
+                },
+                {
+                  "key": "data.id",
+                  "value": "123456789"
+                }
+              ]
+            }
+          },
+          "response": []
         }
       ]
     }

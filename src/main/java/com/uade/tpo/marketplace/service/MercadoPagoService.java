@@ -1,5 +1,7 @@
 package com.uade.tpo.marketplace.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -24,6 +26,8 @@ import com.uade.tpo.marketplace.exception.MercadoPagoException;
 public class MercadoPagoService {
 
     private static final Logger log = LoggerFactory.getLogger(MercadoPagoService.class);
+
+    public static final int MINUTOS_PARA_PAGAR = 30;
 
     private final String publicUrl;
     private final PreferenceClient preferenceClient = new PreferenceClient();
@@ -61,6 +65,12 @@ public class MercadoPagoService {
                 .backUrls(backUrls)
                 .autoReturn("approved")
                 .externalReference(String.valueOf(pago.getIdPago()))
+                .notificationUrl(publicUrl + "/pagos/mercadopago/webhook")
+                // Vence junto con la reserva: si no, se podria pagar una reserva ya rechazada.
+                .expires(true)
+                .expirationDateTo(vencimientoReserva(pago)
+                        .atZone(ZoneId.systemDefault())
+                        .toOffsetDateTime())
                 .build();
 
         try {
@@ -72,6 +82,10 @@ public class MercadoPagoService {
             log.error("Error al crear la preferencia en Mercado Pago", e);
             throw new MercadoPagoException();
         }
+    }
+
+    public static LocalDateTime vencimientoReserva(Pago pago) {
+        return pago.getReserva().getFechaCreacion().plusMinutes(MINUTOS_PARA_PAGAR);
     }
 
     public Preference obtenerPreferencia(String preferenceId) throws MercadoPagoException {

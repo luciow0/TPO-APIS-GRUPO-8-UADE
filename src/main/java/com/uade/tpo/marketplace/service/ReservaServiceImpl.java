@@ -1,10 +1,12 @@
 package com.uade.tpo.marketplace.service;
 
+import com.uade.tpo.marketplace.Enum.EstadoPago;
 import com.uade.tpo.marketplace.Enum.EstadoReserva;
 import com.uade.tpo.marketplace.entity.Carrito;
 import com.uade.tpo.marketplace.entity.Reserva;
 import com.uade.tpo.marketplace.exception.ReservaInvalidException;
 import com.uade.tpo.marketplace.exception.ReservaNotFoundException;
+import com.uade.tpo.marketplace.repository.PagoRepository;
 import com.uade.tpo.marketplace.repository.ReservaRepository;
 import com.uade.tpo.marketplace.service.ReservaService;
 
@@ -13,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
@@ -26,7 +29,11 @@ public class ReservaServiceImpl implements ReservaService {
     @Autowired
     private ReservaRepository reservaRepository;
 
+    @Autowired
+    private PagoRepository pagoRepository;
+
     @PreAuthorize("@seguridadDominio.esDuenioDeReserva(authentication, #idReserva)")
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Reserva cancelarReserva(Long idReserva, Long idUsuario)throws ReservaNotFoundException, ReservaInvalidException {
         Optional<Reserva> reservaOptional = reservaRepository.findById(idReserva);
@@ -41,11 +48,14 @@ public class ReservaServiceImpl implements ReservaService {
         throw new ReservaInvalidException();
     }
 
-    if (reserva.getEstado() != EstadoReserva.CONFIRMADA) {
-        throw new ReservaInvalidException();
-    }
-
-    if (!reserva.getFechaInicio().isAfter(LocalDate.now())) {
+    if (reserva.getEstado() == EstadoReserva.PENDIENTE) {
+        // Todavia no se pago: se libera la reserva y el pago queda rechazado.
+        pagoRepository.findByReservaIdReserva(idReserva).ifPresent(pago -> {
+            pago.setEstado(EstadoPago.RECHAZADO);
+            pagoRepository.save(pago);
+        });
+    } else if (reserva.getEstado() != EstadoReserva.CONFIRMADA
+            || !reserva.getFechaInicio().isAfter(LocalDate.now())) {
         throw new ReservaInvalidException();
     }
 

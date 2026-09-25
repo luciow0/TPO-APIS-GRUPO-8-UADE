@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/pagos/mercadopago/retorno").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/pagos/mercadopago/webhook").permitAll()
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/publicaciones/**",

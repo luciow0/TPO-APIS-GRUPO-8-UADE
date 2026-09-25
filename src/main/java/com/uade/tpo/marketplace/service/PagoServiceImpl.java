@@ -2,10 +2,15 @@ package com.uade.tpo.marketplace.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +33,9 @@ import com.uade.tpo.marketplace.repository.PagoRepository;
 
 @Service
 public class PagoServiceImpl implements PagoService {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(PagoServiceImpl.class);
+
     @Autowired
     private PagoRepository pagoRepository;
 
@@ -154,7 +161,8 @@ public class PagoServiceImpl implements PagoService {
                 .orElseThrow(PagoNotFoundException::new);
 
         if (pago.getMetodo() != MetodoPago.MERCADO_PAGO
-                || pago.getEstado() != EstadoPago.PENDIENTE) {
+                || pago.getEstado() != EstadoPago.PENDIENTE
+                || !MercadoPagoService.vencimientoReserva(pago).isAfter(LocalDateTime.now())) {
             throw new PagoInvalidException();
         }
 
@@ -174,7 +182,7 @@ public class PagoServiceImpl implements PagoService {
                 preferencia.getInitPoint());
     }
 
-    // Sin @PreAuthorize: lo invoca la redireccion de Mercado Pago, no un usuario logueado.
+    // Sin @PreAuthorize: lo invocan el webhook y la redireccion de Mercado Pago, no un usuario logueado.
     // El estado se toma de la API de Mercado Pago, nunca de lo que manda el navegador.
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -213,6 +221,25 @@ public class PagoServiceImpl implements PagoService {
         }
 
         return Optional.of(pagoRepository.save(pago));
+    }
+
+    // Libera las fechas del auto y al usuario si no pago con Mercado Pago a tiempo.
+    @Scheduled(fixedRate = 60_000)
+    @Transactional
+    public void vencerReservasSinPagar() {
+        LocalDateTime limite = LocalDateTime.now().minusMinutes(MercadoPagoService.MINUTOS_PARA_PAGAR);
+
+        List<Pago> vencidos = pagoRepository.findByMetodoAndEstadoAndReservaFechaCreacionBefore(
+                MetodoPago.MERCADO_PAGO, EstadoPago.PENDIENTE, limite);
+
+        for (Pago pago : vencidos) {
+            try {
+                aplicarRechazo(pago);
+                pagoRepository.save(pago);
+            } catch (ReservaNotFoundException | ReservaInvalidException e) {
+                log.warn("No se pudo vencer la reserva del pago {}", pago.getIdPago(), e);
+            }
+        }
     }
 
     @Override
