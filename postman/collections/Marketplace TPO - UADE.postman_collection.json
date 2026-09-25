@@ -194,7 +194,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"direccion\": \"Av. Siempre Viva 742\",\n    \"ciudad\": \"Cordoba\",\n    \"provincia\": \"Cordoba\",\n    \"localidad\": \"Centro\",\n    \"codigoPostal\": \"1423\",\n    \"zona\": \"centro\"\n}",
+              "raw": "{\n    \"direccion\": \"Av. Siempre Viva 742\",\n    \"ciudad\": \"Cordoba\",\n    \"provincia\": \"Cordoba\",\n    \"localidad\": \"Centro\",\n    \"codigoPostal\": \"1423\",\n    \"zona\": \"centro\",\n    \"latitud\": -31.4166870,\n    \"longitud\": -64.1833490\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -260,7 +260,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"direccion\": \"Av. Siempre Viva 742 actualizada\",\n    \"ciudad\": \"La Plata\",\n    \"provincia\": \"Buenos Aires\",\n    \"localidad\": \"Centro\",\n    \"codigoPostal\": \"1900\",\n    \"zona\": \"Sur\"\n}",
+              "raw": "{\n    \"direccion\": \"Av. Siempre Viva 742 actualizada\",\n    \"ciudad\": \"La Plata\",\n    \"provincia\": \"Buenos Aires\",\n    \"localidad\": \"Centro\",\n    \"codigoPostal\": \"1900\",\n    \"zona\": \"Sur\",\n    \"latitud\": -34.9214300,\n    \"longitud\": -57.9544500\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1511,6 +1511,63 @@
                 "pagos",
                 "1",
                 "rechazar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Iniciar checkout Mercado Pago",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "description": "Crea (o recupera) la preferencia de Checkout Pro. Redirigir el navegador a initPoint.",
+            "url": {
+              "raw": "{{baseUrl}}/pagos/1/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos",
+                "1",
+                "checkout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Retorno desde Mercado Pago (back_url)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "description": "Publico. Mercado Pago redirige el navegador aca; responde 302 hacia el frontend (/reservas/{idReserva}).",
+            "url": {
+              "raw": "{{baseUrl}}/pagos/mercadopago/retorno?payment_id=123456789&status=approved&external_reference=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos",
+                "mercadopago",
+                "retorno"
+              ],
+              "query": [
+                {
+                  "key": "payment_id",
+                  "value": "123456789"
+                },
+                {
+                  "key": "status",
+                  "value": "approved"
+                },
+                {
+                  "key": "external_reference",
+                  "value": "1"
+                }
               ]
             }
           },

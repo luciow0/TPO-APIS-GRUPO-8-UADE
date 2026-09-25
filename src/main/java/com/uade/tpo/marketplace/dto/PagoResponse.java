@@ -21,4 +21,6 @@ public class PagoResponse {
     private BigDecimal monto;
     private EstadoPago estado;
     private MetodoPago metodo;
+    private String preferenceId;
+    private String mercadoPagoPaymentId;
 }

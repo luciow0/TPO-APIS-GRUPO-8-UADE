@@ -3,9 +3,9 @@ package com.uade.tpo.marketplace.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 import com.uade.tpo.marketplace.Enum.EstadoReserva;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 

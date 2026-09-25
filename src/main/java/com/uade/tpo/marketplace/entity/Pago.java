@@ -3,14 +3,16 @@ import com.uade.tpo.marketplace.Enum.EstadoPago;
 import com.uade.tpo.marketplace.Enum.MetodoPago;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Pago {
@@ -26,6 +28,8 @@ public class Pago {
     private EstadoPago estado;
     @Enumerated(EnumType.STRING)
     private MetodoPago metodo;
+    private String preferenceId;
+    private String mercadoPagoPaymentId;
 
     @OneToOne
     @JoinColumn(name = "id_reserva", nullable = false, unique = true)

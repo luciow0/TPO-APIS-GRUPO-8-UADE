@@ -4,14 +4,19 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.uade.tpo.marketplace.dto.VehiculoDTO;
+import com.uade.tpo.marketplace.dto.VehiculoRequest;
 import com.uade.tpo.marketplace.entity.TipoVehiculo;
+import com.uade.tpo.marketplace.entity.Usuario;
 import com.uade.tpo.marketplace.entity.Vehiculo;
 import com.uade.tpo.marketplace.exception.EntityNotFoundException;
+import com.uade.tpo.marketplace.repository.UsuarioRepository;
 import com.uade.tpo.marketplace.repository.VehiculoRepository;
 
 @Service
@@ -19,11 +24,14 @@ public class VehiculoServiceImpl implements VehiculoService {
 
     private final VehiculoRepository vehiculoRepository;
     private final TipoVehiculoService tipoVehiculoService;
+    private final UsuarioRepository usuarioRepository;
 
     public VehiculoServiceImpl(VehiculoRepository vehiculoRepository,
-            TipoVehiculoService tipoVehiculoService) {
+            TipoVehiculoService tipoVehiculoService,
+            UsuarioRepository usuarioRepository) {
         this.vehiculoRepository = vehiculoRepository;
         this.tipoVehiculoService = tipoVehiculoService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
@@ -54,25 +62,36 @@ public class VehiculoServiceImpl implements VehiculoService {
 
     @Override
     @Transactional
-    @PreAuthorize("@seguridadDominio.esMismoUsuario(authentication, #vehiculo.propietario.idUsuario) or hasRole('ADMIN')")
-    public VehiculoDTO guardar(Vehiculo vehiculo) {
-        vehiculo.setTipoVehiculo(resolverTipoVehiculo(vehiculo.getTipoVehiculo()));
+    @PreAuthorize("@seguridadDominio.esMismoUsuario(authentication, #request.idUsuario) or hasRole('ADMIN')")
+    public VehiculoDTO guardar(VehiculoRequest request) {
+        Usuario propietario = obtenerUsuario(request.getIdUsuario());
+
+        Vehiculo vehiculo = new Vehiculo();
+        vehiculo.setPatente(request.getPatente());
+        vehiculo.setMarca(request.getMarca());
+        vehiculo.setModelo(request.getModelo());
+        vehiculo.setAnio(request.getAnio());
+        vehiculo.setColor(request.getColor());
+        vehiculo.setCantidadAsientos(request.getCantidadAsientos());
+        vehiculo.setPropietario(propietario);
+        vehiculo.setTipoVehiculo(resolverTipoVehiculo(request.getIdTipoVehiculo()));
+
         return convertirADTO(vehiculoRepository.save(vehiculo));
     }
 
     @PreAuthorize("@seguridadDominio.esDuenioDeVehiculo(authentication, #id) or hasRole('ADMIN')")
     @Override
     @Transactional
-    public VehiculoDTO actualizar(Long id, Vehiculo vehiculo) {
+    public VehiculoDTO actualizar(Long id, VehiculoRequest request) {
         Vehiculo vehiculoExistente = obtenerVehiculo(id);
 
-        vehiculoExistente.setPatente(vehiculo.getPatente());
-        vehiculoExistente.setMarca(vehiculo.getMarca());
-        vehiculoExistente.setModelo(vehiculo.getModelo());
-        vehiculoExistente.setAnio(vehiculo.getAnio());
-        vehiculoExistente.setColor(vehiculo.getColor());
-        vehiculoExistente.setCantidadAsientos(vehiculo.getCantidadAsientos());
-        vehiculoExistente.setTipoVehiculo(resolverTipoVehiculo(vehiculo.getTipoVehiculo()));
+        vehiculoExistente.setPatente(request.getPatente());
+        vehiculoExistente.setMarca(request.getMarca());
+        vehiculoExistente.setModelo(request.getModelo());
+        vehiculoExistente.setAnio(request.getAnio());
+        vehiculoExistente.setColor(request.getColor());
+        vehiculoExistente.setCantidadAsientos(request.getCantidadAsientos());
+        vehiculoExistente.setTipoVehiculo(resolverTipoVehiculo(request.getIdTipoVehiculo()));
 
         return convertirADTO(vehiculoRepository.save(vehiculoExistente));
     }
@@ -95,6 +114,12 @@ public class VehiculoServiceImpl implements VehiculoService {
                 .orElseThrow(() -> new EntityNotFoundException("Vehiculo no encontrado con id: " + id));
     }
 
+    private Usuario obtenerUsuario(Long idUsuario) {
+        return usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Usuario no encontrado con id: " + idUsuario));
+    }
+
     //
      //Valida el tipo de vehiculo que viene en el request.
      //buscamos ese id en la BD.
@@ -102,13 +127,13 @@ public class VehiculoServiceImpl implements VehiculoService {
      // si el id existe -> devolvemos el tipo real de la BD
      // si el id NO existe -> 404 limpio
      //
-    private TipoVehiculo resolverTipoVehiculo(TipoVehiculo tipoVehiculo) {
-        if (tipoVehiculo == null || tipoVehiculo.getIdTipoVehiculo() == null) {
+    private TipoVehiculo resolverTipoVehiculo(Long idTipoVehiculo) {
+        if (idTipoVehiculo == null) {
             return null;
         }
-        return tipoVehiculoService.obtenerTipoVehiculoPorId(tipoVehiculo.getIdTipoVehiculo())
+        return tipoVehiculoService.obtenerTipoVehiculoPorId(idTipoVehiculo)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Tipo de vehiculo no encontrado con id: " + tipoVehiculo.getIdTipoVehiculo()));
+                        "Tipo de vehiculo no encontrado con id: " + idTipoVehiculo));
     }
 
     private VehiculoDTO convertirADTO(Vehiculo vehiculo) {

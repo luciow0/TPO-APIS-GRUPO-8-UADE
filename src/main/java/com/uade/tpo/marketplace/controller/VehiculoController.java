@@ -17,14 +17,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplace.dto.VehiculoDTO;
-import com.uade.tpo.marketplace.entity.Vehiculo;
+import com.uade.tpo.marketplace.dto.VehiculoRequest;
 import com.uade.tpo.marketplace.service.VehiculoService;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("vehiculo")
-public class VehiculoController {
+public class
+VehiculoController {
 
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_SIZE = 10;
@@ -43,17 +44,17 @@ public class VehiculoController {
     }
 
     @PostMapping
-    public ResponseEntity<VehiculoDTO> crearVehiculo(@Valid @RequestBody Vehiculo vehiculo) {
+    public ResponseEntity<VehiculoDTO> crearVehiculo(@Valid @RequestBody VehiculoRequest request) {
         // Validar que la patente no exista
-        if (vehiculoService.existePatente(vehiculo.getPatente())) {
-            throw new IllegalArgumentException("La patente " + vehiculo.getPatente() + " ya existe");
+        if (vehiculoService.existePatente(request.getPatente())) {
+            throw new IllegalArgumentException("La patente " + request.getPatente() + " ya existe");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(vehiculoService.guardar(vehiculo));
+        return ResponseEntity.status(HttpStatus.CREATED).body(vehiculoService.guardar(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VehiculoDTO> actualizarVehiculo(@PathVariable Long id, @Valid @RequestBody Vehiculo vehiculo) {
-        return ResponseEntity.ok(vehiculoService.actualizar(id, vehiculo));
+    public ResponseEntity<VehiculoDTO> actualizarVehiculo(@PathVariable Long id, @Valid @RequestBody VehiculoRequest request) {
+        return ResponseEntity.ok(vehiculoService.actualizar(id, request));
     }
 
     @DeleteMapping("/{id}")

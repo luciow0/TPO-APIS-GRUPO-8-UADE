@@ -14,13 +14,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Usuario {
@@ -55,14 +55,10 @@ public class Usuario {
     @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
 
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @JsonIgnore
     @OneToMany(mappedBy = "propietario")
     private List<Vehiculo> vehiculos = new ArrayList<>();
 
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @JsonIgnore
     @OneToMany(mappedBy = "cliente")
     private List<Reserva> reservas = new ArrayList<>();

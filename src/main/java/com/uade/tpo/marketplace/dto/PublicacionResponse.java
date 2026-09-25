@@ -36,4 +36,7 @@ public class PublicacionResponse {
     private String ciudad;
     private String localidad;
     private String zona;
+    private String direccion;
+    private BigDecimal latitud;
+    private BigDecimal longitud;
 }

@@ -278,7 +278,10 @@ public class PublicacionController {
                 ubicacion.getProvincia(),
                 ubicacion.getCiudad(),
                 ubicacion.getLocalidad(),
-                ubicacion.getZona());
+                ubicacion.getZona(),
+                ubicacion.getDireccion(),
+                ubicacion.getLatitud(),
+                ubicacion.getLongitud());
     }
 
 }

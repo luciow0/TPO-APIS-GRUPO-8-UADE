@@ -32,6 +32,9 @@ public class UbicacionServiceImpl implements UbicacionService {
         u.setProvincia(request.getProvincia());
         u.setLocalidad(request.getLocalidad());
         u.setCodigoPostal(request.getCodigoPostal());
+        u.setLatitud(request.getLatitud());
+        u.setLongitud(request.getLongitud());
+        u.setPlaceId(request.getPlaceId());
         return ubicacionRepository.save(u);   // aquí se genera el idUbicacion
     }
 
@@ -52,6 +55,9 @@ public class UbicacionServiceImpl implements UbicacionService {
         u.setLocalidad(request.getLocalidad());
         u.setCodigoPostal(request.getCodigoPostal());
         u.setZona(request.getZona());
+        u.setLatitud(request.getLatitud());
+        u.setLongitud(request.getLongitud());
+        u.setPlaceId(request.getPlaceId());
         return ubicacionRepository.save(u);
     }
 }
