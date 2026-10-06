@@ -48,6 +48,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
+    public UsuarioDTO buscarPorEmail(String email) throws UsuarioNotFoundException {
+        return convertirADTO(obtenerUsuarioPorEmail(email));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Usuario obtenerUsuarioPorEmail(String email) throws UsuarioNotFoundException {
         return usuarioRepository.findByEmail(email)
@@ -106,7 +113,8 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuario.getEmail(),
                 usuario.getPassword(),
                 usuario.getTelefono(),
-                usuario.getFechaNacimiento());
+                usuario.getFechaNacimiento(),
+                usuario.getRole());
     }
 
     private Usuario convertirAEntidad(UsuarioDTO usuarioDTO) {
