@@ -17,7 +17,7 @@ jwt.secret-key=CAMBIAR_POR_UNA_CLAVE_DE_AL_MENOS_32_CARACTERES
 jwt.expiration=86400000
 
 # Mercado Pago (Checkout Pro)
-# Access Token de produccion del usuario vendedor DE PRUEBA (APP_USR-...). Mejor pasarlo por variable de entorno.
+# Access Token de "Credenciales de prueba" de la app en Mercado Pago Developers. Nunca commitearlo.
 mercadopago.access-token=${MERCADOPAGO_ACCESS_TOKEN:}
 # URL publica HTTPS del backend (ngrok/cloudflared) para la back_url. Mercado Pago no acepta localhost.
 app.public-url=${APP_PUBLIC_URL:}
