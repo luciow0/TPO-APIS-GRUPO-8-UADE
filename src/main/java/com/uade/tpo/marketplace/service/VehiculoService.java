@@ -12,6 +12,7 @@ import com.uade.tpo.marketplace.entity.Vehiculo;
 public interface VehiculoService {
 
     public Page<VehiculoDTO> listar(Pageable pageable);
+    public Page<VehiculoDTO> listarMisVehiculos(String emailUsuario, Pageable pageable);
     public VehiculoDTO buscarPorId(Long id);
     public VehiculoDTO buscarPorPatente(String patente);
     public VehiculoDTO guardar(VehiculoRequest request);

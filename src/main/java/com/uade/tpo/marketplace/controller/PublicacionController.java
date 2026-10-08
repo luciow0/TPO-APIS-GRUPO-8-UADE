@@ -6,6 +6,7 @@ import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -48,10 +49,13 @@ public class PublicacionController {
     @GetMapping("/mias")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<PublicacionResponse>> obtenerMisPublicaciones(
-            Authentication authentication, Pageable pageable) {
+            Authentication authentication,
+            @RequestParam(required = false) EstadoPublicacion estado,
+            @RequestParam(required = false) String busqueda,
+            @PageableDefault(size = 10) Pageable pageable) {
 
         return ResponseEntity.ok(
-                publicacionService.obtenerMisPublicaciones(authentication.getName(), pageable)
+                publicacionService.obtenerMisPublicaciones(authentication.getName(), estado, busqueda, pageable)
                         .map(this::convertirAResponse));
     }
 

@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.uade.tpo.marketplace.entity.Publicacion;
@@ -24,6 +26,26 @@ public interface PublicacionRepository extends JpaRepository<Publicacion, Long> 
 
         @EntityGraph(attributePaths = {"vehiculo", "vehiculo.tipoVehiculo", "ubicacion"})
         Page<Publicacion> findByVehiculo_Propietario_Email(String email, Pageable pageable);
+
+        @EntityGraph(attributePaths = {"vehiculo", "vehiculo.tipoVehiculo", "ubicacion"})
+        @Query(value = """
+                        select p from Publicacion p join p.vehiculo v
+                        where v.propietario.email = :emailUsuario
+                        and (:estado is null or p.estado = :estado)
+                        and (:busqueda is null or lower(concat(v.marca, ' ', v.modelo, ' ', v.patente))
+                             like :busqueda escape '!')
+                        """, countQuery = """
+                        select count(p) from Publicacion p join p.vehiculo v
+                        where v.propietario.email = :emailUsuario
+                        and (:estado is null or p.estado = :estado)
+                        and (:busqueda is null or lower(concat(v.marca, ' ', v.modelo, ' ', v.patente))
+                             like :busqueda escape '!')
+                        """)
+        Page<Publicacion> buscarMisPublicaciones(
+                        @Param("emailUsuario") String emailUsuario,
+                        @Param("estado") EstadoPublicacion estado,
+                        @Param("busqueda") String busqueda,
+                        Pageable pageable);
 
         @EntityGraph(attributePaths = {"vehiculo", "vehiculo.tipoVehiculo", "ubicacion"})
         Page<Publicacion> findByPrecioDiaBetweenAndEstado(

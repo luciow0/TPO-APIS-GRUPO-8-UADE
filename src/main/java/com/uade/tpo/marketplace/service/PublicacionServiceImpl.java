@@ -2,13 +2,17 @@ package com.uade.tpo.marketplace.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.uade.tpo.marketplace.dto.PublicacionRequest;
@@ -83,10 +87,23 @@ public class PublicacionServiceImpl implements PublicacionService {
                 return publicacionRepository.findByEstado(EstadoPublicacion.ACTIVA, pageable);
         }
 
-        @PreAuthorize("isAuthenticated()")
+        @PreAuthorize("isAuthenticated() and #emailUsuario == authentication.name")
         @Override
-        public Page<Publicacion> obtenerMisPublicaciones(String emailUsuario, Pageable pageable) {
-                return publicacionRepository.findByVehiculo_Propietario_Email(emailUsuario, pageable);
+        @Transactional(readOnly = true)
+        public Page<Publicacion> obtenerMisPublicaciones(
+                        String emailUsuario, EstadoPublicacion estado, String busqueda, Pageable pageable) {
+                String patron = null;
+                if (busqueda != null && !busqueda.isBlank()) {
+                        String texto = busqueda.trim().toLowerCase(Locale.ROOT)
+                                        .replace("!", "!!").replace("%", "!%").replace("_", "!_");
+                        patron = "%" + texto + "%";
+                }
+                Pageable pagina = PageRequest.of(pageable.getPageNumber(), Math.min(pageable.getPageSize(), 100),
+                                Sort.by(Sort.Direction.DESC, "idPublicacion"));
+                if (pagina.getOffset() > Integer.MAX_VALUE) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Número de página demasiado grande");
+                }
+                return publicacionRepository.buscarMisPublicaciones(emailUsuario, estado, patron, pagina);
         }
 
         @Override
