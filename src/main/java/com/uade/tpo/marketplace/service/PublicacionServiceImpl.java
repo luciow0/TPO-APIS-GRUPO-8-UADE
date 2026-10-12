@@ -412,6 +412,12 @@ public class PublicacionServiceImpl implements PublicacionService {
                                         "La descripcion es obligatoria");
                 }
 
+                if (request.getDescripcion().length() > 600) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "La descripcion no puede superar los 600 caracteres");
+                }
+
                 if (request.getHoraRetiroDevolucion() == null) {
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,

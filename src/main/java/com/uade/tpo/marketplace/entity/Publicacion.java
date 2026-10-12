@@ -59,6 +59,7 @@ public class Publicacion {
     @Column(precision = 5, scale = 2)
     private BigDecimal descuentoPorcentaje;
 
+    @Column(length = 600)
     private String descripcion;
 
     private LocalTime horaRetiroDevolucion;
