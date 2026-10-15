@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.uade.tpo.marketplace.Enum.EstadoPago;
 import com.uade.tpo.marketplace.Enum.EstadoPublicacion;
 import com.uade.tpo.marketplace.Enum.MetodoPago;
 import com.uade.tpo.marketplace.dto.AgregarCarritoRequest;
@@ -286,6 +287,14 @@ public class CarritoServiceImpl implements CarritoService {
                 pagoService.crearPago(
                         reserva.getIdReserva(),
                         metodoPago);
+
+        // Efectivo: aceptamos la reserva sin aprobación administrativa.
+        if (metodoPago == MetodoPago.EFECTIVO) {
+            reserva = reservaService.confirmarReserva(reserva.getIdReserva());
+
+            // Simplificación del TPO: no verifica el cobro del efectivo.
+            pago.setEstado(EstadoPago.APROBADO);
+        }
 
         carritoRepository.delete(carrito);
 
