@@ -1,6 +1,7 @@
 package com.uade.tpo.marketplace.controller;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.uade.tpo.marketplace.auth.SeguridadDominio;
 import com.uade.tpo.marketplace.dto.PublicacionRequest;
 import com.uade.tpo.marketplace.dto.PublicacionResponse;
 import com.uade.tpo.marketplace.entity.Publicacion;
@@ -35,8 +38,13 @@ import com.uade.tpo.marketplace.service.PublicacionService;
 @RequestMapping("publicaciones")
 public class PublicacionController {
 
+    private static final BigDecimal PASO_CUADRICULA = new BigDecimal("0.005");
+
     @Autowired
     private PublicacionService publicacionService;
+
+    @Autowired
+    private SeguridadDominio seguridadDominio;
 
     @GetMapping
     public ResponseEntity<Page<PublicacionResponse>> obtenerPublicaciones(Pageable pageable) {
@@ -261,6 +269,9 @@ public class PublicacionController {
         TipoVehiculo tipoVehiculo = vehiculo.getTipoVehiculo();
         Ubicacion ubicacion = publicacion.getUbicacion();
 
+        boolean exacta = seguridadDominio.puedeVerUbicacionExacta(
+                SecurityContextHolder.getContext().getAuthentication(), publicacion);
+
         return new PublicacionResponse(
                 publicacion.getIdPublicacion(),
                 publicacion.getFechaPublicacion(),
@@ -283,9 +294,21 @@ public class PublicacionController {
                 ubicacion.getCiudad(),
                 ubicacion.getLocalidad(),
                 ubicacion.getZona(),
-                ubicacion.getDireccion(),
-                ubicacion.getLatitud(),
-                ubicacion.getLongitud());
+                exacta ? ubicacion.getDireccion() : null,
+                exacta ? ubicacion.getLatitud() : zonaAproximada(ubicacion.getLatitud()),
+                exacta ? ubicacion.getLongitud() : zonaAproximada(ubicacion.getLongitud()));
+    }
+
+    // Lleva la coordenada al centro de su cuadro de la cuadrícula (~500 m).
+    // Misma cuenta que el front: Math.round(x / PASO) * PASO, es decir floor(x / PASO + 0.5).
+    private static BigDecimal zonaAproximada(BigDecimal coordenada) {
+        if (coordenada == null) {
+            return null;
+        }
+        return coordenada.divide(PASO_CUADRICULA)
+                .add(new BigDecimal("0.5"))
+                .setScale(0, RoundingMode.FLOOR)
+                .multiply(PASO_CUADRICULA);
     }
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.uade.tpo.marketplace.dto.UbicacionRequest;
 import com.uade.tpo.marketplace.entity.Ubicacion;
@@ -24,11 +25,13 @@ public class UbicacionController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Ubicacion>> listar() {
         return ResponseEntity.ok(ubicacionService.listar());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@seguridadDominio.puedeVerUbicacion(authentication, #id)")
     public ResponseEntity<Ubicacion> buscarPorId(@PathVariable Long id)
             throws UbicacionNotFoundException {
         return ResponseEntity.ok(ubicacionService.obtenerUbicacionPorId(id)
@@ -36,6 +39,7 @@ public class UbicacionController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Ubicacion> actualizar(@PathVariable Long id,
                                                 @Valid @RequestBody UbicacionRequest req) throws UbicacionNotFoundException {
         return ResponseEntity.ok(ubicacionService.updateUbicacion(id, req));

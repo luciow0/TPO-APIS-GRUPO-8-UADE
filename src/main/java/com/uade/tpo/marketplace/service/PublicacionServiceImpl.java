@@ -55,6 +55,8 @@ public class PublicacionServiceImpl implements PublicacionService {
                                                 HttpStatus.NOT_FOUND,
                                                 "Ubicacion no encontrada"));
 
+                validarUbicacionPropia(ubicacion, vehiculo);
+
                 if (publicacionRepository
                                 .existsByVehiculo_IdVehiculoAndEstadoIn(
                                                 request.getIdVehiculo(),
@@ -140,6 +142,8 @@ public class PublicacionServiceImpl implements PublicacionService {
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
                                                 "Ubicacion no encontrada"));
+
+                validarUbicacionPropia(ubicacion, publicacion.getVehiculo());
 
                 BigDecimal descuento = request.getDescuentoPorcentaje();
 
@@ -372,6 +376,23 @@ public class PublicacionServiceImpl implements PublicacionService {
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,
                                         mensaje);
+                }
+        }
+
+        // Una ubicación ya usada por una publicación de otro propietario no se puede reutilizar
+        private void validarUbicacionPropia(Ubicacion ubicacion, Vehiculo vehiculo) {
+                String emailPropietario = vehiculo.getPropietario().getEmail();
+
+                boolean usadaPorOtro = publicacionRepository
+                                .findByUbicacion_IdUbicacion(ubicacion.getIdUbicacion())
+                                .stream()
+                                .anyMatch(p -> !p.getVehiculo().getPropietario().getEmail()
+                                                .equals(emailPropietario));
+
+                if (usadaPorOtro) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.FORBIDDEN,
+                                        "La ubicacion pertenece a otro usuario");
                 }
         }
 

@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import com.uade.tpo.marketplace.Enum.EstadoPublicacion;
+import com.uade.tpo.marketplace.Enum.EstadoReserva;
 import com.uade.tpo.marketplace.entity.*;
 import com.uade.tpo.marketplace.exception.*;
 import com.uade.tpo.marketplace.repository.*;
@@ -61,6 +62,33 @@ public class SeguridadDominio {
         return auth.getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))
                 || publicacion.getVehiculo().getPropietario().getEmail().equals(auth.getName());
+    }
+
+    // Dirección y coordenadas exactas: solo el dueño o quien tiene una reserva confirmada
+    public boolean puedeVerUbicacionExacta(Authentication auth, Publicacion publicacion) {
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return false;
+        }
+
+        String email = auth.getName();
+        return publicacion.getVehiculo().getPropietario().getEmail().equals(email)
+                || reservaRepository.existsByClienteEmailAndPublicacionIdPublicacionAndEstado(
+                        email, publicacion.getIdPublicacion(), EstadoReserva.CONFIRMADA);
+    }
+
+    // GET /ubicaciones/{id}: el admin, o quien puede ver la ubicación exacta de alguna publicación que la usa
+    public boolean puedeVerUbicacion(Authentication auth, Long idUbicacion) {
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return false;
+        }
+
+        if (auth.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))) {
+            return true;
+        }
+
+        return publicacionRepository.findByUbicacion_IdUbicacion(idUbicacion).stream()
+                .anyMatch(publicacion -> puedeVerUbicacionExacta(auth, publicacion));
     }
 
     public boolean esDuenioDeVehiculo(Authentication auth, Long idVehiculo) {
