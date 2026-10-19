@@ -1,6 +1,7 @@
 package com.uade.tpo.marketplace.controller;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class CarritoController {
     }
 
     @GetMapping("/mio")
-    public ResponseEntity<CarritoResponse> obtenerMiCarrito(
+    public ResponseEntity<?> obtenerMiCarrito(
             Authentication authentication)
             throws UsuarioNotFoundException,
             PublicacionNoDisponibleException {
@@ -74,7 +75,8 @@ public class CarritoController {
                         authentication.getName());
 
         if (carritoOptional.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok(
+                    Map.of("mensaje", "Carrito vacío"));
         }
 
         return ResponseEntity.ok(carritoOptional.get());

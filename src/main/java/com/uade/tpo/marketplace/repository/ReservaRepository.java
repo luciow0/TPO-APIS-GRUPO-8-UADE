@@ -14,6 +14,7 @@ import com.uade.tpo.marketplace.entity.Reserva;
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
         Page<Reserva> findByClienteIdUsuario(Long idUsuario, Pageable pageable);
+        Page<Reserva> findByClienteEmail(String email, Pageable pageable);
         List<Reserva> findByPublicacion_Vehiculo_IdVehiculoAndEstadoIn(
                         Long idVehiculo,
                         Collection<EstadoReserva> estados);

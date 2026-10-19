@@ -19,7 +19,9 @@ public interface ReservaService {
 
         Page<Reserva> getReservasByUsuario(Long idUsuario,PageRequest pageRequest);
 
-        Reserva cancelarReserva(Long idReserva,Long idUsuario )throws ReservaNotFoundException, ReservaInvalidException;
+        Page<Reserva> getMisReservas(String emailUsuario, PageRequest pageRequest);
+
+        Reserva cancelarReserva(Long idReserva)throws ReservaNotFoundException, ReservaInvalidException;
 
         Reserva confirmarReserva(Long idReserva)throws ReservaNotFoundException, ReservaInvalidException;
 

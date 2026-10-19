@@ -35,18 +35,15 @@ public class ReservaServiceImpl implements ReservaService {
     @PreAuthorize("@seguridadDominio.esDuenioDeReserva(authentication, #idReserva)")
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Reserva cancelarReserva(Long idReserva, Long idUsuario)throws ReservaNotFoundException, ReservaInvalidException {
+    public Reserva cancelarReserva(Long idReserva)throws ReservaNotFoundException, ReservaInvalidException {
         Optional<Reserva> reservaOptional = reservaRepository.findById(idReserva);
 
     if (reservaOptional.isEmpty()) {
         throw new ReservaNotFoundException();
     }
 
+    // El @PreAuthorize ya verifica que la reserva sea del usuario del token.
     Reserva reserva = reservaOptional.get();
-
-    if (!reserva.getCliente().getIdUsuario().equals(idUsuario)) {
-        throw new ReservaInvalidException();
-    }
 
     if (reserva.getEstado() == EstadoReserva.PENDIENTE) {
         // Todavia no se pago: se libera la reserva y el pago queda rechazado.
@@ -175,6 +172,12 @@ public class ReservaServiceImpl implements ReservaService {
     public Page<Reserva> getReservasByUsuario(Long idUsuario, PageRequest pageRequest) {
         
         return reservaRepository.findByClienteIdUsuario(idUsuario, pageRequest);
+    }
+
+    @PreAuthorize("isAuthenticated() and #emailUsuario == authentication.name")
+    @Override
+    public Page<Reserva> getMisReservas(String emailUsuario, PageRequest pageRequest) {
+        return reservaRepository.findByClienteEmail(emailUsuario, pageRequest);
     }
 
     private void validarFechas(LocalDate fechaInicio, LocalDate fechaFin)throws ReservaInvalidException {
