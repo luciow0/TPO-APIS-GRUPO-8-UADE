@@ -43,27 +43,23 @@ public class PagoController {
     private String frontendUrl;
 
     @GetMapping("/{idPago}")
-    public ResponseEntity<PagoResponse> getPagoById(@PathVariable Long idPago) {
+    public ResponseEntity<PagoResponse> getPagoById(@PathVariable Long idPago)
+            throws PagoNotFoundException {
 
-        Optional<Pago> result = pagoService.getPagoById(idPago);
+        Pago pago = pagoService.getPagoById(idPago)
+                .orElseThrow(PagoNotFoundException::new);
 
-        if (result.isPresent()) {
-            return ResponseEntity.ok(convertirAResponse(result.get()));
-        }
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(convertirAResponse(pago));
     }
 
     @GetMapping("/reserva/{idReserva}")
-    public ResponseEntity<PagoResponse> getPagoByReserva(@PathVariable Long idReserva) {
+    public ResponseEntity<PagoResponse> getPagoByReserva(@PathVariable Long idReserva)
+            throws PagoNotFoundException {
 
-        Optional<Pago> result = pagoService.getPagoByReserva(idReserva);
+        Pago pago = pagoService.getPagoByReserva(idReserva)
+                .orElseThrow(PagoNotFoundException::new);
 
-        if (result.isPresent()) {
-            return ResponseEntity.ok(convertirAResponse(result.get()));
-        }
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(convertirAResponse(pago));
     }
 
     @PostMapping

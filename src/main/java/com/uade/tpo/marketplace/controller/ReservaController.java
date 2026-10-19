@@ -9,7 +9,6 @@ import com.uade.tpo.marketplace.service.ReservaService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,15 +31,13 @@ public class ReservaController {
 
 
     @GetMapping("/{idReserva}")
-    public ResponseEntity<ReservaResponse> getReservaById(@PathVariable Long idReserva) {
+    public ResponseEntity<ReservaResponse> getReservaById(@PathVariable Long idReserva)
+            throws ReservaNotFoundException {
 
-        Optional<Reserva> result = reservaService.getReservaById(idReserva);
+        Reserva reserva = reservaService.getReservaById(idReserva)
+                .orElseThrow(ReservaNotFoundException::new);
 
-        if (result.isPresent()) {
-            return ResponseEntity.ok(convertirAResponse(result.get()));
-        }
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(convertirAResponse(reserva));
     }
 
 
