@@ -37,8 +37,8 @@ public class Vehiculo {
     private Long idVehiculo;
 
     @NotBlank
-    @Size(max = 6)
-    @Column(nullable = false, unique = true, length = 6)
+    @Size(max = 7)
+    @Column(nullable = false, unique = true, length = 7)
     private String patente;
 
     @NotBlank
@@ -53,7 +53,7 @@ public class Vehiculo {
 
     @NotNull
     @Min(1900)
-    @Max(value = 2026, message = "El año no puede ser mayor al año actual")
+    @Max(value = 2027, message = "El año no puede ser mayor al año actual")
     @Column(nullable = false)
     private Integer anio;
     

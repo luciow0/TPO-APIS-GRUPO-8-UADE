@@ -17,7 +17,7 @@ import lombok.Data;
 public class VehiculoRequest {
 
     @NotBlank
-    @Size(max = 6)
+    @Size(max = 7)
     private String patente;
 
     @NotBlank
@@ -30,7 +30,7 @@ public class VehiculoRequest {
 
     @NotNull
     @Min(1900)
-    @Max(value = 2026, message = "El año no puede ser mayor al año actual")
+    @Max(value = 2027, message = "El año no puede ser mayor al año actual")
     private Integer anio;
 
     @NotBlank
