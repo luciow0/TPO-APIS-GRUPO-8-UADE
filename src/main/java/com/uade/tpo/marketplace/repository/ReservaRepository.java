@@ -19,6 +19,10 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
                         Long idVehiculo,
                         Collection<EstadoReserva> estados);
         boolean existsByClienteIdUsuarioAndEstado(Long idUsuario, EstadoReserva estado);
+        // Incluye el historial para poder consultar publicaciones de reservas anteriores.
+        boolean existsByClienteEmailAndPublicacionIdPublicacion(
+                        String email,
+                        Long idPublicacion);
         boolean existsByClienteEmailAndPublicacionIdPublicacionAndEstado(
                         String email,
                         Long idPublicacion,

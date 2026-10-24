@@ -61,7 +61,9 @@ public class SeguridadDominio {
 
         return auth.getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))
-                || publicacion.getVehiculo().getPropietario().getEmail().equals(auth.getName());
+                || publicacion.getVehiculo().getPropietario().getEmail().equals(auth.getName())
+                || reservaRepository.existsByClienteEmailAndPublicacionIdPublicacion(
+                        auth.getName(), idPublicacion);
     }
 
     // Dirección y coordenadas exactas: solo el dueño o quien tiene una reserva confirmada
