@@ -1,6 +1,8 @@
 package com.uade.tpo.marketplace.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -75,4 +77,14 @@ public interface PublicacionService {
                         Pageable pageable);
 
         Page<Publicacion> obtenerPublicacionesPorZona(String zona, Pageable pageable);
+
+        Page<Publicacion> buscarCatalogo(
+                        String zona,
+                        Long idTipoVehiculo,
+                        LocalDate fechaInicio,
+                        LocalDate fechaFin,
+                        String orden,
+                        Pageable pageable);
+
+        List<String> obtenerZonasDelCatalogo();
 }

@@ -3,11 +3,14 @@ package com.uade.tpo.marketplace.controller;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
+import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -52,6 +55,27 @@ public class PublicacionController {
         return ResponseEntity.ok(
                 publicacionService.obtenerPublicaciones(pageable)
                         .map(this::convertirAResponse));
+    }
+
+    // Catálogo con filtros combinables y paginación. Las fechas van como yyyy-MM-dd.
+    @GetMapping("/buscar")
+    public ResponseEntity<Page<PublicacionResponse>> buscarCatalogo(
+            @RequestParam(required = false) String zona,
+            @RequestParam(required = false) Long idTipoVehiculo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+            @RequestParam(required = false) String orden,
+            @PageableDefault(size = 9) Pageable pageable) {
+
+        return ResponseEntity.ok(
+                publicacionService.buscarCatalogo(zona, idTipoVehiculo, fechaInicio, fechaFin, orden, pageable)
+                        .map(this::convertirAResponse));
+    }
+
+    // Zonas con publicaciones activas, para el selector del catálogo.
+    @GetMapping("/zonas")
+    public ResponseEntity<List<String>> obtenerZonasDelCatalogo() {
+        return ResponseEntity.ok(publicacionService.obtenerZonasDelCatalogo());
     }
 
     @GetMapping("/mias")

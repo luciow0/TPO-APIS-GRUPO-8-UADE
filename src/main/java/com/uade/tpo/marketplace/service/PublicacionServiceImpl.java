@@ -1,6 +1,8 @@
 package com.uade.tpo.marketplace.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -20,6 +22,7 @@ import com.uade.tpo.marketplace.entity.Publicacion;
 import com.uade.tpo.marketplace.entity.Ubicacion;
 import com.uade.tpo.marketplace.entity.Vehiculo;
 import com.uade.tpo.marketplace.Enum.EstadoPublicacion;
+import com.uade.tpo.marketplace.Enum.EstadoReserva;
 import com.uade.tpo.marketplace.exception.PublicacionDuplicateException;
 import com.uade.tpo.marketplace.exception.PublicacionNotFoundException;
 import com.uade.tpo.marketplace.repository.PublicacionRepository;
@@ -465,6 +468,59 @@ public class PublicacionServiceImpl implements PublicacionService {
                 return publicacionRepository
                                 .findByUbicacion_ZonaIgnoreCaseAndEstado(
                                                 zona.trim(), EstadoPublicacion.ACTIVA, pageable);
+        }
+
+        private static final List<String> ORDENES_CATALOGO =
+                        List.of("recientes", "precio-asc", "precio-desc", "anio-desc");
+
+        @Override
+        @Transactional(readOnly = true)
+        public Page<Publicacion> buscarCatalogo(
+                        String zona,
+                        Long idTipoVehiculo,
+                        LocalDate fechaInicio,
+                        LocalDate fechaFin,
+                        String orden,
+                        Pageable pageable) {
+
+                if ((fechaInicio == null) != (fechaFin == null)) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                        "Elegí la fecha de retiro y la de devolución");
+                }
+                if (fechaInicio != null && fechaInicio.isBefore(LocalDate.now())) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                        "La fecha de retiro no puede ser anterior a hoy");
+                }
+                if (fechaInicio != null && !fechaFin.isAfter(fechaInicio)) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                        "La fecha de devolución debe ser posterior a la de retiro");
+                }
+                String ordenElegido = orden == null || orden.isBlank() ? "recientes" : orden;
+                if (!ORDENES_CATALOGO.contains(ordenElegido)) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Orden no válido");
+                }
+
+                // El orden lo arma la consulta; de la página solo se usan número y tamaño
+                Pageable pagina = PageRequest.of(pageable.getPageNumber(), Math.min(pageable.getPageSize(), 100));
+                if (pagina.getOffset() > Integer.MAX_VALUE) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Número de página demasiado grande");
+                }
+
+                return publicacionRepository.buscarCatalogo(
+                                EstadoPublicacion.ACTIVA,
+                                zona == null || zona.isBlank() ? null : zona.trim().toLowerCase(Locale.ROOT),
+                                idTipoVehiculo,
+                                fechaInicio,
+                                fechaFin,
+                                List.of(EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA),
+                                LocalDateTime.now(),
+                                ordenElegido,
+                                pagina);
+        }
+
+        @Override
+        public List<String> obtenerZonasDelCatalogo() {
+                return publicacionRepository.buscarZonas(EstadoPublicacion.ACTIVA);
         }
 
 }
