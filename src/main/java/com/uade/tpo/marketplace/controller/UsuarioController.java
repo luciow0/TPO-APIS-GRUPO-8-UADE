@@ -19,8 +19,7 @@ import com.uade.tpo.marketplace.dto.UsuarioDTO;
 import com.uade.tpo.marketplace.exception.UsuarioDuplicateException;
 import com.uade.tpo.marketplace.exception.UsuarioNotFoundException;
 import com.uade.tpo.marketplace.service.UsuarioService;
-
-import jakarta.validation.Valid;
+import com.uade.tpo.marketplace.service.ValidacionVolanta;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -45,14 +44,16 @@ public class UsuarioController {
 	}
 
 	@PostMapping
-	public ResponseEntity<UsuarioDTO> crear(@Valid @RequestBody UsuarioDTO usuarioDTO) throws UsuarioDuplicateException {
+	public ResponseEntity<UsuarioDTO> crear(@RequestBody UsuarioDTO usuarioDTO) throws UsuarioDuplicateException {
+		validarUsuario(usuarioDTO);
 		return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.crear(usuarioDTO));
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<UsuarioDTO> actualizar(
 			@PathVariable Long id,
-			@Valid @RequestBody UsuarioDTO usuarioDTO) throws UsuarioNotFoundException, UsuarioDuplicateException {
+			@RequestBody UsuarioDTO usuarioDTO) throws UsuarioNotFoundException, UsuarioDuplicateException {
+		validarUsuario(usuarioDTO);
 		return ResponseEntity.ok(usuarioService.actualizar(id, usuarioDTO));
 	}
 
@@ -60,5 +61,14 @@ public class UsuarioController {
 	public ResponseEntity<Void> eliminar(@PathVariable Long id) throws UsuarioNotFoundException {
 		usuarioService.eliminar(id);
 		return ResponseEntity.noContent().build();
+	}
+
+	private void validarUsuario(UsuarioDTO usuarioDTO) {
+		ValidacionVolanta.validarNombreNoVacio(usuarioDTO.getNombre());
+		ValidacionVolanta.validarApellidoNoVacio(usuarioDTO.getApellido());
+		ValidacionVolanta.validarEmailValido(usuarioDTO.getEmail());
+		ValidacionVolanta.validarPasswordValida(usuarioDTO.getPassword());
+		ValidacionVolanta.validarTelefonoLargo(usuarioDTO.getTelefono());
+		ValidacionVolanta.validarFechaNacimientoPasada(usuarioDTO.getFechaNacimiento());
 	}
 }

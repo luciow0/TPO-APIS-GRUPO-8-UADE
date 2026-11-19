@@ -5,8 +5,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(
         code = HttpStatus.BAD_REQUEST,
-        reason = "La operacion sobre la reserva no es valida"
+        reason = "No pudimos actualizar la reserva. Revisá los datos e intentá de nuevo."
 )
 public class ReservaInvalidException extends Exception {
 
+    public ReservaInvalidException() {
+        super();
+    }
+
+    public ReservaInvalidException(String mensaje) {
+        super(mensaje);
+    }
 }

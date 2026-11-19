@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.uade.tpo.marketplace.exception.GlobalExceptionHandler;
 import com.uade.tpo.marketplace.repository.UsuarioRepository;
 
 /**
@@ -41,7 +42,7 @@ public class ApplicationConfig {
                         .password(usuario.getPassword())
                         .authorities(new SimpleGrantedAuthority("ROLE_" + usuario.getRole().name()))
                         .build())
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException(GlobalExceptionHandler.MENSAJE_LOGIN_INCORRECTO));
     }
 
     @Bean

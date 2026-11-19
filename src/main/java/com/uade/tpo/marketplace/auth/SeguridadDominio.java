@@ -47,7 +47,10 @@ public class SeguridadDominio {
         return publicacion.getVehiculo().getPropietario().getEmail().equals(auth.getName());
     }
 
-    public boolean puedeVerPublicacion(Authentication auth, Long idPublicacion) throws PublicacionNotFoundException {
+    // Una publicacion pausada o dada de baja solo la ven el admin, el dueño y quien la reservó.
+    // A los demas se les avisa que ya no está disponible (en lugar del 403 genérico).
+    public boolean puedeVerPublicacion(Authentication auth, Long idPublicacion)
+            throws PublicacionNotFoundException, PublicacionNoDisponibleException {
         Publicacion publicacion = publicacionRepository.findById(idPublicacion)
                 .orElseThrow(PublicacionNotFoundException::new);
 
@@ -55,15 +58,20 @@ public class SeguridadDominio {
             return true;
         }
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return false;
-        }
+        boolean logueado = auth != null && auth.isAuthenticated()
+                && !(auth instanceof AnonymousAuthenticationToken);
 
-        return auth.getAuthorities().stream()
+        boolean puedeVer = logueado && (auth.getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))
                 || publicacion.getVehiculo().getPropietario().getEmail().equals(auth.getName())
                 || reservaRepository.existsByClienteEmailAndPublicacionIdPublicacion(
-                        auth.getName(), idPublicacion);
+                        auth.getName(), idPublicacion));
+
+        if (!puedeVer) {
+            throw new PublicacionNoDisponibleException("Esta publicación ya no está disponible.");
+        }
+
+        return true;
     }
 
     // Dirección y coordenadas exactas: solo el dueño o quien tiene una reserva confirmada
@@ -95,13 +103,13 @@ public class SeguridadDominio {
 
     public boolean esDuenioDeVehiculo(Authentication auth, Long idVehiculo) {
         Vehiculo vehiculo = vehiculoRepository.findById(idVehiculo)
-                .orElseThrow(() -> new EntityNotFoundException("Vehículo no encontrado con id: " + idVehiculo));
+                .orElseThrow(() -> new EntityNotFoundException("No encontramos ese vehículo."));
         return vehiculo.getPropietario().getEmail().equals(auth.getName());
     }
 
     public boolean esDuenioDePago(Authentication auth, Long idPago) throws PagoNotFoundException {
         Pago pago = pagoRepository.findById(idPago)
-                .orElseThrow(PagoNotFoundException::new);
+                .orElseThrow(() -> new PagoNotFoundException("No encontramos ese pago."));
         return pago.getReserva().getCliente().getEmail().equals(auth.getName());
     }
 
@@ -113,7 +121,7 @@ public class SeguridadDominio {
 
     public boolean esDuenioDeImagen(Authentication auth, Long idImagen) {
         ImagenVehiculo img = imagenVehiculoRepository.findById(idImagen)
-                .orElseThrow(() -> new EntityNotFoundException("Imagen no encontrada con id: " + idImagen));
+                .orElseThrow(() -> new EntityNotFoundException("No encontramos esa foto."));
         return img.getVehiculo().getPropietario().getEmail().equals(auth.getName());
     }
 }

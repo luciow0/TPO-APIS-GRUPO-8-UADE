@@ -115,30 +115,16 @@ public class DisponibilidadServiceImpl implements DisponibilidadService {
 
     private void validarRequest(DisponibilidadRequest request) {
 
-        if (request == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La disponibilidad no puede estar vacia");
-        }
-
-        if (request.getFechaInicio() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La fecha de inicio es obligatoria");
-        }
-
-        if (request.getFechaFin() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La fecha de fin es obligatoria");
-        }
+        ValidacionVolanta.validarDatosCompletos(request);
+        ValidacionVolanta.validarFechasPeriodo(request.getFechaInicio(), request.getFechaFin());
+        ValidacionVolanta.validarIdPublicacionPositivo(request.getIdPublicacion());
 
         if (!request.getFechaFin()
                 .isAfter(request.getFechaInicio())) {
 
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "La fecha de fin debe ser posterior a la fecha de inicio");
+                    "La fecha de fin tiene que ser posterior a la de inicio.");
         }
 
         if (request.getFechaInicio()
@@ -146,13 +132,7 @@ public class DisponibilidadServiceImpl implements DisponibilidadService {
 
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "La fecha de inicio no puede ser anterior a la fecha actual");
-        }
-
-        if (request.getIdPublicacion() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La publicacion es obligatoria");
+                    "La fecha de inicio no puede ser anterior a hoy.");
         }
     }
 }

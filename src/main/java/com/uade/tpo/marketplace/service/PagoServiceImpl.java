@@ -54,14 +54,15 @@ public class PagoServiceImpl implements PagoService {
         Optional<Pago> pagoOptional = pagoRepository.findById(idPago);
 
         if (pagoOptional.isEmpty()) {
-            throw new PagoNotFoundException();
+            throw new PagoNotFoundException("No encontramos ese pago.");
         }
 
         Pago pago = pagoOptional.get();
 
         if (pago.getEstado() != EstadoPago.PENDIENTE
                 || pago.getMetodo() == MetodoPago.MERCADO_PAGO) {
-            throw new PagoInvalidException();
+            throw new PagoInvalidException(
+                    "Este pago ya se procesó o se confirma desde Mercado Pago.");
         }
 
         aplicarAprobacion(pago);
@@ -76,9 +77,8 @@ public class PagoServiceImpl implements PagoService {
             PagoDuplicateException,
             PagoInvalidException {
 
-        if (idReserva == null || metodoPago == null) {
-            throw new PagoInvalidException();
-        }
+        ValidacionVolanta.validarIdReservaPositivo(idReserva);
+        ValidacionVolanta.validarMetodoPagoElegido(metodoPago);
 
         Optional<Reserva> reservaOptional =
                 reservaService.getReservaById(idReserva);
@@ -97,7 +97,9 @@ public class PagoServiceImpl implements PagoService {
         }
 
         if (reserva.getEstado() != EstadoReserva.PENDIENTE) {
-            throw new PagoInvalidException();
+            throw new PagoInvalidException(
+                    "Solo se puede pagar una reserva pendiente. Esta ya está "
+                            + reserva.getEstado().name().toLowerCase() + ".");
         }
 
         BigDecimal monto = calcularMonto(reserva);
@@ -135,14 +137,15 @@ public class PagoServiceImpl implements PagoService {
         Optional<Pago> pagoOptional = pagoRepository.findById(idPago);
 
         if (pagoOptional.isEmpty()) {
-            throw new PagoNotFoundException();
+            throw new PagoNotFoundException("No encontramos ese pago.");
         }
 
         Pago pago = pagoOptional.get();
 
         if (pago.getEstado() != EstadoPago.PENDIENTE
                 || pago.getMetodo() == MetodoPago.MERCADO_PAGO) {
-            throw new PagoInvalidException();
+            throw new PagoInvalidException(
+                    "Este pago ya se procesó o se confirma desde Mercado Pago.");
         }
 
         aplicarRechazo(pago);
@@ -158,12 +161,21 @@ public class PagoServiceImpl implements PagoService {
             MercadoPagoException {
 
         Pago pago = pagoRepository.findById(idPago)
-                .orElseThrow(PagoNotFoundException::new);
+                .orElseThrow(() -> new PagoNotFoundException("No encontramos ese pago."));
 
-        if (pago.getMetodo() != MetodoPago.MERCADO_PAGO
-                || pago.getEstado() != EstadoPago.PENDIENTE
-                || !MercadoPagoService.vencimientoReserva(pago).isAfter(LocalDateTime.now())) {
-            throw new PagoInvalidException();
+        if (pago.getMetodo() != MetodoPago.MERCADO_PAGO) {
+            throw new PagoInvalidException(
+                    "Esta reserva se paga en efectivo al retirar el auto.");
+        }
+
+        if (pago.getEstado() != EstadoPago.PENDIENTE) {
+            throw new PagoInvalidException(
+                    "Este pago ya se procesó. Revisá su estado en Mis reservas.");
+        }
+
+        if (!MercadoPagoService.vencimientoReserva(pago).isAfter(LocalDateTime.now())) {
+            throw new PagoInvalidException(
+                    "Se venció el plazo para pagar esta reserva. Hacé una reserva nueva.");
         }
 
         Preference preferencia;
@@ -277,7 +289,8 @@ public class PagoServiceImpl implements PagoService {
                 || reserva.getFechaFin() == null
                 || reserva.getPrecioDiaAplicado() == null) {
 
-            throw new PagoInvalidException();
+            throw new PagoInvalidException(
+                    "No pudimos calcular el total de la reserva. Intentá de nuevo.");
         }
 
         long cantidadDias = ChronoUnit.DAYS.between(
@@ -285,7 +298,8 @@ public class PagoServiceImpl implements PagoService {
                 reserva.getFechaFin());
 
         if (cantidadDias <= 0) {
-            throw new PagoInvalidException();
+            throw new PagoInvalidException(
+                    "No pudimos calcular el total de la reserva. Intentá de nuevo.");
         }
 
         return reserva.getPrecioDiaAplicado()

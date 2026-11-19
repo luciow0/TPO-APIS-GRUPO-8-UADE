@@ -5,7 +5,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(
         code = HttpStatus.BAD_GATEWAY,
-        reason = "Error al comunicarse con Mercado Pago"
+        reason = "No pudimos conectar con Mercado Pago. Intentá de nuevo."
 )
 public class MercadoPagoException extends Exception {
+
+    public MercadoPagoException() {
+        super();
+    }
+
+    public MercadoPagoException(String mensaje) {
+        super(mensaje);
+    }
 }

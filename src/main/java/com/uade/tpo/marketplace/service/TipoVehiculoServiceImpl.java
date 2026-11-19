@@ -32,12 +32,12 @@ public class TipoVehiculoServiceImpl implements TipoVehiculoService {
     @PreAuthorize("hasRole('ADMIN')")
     public TipoVehiculo crearTipoVehiculo(TipoVehiculo tipoVehiculo) {
         if (tipoVehiculo.getNombre() == null || tipoVehiculo.getNombre().isBlank()) {
-            throw new IllegalArgumentException("El nombre del tipo de vehiculo es requerido");
+            throw new IllegalArgumentException("Ingresá el nombre del tipo de vehículo.");
         }
         // No permitir dos tipos con el mismo nombre
         if (tipoVehiculoRepository.existsByNombre(tipoVehiculo.getNombre())) {
             throw new IllegalArgumentException(
-                    "El tipo de vehiculo '" + tipoVehiculo.getNombre() + "' ya existe");
+                    "Ya existe un tipo de vehículo con ese nombre.");
         }
         return tipoVehiculoRepository.save(tipoVehiculo);
     }

@@ -10,7 +10,7 @@ import com.uade.tpo.marketplace.dto.UbicacionRequest;
 import com.uade.tpo.marketplace.entity.Ubicacion;
 import com.uade.tpo.marketplace.exception.UbicacionNotFoundException;
 import com.uade.tpo.marketplace.service.UbicacionService;
-import jakarta.validation.Valid;
+import com.uade.tpo.marketplace.service.ValidacionVolanta;
 
 @RestController
 @RequestMapping("/ubicaciones")
@@ -20,7 +20,8 @@ public class UbicacionController {
     private UbicacionService ubicacionService;
 
     @PostMapping
-    public ResponseEntity<Ubicacion> crear(@Valid @RequestBody UbicacionRequest req) {
+    public ResponseEntity<Ubicacion> crear(@RequestBody UbicacionRequest req) {
+        validarUbicacion(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(ubicacionService.crear(req));
     }
 
@@ -41,8 +42,19 @@ public class UbicacionController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Ubicacion> actualizar(@PathVariable Long id,
-                                                @Valid @RequestBody UbicacionRequest req) throws UbicacionNotFoundException {
+                                                @RequestBody UbicacionRequest req) throws UbicacionNotFoundException {
+        validarUbicacion(req);
         return ResponseEntity.ok(ubicacionService.updateUbicacion(id, req));
+    }
+
+    private void validarUbicacion(UbicacionRequest req) {
+        ValidacionVolanta.validarDireccionNoVacia(req.getDireccion());
+        ValidacionVolanta.validarCiudadNoVacia(req.getCiudad());
+        ValidacionVolanta.validarProvinciaNoVacia(req.getProvincia());
+        ValidacionVolanta.validarLocalidadNoVacia(req.getLocalidad());
+        ValidacionVolanta.validarCodigoPostalNoVacio(req.getCodigoPostal());
+        ValidacionVolanta.validarZonaNoVacia(req.getZona());
+        ValidacionVolanta.validarCoordenadas(req.getLatitud(), req.getLongitud());
     }
 
 }

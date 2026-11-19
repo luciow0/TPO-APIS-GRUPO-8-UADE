@@ -5,7 +5,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(
         code = HttpStatus.BAD_REQUEST,
-        reason = "El email ya está registrado"
+        reason = "Ya existe una cuenta con ese email. Iniciá sesión o usá otro."
 )
 public class UsuarioDuplicateException extends Exception {
+
+    public UsuarioDuplicateException() {
+        super();
+    }
+
+    public UsuarioDuplicateException(String mensaje) {
+        super(mensaje);
+    }
 }

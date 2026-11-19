@@ -49,7 +49,7 @@ public class VehiculoServiceImpl implements VehiculoService {
         Pageable pagina = PageRequest.of(pageable.getPageNumber(), Math.min(pageable.getPageSize(), 100),
                 Sort.by(Sort.Direction.DESC, "idVehiculo"));
         if (pagina.getOffset() > Integer.MAX_VALUE) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Número de página demasiado grande");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No hay más resultados para mostrar.");
         }
         return vehiculoRepository.findByPropietario_Email(emailUsuario, pagina).map(this::convertirADTO);
     }
@@ -64,7 +64,7 @@ public class VehiculoServiceImpl implements VehiculoService {
     @Transactional(readOnly = true)
     public VehiculoDTO buscarPorPatente(String patente) {
         Vehiculo vehiculo = vehiculoRepository.findByPatente(patente)
-                .orElseThrow(() -> new EntityNotFoundException("Vehiculo con patente " + patente + " no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("No encontramos un vehículo con esa patente."));
         return convertirADTO(vehiculo);
     }
 
@@ -99,6 +99,13 @@ public class VehiculoServiceImpl implements VehiculoService {
     public VehiculoDTO actualizar(Long id, VehiculoRequest request) {
         Vehiculo vehiculoExistente = obtenerVehiculo(id);
 
+        // Puede dejar su propia patente; solo se rechaza si la tiene otro vehiculo.
+        vehiculoRepository.findByPatente(request.getPatente())
+                .filter(otro -> !otro.getIdVehiculo().equals(id))
+                .ifPresent(otro -> {
+                    throw new IllegalArgumentException("Ya hay un vehículo registrado con esa patente.");
+                });
+
         vehiculoExistente.setPatente(request.getPatente());
         vehiculoExistente.setMarca(request.getMarca());
         vehiculoExistente.setModelo(request.getModelo());
@@ -125,13 +132,13 @@ public class VehiculoServiceImpl implements VehiculoService {
 
     private Vehiculo obtenerVehiculo(Long id) {
         return vehiculoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Vehiculo no encontrado con id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("No encontramos ese vehículo."));
     }
 
     private Usuario obtenerUsuario(Long idUsuario) {
         return usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Usuario no encontrado con id: " + idUsuario));
+                        HttpStatus.NOT_FOUND, "No encontramos esa cuenta."));
     }
 
     //
@@ -147,7 +154,7 @@ public class VehiculoServiceImpl implements VehiculoService {
         }
         return tipoVehiculoService.obtenerTipoVehiculoPorId(idTipoVehiculo)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Tipo de vehiculo no encontrado con id: " + idTipoVehiculo));
+                        "Elegí un tipo de vehículo de la lista."));
     }
 
     private VehiculoDTO convertirADTO(Vehiculo vehiculo) {

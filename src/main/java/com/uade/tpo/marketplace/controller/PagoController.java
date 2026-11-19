@@ -29,6 +29,7 @@ import com.uade.tpo.marketplace.exception.PagoNotFoundException;
 import com.uade.tpo.marketplace.exception.ReservaInvalidException;
 import com.uade.tpo.marketplace.exception.ReservaNotFoundException;
 import com.uade.tpo.marketplace.service.PagoService;
+import com.uade.tpo.marketplace.service.ValidacionVolanta;
 
 @RestController
 @RequestMapping("/pagos")
@@ -47,7 +48,7 @@ public class PagoController {
             throws PagoNotFoundException {
 
         Pago pago = pagoService.getPagoById(idPago)
-                .orElseThrow(PagoNotFoundException::new);
+                .orElseThrow(() -> new PagoNotFoundException("No encontramos ese pago."));
 
         return ResponseEntity.ok(convertirAResponse(pago));
     }
@@ -68,9 +69,8 @@ public class PagoController {
             PagoDuplicateException,
             PagoInvalidException {
 
-        if (pagoRequest == null) {
-            throw new PagoInvalidException();
-        }
+        ValidacionVolanta.validarIdReservaPositivo(pagoRequest.getIdReserva());
+        ValidacionVolanta.validarMetodoPagoElegido(pagoRequest.getMetodoPago());
 
         Pago result = pagoService.crearPago(
                 pagoRequest.getIdReserva(),

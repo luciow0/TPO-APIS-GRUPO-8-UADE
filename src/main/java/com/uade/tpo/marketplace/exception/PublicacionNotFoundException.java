@@ -5,8 +5,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(
         code = HttpStatus.NOT_FOUND,
-        reason = "Publicacion no encontrada"
+        reason = "No encontramos esa publicación."
 )
 public class PublicacionNotFoundException extends Exception {
 
+    public PublicacionNotFoundException() {
+        super();
+    }
+
+    public PublicacionNotFoundException(String mensaje) {
+        super(mensaje);
+    }
 }

@@ -21,9 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplace.dto.VehiculoDTO;
 import com.uade.tpo.marketplace.dto.VehiculoRequest;
+import com.uade.tpo.marketplace.service.ValidacionVolanta;
 import com.uade.tpo.marketplace.service.VehiculoService;
-
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("vehiculo")
@@ -54,16 +53,18 @@ VehiculoController {
     }
 
     @PostMapping
-    public ResponseEntity<VehiculoDTO> crearVehiculo(@Valid @RequestBody VehiculoRequest request) {
+    public ResponseEntity<VehiculoDTO> crearVehiculo(@RequestBody VehiculoRequest request) {
+        validarVehiculo(request);
         // Validar que la patente no exista
         if (vehiculoService.existePatente(request.getPatente())) {
-            throw new IllegalArgumentException("La patente " + request.getPatente() + " ya existe");
+            throw new IllegalArgumentException("Ya hay un vehículo registrado con esa patente.");
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(vehiculoService.guardar(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VehiculoDTO> actualizarVehiculo(@PathVariable Long id, @Valid @RequestBody VehiculoRequest request) {
+    public ResponseEntity<VehiculoDTO> actualizarVehiculo(@PathVariable Long id, @RequestBody VehiculoRequest request) {
+        validarVehiculo(request);
         return ResponseEntity.ok(vehiculoService.actualizar(id, request));
     }
 
@@ -81,5 +82,15 @@ VehiculoController {
     @GetMapping("/patente/{patente}")
     public ResponseEntity<VehiculoDTO> buscarPorPatente(@PathVariable String patente) {
         return ResponseEntity.ok(vehiculoService.buscarPorPatente(patente));
+    }
+
+    private void validarVehiculo(VehiculoRequest request) {
+        ValidacionVolanta.validarPatenteLargo(request.getPatente());
+        ValidacionVolanta.validarMarcaNoVacia(request.getMarca());
+        ValidacionVolanta.validarModeloNoVacio(request.getModelo());
+        ValidacionVolanta.validarAnioValido(request.getAnio());
+        ValidacionVolanta.validarColorNoVacio(request.getColor());
+        ValidacionVolanta.validarCantidadAsientosValida(request.getCantidadAsientos());
+        ValidacionVolanta.validarIdUsuarioPositivo(request.getIdUsuario());
     }
 }

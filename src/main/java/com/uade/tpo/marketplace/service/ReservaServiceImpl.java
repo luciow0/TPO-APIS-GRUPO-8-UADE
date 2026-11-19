@@ -51,9 +51,13 @@ public class ReservaServiceImpl implements ReservaService {
             pago.setEstado(EstadoPago.RECHAZADO);
             pagoRepository.save(pago);
         });
-    } else if (reserva.getEstado() != EstadoReserva.CONFIRMADA
-            || !reserva.getFechaInicio().isAfter(LocalDate.now())) {
-        throw new ReservaInvalidException();
+    } else if (reserva.getEstado() != EstadoReserva.CONFIRMADA) {
+        throw new ReservaInvalidException(
+                "Esta reserva ya está " + reserva.getEstado().name().toLowerCase()
+                        + " y no se puede cancelar.");
+    } else if (!reserva.getFechaInicio().isAfter(LocalDate.now())) {
+        throw new ReservaInvalidException(
+                "Solo podés cancelar hasta el día anterior al retiro.");
     }
 
     reserva.setEstado(EstadoReserva.CANCELADA);
@@ -74,7 +78,8 @@ public class ReservaServiceImpl implements ReservaService {
         Reserva reserva = reservaOptional.get();
 
         if (reserva.getEstado() != EstadoReserva.PENDIENTE) {
-            throw new ReservaInvalidException();
+            throw new ReservaInvalidException(
+                    "Esta reserva ya no está pendiente, así que no se puede modificar.");
         }
 
         validarSolapamientoPorVehiculo(
@@ -103,7 +108,8 @@ public class ReservaServiceImpl implements ReservaService {
         Reserva reserva = reservaOptional.get();
 
         if (reserva.getEstado() != EstadoReserva.PENDIENTE) {
-            throw new ReservaInvalidException();
+            throw new ReservaInvalidException(
+                    "Esta reserva ya no está pendiente, así que no se puede modificar.");
         }
 
         reserva.setEstado(EstadoReserva.RECHAZADA);
@@ -123,11 +129,13 @@ public class ReservaServiceImpl implements ReservaService {
                 || carrito.getFechaExpiracion() == null
                 || carrito.getPrecioDiaAplicado() == null) {
 
-            throw new ReservaInvalidException();
+            throw new ReservaInvalidException(
+                    "Faltan datos del carrito. Volvé a elegir las fechas.");
         }
 
         if (!carrito.getFechaExpiracion().isAfter(LocalDateTime.now())) {
-            throw new ReservaInvalidException();
+            throw new ReservaInvalidException(
+                    "Tu carrito venció porque pasaron 15 minutos. Volvé a elegir el auto y las fechas.");
         }
 
         boolean tieneReservaPendiente =
@@ -136,7 +144,8 @@ public class ReservaServiceImpl implements ReservaService {
                         EstadoReserva.PENDIENTE);
 
         if (tieneReservaPendiente) {
-            throw new ReservaInvalidException();
+            throw new ReservaInvalidException(
+                    "Ya tenés una reserva pendiente de pago. Pagala o cancelala desde Mis reservas antes de hacer otra.");
         }
 
         validarFechas(
@@ -182,8 +191,11 @@ public class ReservaServiceImpl implements ReservaService {
 
     private void validarFechas(LocalDate fechaInicio, LocalDate fechaFin)throws ReservaInvalidException {
 
+        ValidacionVolanta.validarFechasRetiroYDevolucion(fechaInicio, fechaFin);
+
         if (!fechaFin.isAfter(fechaInicio)) {
-            throw new ReservaInvalidException();
+            throw new ReservaInvalidException(
+                    "La devolución tiene que ser al menos un día después del retiro.");
         }
     }
 
@@ -235,7 +247,8 @@ public class ReservaServiceImpl implements ReservaService {
                         .isBefore(finBloqueadoNuevaReserva);
 
             if (haySolapamiento) {
-                throw new ReservaInvalidException();
+                throw new ReservaInvalidException(
+                        "El auto ya está reservado en esas fechas. Elegí otras.");
             }
         }
     }

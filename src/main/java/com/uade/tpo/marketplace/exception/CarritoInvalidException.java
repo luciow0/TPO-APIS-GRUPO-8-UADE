@@ -5,7 +5,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(
         code = HttpStatus.BAD_REQUEST,
-        reason = "La operacion sobre el carrito no es valida"
+        reason = "No pudimos actualizar tu carrito. Revisá los datos e intentá de nuevo."
 )
 public class CarritoInvalidException extends Exception {
+
+    public CarritoInvalidException() {
+        super();
+    }
+
+    public CarritoInvalidException(String mensaje) {
+        super(mensaje);
+    }
 }

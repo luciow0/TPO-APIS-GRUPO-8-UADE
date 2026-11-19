@@ -32,8 +32,7 @@ import com.uade.tpo.marketplace.exception.ReservaInvalidException;
 import com.uade.tpo.marketplace.exception.ReservaNotFoundException;
 import com.uade.tpo.marketplace.exception.UsuarioNotFoundException;
 import com.uade.tpo.marketplace.service.CarritoService;
-
-import jakarta.validation.Valid;
+import com.uade.tpo.marketplace.service.ValidacionVolanta;
 
 @RestController
 @RequestMapping("/carritos")
@@ -45,13 +44,16 @@ public class CarritoController {
     @PostMapping("/publicaciones/{idPublicacion}")
     public ResponseEntity<CarritoResponse> agregarPublicacionAlCarrito(
             @PathVariable Long idPublicacion,
-            @Valid @RequestBody AgregarCarritoRequest request,
+            @RequestBody AgregarCarritoRequest request,
             Authentication authentication)
             throws CarritoInvalidException,
             CarritoDuplicateException,
             PublicacionNotFoundException,
             PublicacionNoDisponibleException,
             UsuarioNotFoundException {
+
+        ValidacionVolanta.validarAutoYFechasElegidos(idPublicacion, request);
+        ValidacionVolanta.validarFechasRetiroYDevolucion(request.getFechaInicio(), request.getFechaFin());
 
         CarritoResponse carrito =
                 carritoService.agregarPublicacionAlCarrito(
@@ -76,7 +78,7 @@ public class CarritoController {
 
         if (carritoOptional.isEmpty()) {
             return ResponseEntity.ok(
-                    Map.of("mensaje", "Carrito vacío"));
+                    Map.of("mensaje", "Tu carrito está vacío."));
         }
 
         return ResponseEntity.ok(carritoOptional.get());
@@ -85,11 +87,13 @@ public class CarritoController {
     @PutMapping("/{idCarrito}/fechas")
     public ResponseEntity<CarritoResponse> modificarFechas(
             @PathVariable Long idCarrito,
-            @Valid @RequestBody ModificarFechasCarritoRequest request)
+            @RequestBody ModificarFechasCarritoRequest request)
             throws CarritoNotFoundException,
             CarritoInvalidException,
             PublicacionNoDisponibleException,
             PublicacionNotFoundException {
+
+        ValidacionVolanta.validarFechasRetiroYDevolucion(request.getFechaInicio(), request.getFechaFin());
 
         CarritoResponse carrito = carritoService.modificarFechas(
                 idCarrito,
@@ -111,7 +115,7 @@ public class CarritoController {
     @PostMapping("/{idCarrito}/confirmar")
     public ResponseEntity<ConfirmacionCarritoResponse> confirmarCarrito(
             @PathVariable Long idCarrito,
-            @Valid @RequestBody ConfirmarCarritoRequest request)
+            @RequestBody ConfirmarCarritoRequest request)
             throws CarritoNotFoundException,
             CarritoInvalidException,
             PublicacionNoDisponibleException,
@@ -120,6 +124,8 @@ public class CarritoController {
             ReservaNotFoundException,
             PagoDuplicateException,
             PagoInvalidException {
+
+        ValidacionVolanta.validarMetodoPagoElegido(request.getMetodoPago());
 
         ConfirmacionCarritoResponse confirmacion =
                 carritoService.confirmarCarrito(

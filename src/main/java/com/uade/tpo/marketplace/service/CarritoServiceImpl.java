@@ -166,15 +166,14 @@ public class CarritoServiceImpl implements CarritoService {
 
         Carrito carrito = carritoOptional.get();
 
-        if (request == null) {
-            throw new CarritoInvalidException();
-        }
+        ValidacionVolanta.validarDatosCompletos(request);
 
         if (!carrito.getFechaExpiracion()
                 .isAfter(LocalDateTime.now())) {
 
             carritoRepository.delete(carrito);
-            throw new CarritoNotFoundException();
+            throw new CarritoNotFoundException(
+                    "Tu carrito venció porque pasaron 15 minutos. Volvé a elegir el auto y las fechas.");
         }
 
         validarFechas(
@@ -237,9 +236,7 @@ public class CarritoServiceImpl implements CarritoService {
             PagoDuplicateException,
             PagoInvalidException {
 
-        if (metodoPago == null) {
-            throw new PagoInvalidException();
-        }
+        ValidacionVolanta.validarMetodoPagoElegido(metodoPago);
 
         Optional<Carrito> carritoOptional =
                 carritoRepository.findById(idCarrito);
@@ -253,7 +250,8 @@ public class CarritoServiceImpl implements CarritoService {
         if (!carrito.getFechaExpiracion()
                 .isAfter(LocalDateTime.now())) {
 
-            throw new CarritoNotFoundException();
+            throw new CarritoNotFoundException(
+                    "Tu carrito venció porque pasaron 15 minutos. Volvé a elegir el auto y las fechas.");
         }
 
         validarFechas(
@@ -311,16 +309,16 @@ public class CarritoServiceImpl implements CarritoService {
             LocalDate fechaFin)
             throws CarritoInvalidException {
 
-        if (fechaInicio == null || fechaFin == null) {
-            throw new CarritoInvalidException();
-        }
+        ValidacionVolanta.validarFechasRetiroYDevolucion(fechaInicio, fechaFin);
 
         if (fechaInicio.isBefore(LocalDate.now())) {
-            throw new CarritoInvalidException();
+            throw new CarritoInvalidException(
+                    "La fecha de retiro no puede ser anterior a hoy.");
         }
 
         if (!fechaFin.isAfter(fechaInicio)) {
-            throw new CarritoInvalidException();
+            throw new CarritoInvalidException(
+                    "La devolución tiene que ser al menos un día después del retiro.");
         }
     }
 
@@ -355,7 +353,8 @@ public class CarritoServiceImpl implements CarritoService {
         }
 
         if (!fechasDisponibles) {
-            throw new CarritoInvalidException();
+            throw new CarritoInvalidException(
+                    "El auto no está disponible en esas fechas. Elegí otras dentro del período publicado.");
         }
     }
 
@@ -374,7 +373,8 @@ public class CarritoServiceImpl implements CarritoService {
                 != EstadoPublicacion.ACTIVA) {
 
             carritoRepository.delete(carrito);
-            throw new PublicacionNoDisponibleException();
+            throw new PublicacionNoDisponibleException(
+                    "El dueño pausó o dio de baja esta publicación, así que la quitamos de tu carrito.");
         }
     }
 
@@ -438,7 +438,8 @@ public class CarritoServiceImpl implements CarritoService {
                             .isBefore(finBloqueadoNuevo);
 
             if (haySolapamiento) {
-                throw new CarritoInvalidException();
+                throw new CarritoInvalidException(
+                        "Otra persona está reservando este auto en esas fechas.");
             }
         }
     }
@@ -455,7 +456,8 @@ public class CarritoServiceImpl implements CarritoService {
                     fechaInicio,
                     fechaFin);
         } catch (ReservaInvalidException exception) {
-            throw new CarritoInvalidException();
+            // Usa el mensaje de la reserva: "El auto ya está reservado en esas fechas..."
+            throw new CarritoInvalidException(exception.getMessage());
         }
     }
 
@@ -464,13 +466,7 @@ public class CarritoServiceImpl implements CarritoService {
             AgregarCarritoRequest request)
             throws CarritoInvalidException {
 
-        if (request == null) {
-            throw new CarritoInvalidException();
-        }
-
-        if (idPublicacion == null) {
-            throw new CarritoInvalidException();
-        }
+        ValidacionVolanta.validarAutoYFechasElegidos(idPublicacion, request);
 
         validarFechas(
                 request.getFechaInicio(),

@@ -50,13 +50,13 @@ public class PublicacionServiceImpl implements PublicacionService {
                                 .obtenerVehiculoPorId(request.getIdVehiculo())
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
-                                                "Vehiculo no encontrado"));
+                                                "No encontramos ese vehículo."));
 
                 Ubicacion ubicacion = ubicacionService
                                 .obtenerUbicacionPorId(request.getIdUbicacion())
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
-                                                "Ubicacion no encontrada"));
+                                                "No encontramos esa ubicación."));
 
                 validarUbicacionPropia(ubicacion, vehiculo);
 
@@ -106,7 +106,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                 Pageable pagina = PageRequest.of(pageable.getPageNumber(), Math.min(pageable.getPageSize(), 100),
                                 Sort.by(Sort.Direction.DESC, "idPublicacion"));
                 if (pagina.getOffset() > Integer.MAX_VALUE) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Número de página demasiado grande");
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No hay más resultados para mostrar.");
                 }
                 return publicacionRepository.buscarMisPublicaciones(emailUsuario, estado, patron, pagina);
         }
@@ -137,14 +137,14 @@ public class PublicacionServiceImpl implements PublicacionService {
 
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,
-                                        "No se puede cambiar el vehiculo de una publicacion");
+                                        "No podés cambiar el vehículo de una publicación.");
                 }
 
                 Ubicacion ubicacion = ubicacionService
                                 .obtenerUbicacionPorId(request.getIdUbicacion())
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
-                                                "Ubicacion no encontrada"));
+                                                "No encontramos esa ubicación."));
 
                 validarUbicacionPropia(ubicacion, publicacion.getVehiculo());
 
@@ -189,7 +189,7 @@ public class PublicacionServiceImpl implements PublicacionService {
 
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,
-                                        "No se puede pausar una publicacion desactivada");
+                                        "No podés pausar una publicación dada de baja.");
                 }
 
                 publicacion.setEstado(EstadoPublicacion.PAUSADA);
@@ -208,13 +208,13 @@ public class PublicacionServiceImpl implements PublicacionService {
                 if (publicacion.getEstado() == EstadoPublicacion.DESACTIVADA) {
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,
-                                        "No se puede reactivar una publicacion desactivada");
+                                        "No podés reactivar una publicación dada de baja.");
                 }
 
                 if (publicacion.getEstado() != EstadoPublicacion.PAUSADA) {
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,
-                                        "Solo se puede reactivar una publicacion pausada");
+                                        "Solo podés reactivar una publicación pausada.");
                 }
 
                 publicacion.setEstado(EstadoPublicacion.ACTIVA);
@@ -239,7 +239,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                 if (precioMin == null || precioMax == null) {
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,
-                                        "Los precios minimo y maximo son obligatorios");
+                                        "Ingresá el precio mínimo y el máximo.");
                 }
 
                 if (precioMin.compareTo(BigDecimal.ZERO) < 0
@@ -247,13 +247,13 @@ public class PublicacionServiceImpl implements PublicacionService {
 
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,
-                                        "Los precios no pueden ser negativos");
+                                        "Los precios no pueden ser negativos.");
                 }
 
                 if (precioMin.compareTo(precioMax) > 0) {
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,
-                                        "El precio minimo no puede ser mayor al precio maximo");
+                                        "El precio mínimo no puede ser mayor al máximo.");
                 }
 
                 return publicacionRepository.findByPrecioDiaBetweenAndEstado(
@@ -271,7 +271,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                 if (idTipoVehiculo == null) {
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,
-                                        "El tipo de vehiculo es obligatorio");
+                                        "Elegí un tipo de vehículo.");
                 }
 
                 return publicacionRepository
@@ -286,7 +286,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                         String marca,
                         Pageable pageable) {
 
-                validarTextoFiltro(marca, "La marca es obligatoria");
+                validarTextoFiltro(marca, "Ingresá la marca.");
 
                 return publicacionRepository
                                 .findByVehiculo_MarcaIgnoreCaseAndEstado(
@@ -298,7 +298,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                         String modelo,
                         Pageable pageable) {
 
-                validarTextoFiltro(modelo, "El modelo es obligatorio");
+                validarTextoFiltro(modelo, "Ingresá el modelo.");
 
                 return publicacionRepository
                                 .findByVehiculo_ModeloIgnoreCaseAndEstado(
@@ -312,7 +312,7 @@ public class PublicacionServiceImpl implements PublicacionService {
 
                 validarTextoFiltro(
                                 provincia,
-                                "La provincia es obligatoria");
+                                "Elegí la provincia.");
 
                 return publicacionRepository
                                 .findByUbicacion_ProvinciaIgnoreCaseAndEstado(
@@ -329,11 +329,11 @@ public class PublicacionServiceImpl implements PublicacionService {
 
                 validarTextoFiltro(
                                 provincia,
-                                "La provincia es obligatoria");
+                                "Elegí la provincia.");
 
                 validarTextoFiltro(
                                 ciudad,
-                                "La ciudad es obligatoria");
+                                "Elegí la ciudad.");
 
                 return publicacionRepository
                                 .findByUbicacion_ProvinciaIgnoreCaseAndUbicacion_CiudadIgnoreCaseAndEstado(
@@ -352,15 +352,15 @@ public class PublicacionServiceImpl implements PublicacionService {
 
                 validarTextoFiltro(
                                 provincia,
-                                "La provincia es obligatoria");
+                                "Elegí la provincia.");
 
                 validarTextoFiltro(
                                 ciudad,
-                                "La ciudad es obligatoria");
+                                "Elegí la ciudad.");
 
                 validarTextoFiltro(
                                 localidad,
-                                "La localidad es obligatoria");
+                                "Elegí la localidad.");
 
                 return publicacionRepository
                                 .findByUbicacion_ProvinciaIgnoreCaseAndUbicacion_CiudadIgnoreCaseAndUbicacion_LocalidadIgnoreCaseAndEstado(
@@ -395,75 +395,24 @@ public class PublicacionServiceImpl implements PublicacionService {
                 if (usadaPorOtro) {
                         throw new ResponseStatusException(
                                         HttpStatus.FORBIDDEN,
-                                        "La ubicacion pertenece a otro usuario");
+                                        "Esa ubicación no es tuya. Elegí una de tus ubicaciones o cargá una nueva.");
                 }
         }
 
         private void validarRequest(PublicacionRequest request) {
 
-                if (request == null) {
-                        throw new ResponseStatusException(
-                                        HttpStatus.BAD_REQUEST,
-                                        "La publicacion no puede estar vacia");
-                }
-
-                if (request.getPrecioDia() == null
-                                || request.getPrecioDia()
-                                                .compareTo(BigDecimal.ZERO) <= 0) {
-
-                        throw new ResponseStatusException(
-                                        HttpStatus.BAD_REQUEST,
-                                        "El precio por dia debe ser mayor a cero");
-                }
-
-                if (request.getDescuentoPorcentaje() != null
-                                && (request.getDescuentoPorcentaje()
-                                                .compareTo(BigDecimal.ZERO) < 0
-                                                || request.getDescuentoPorcentaje()
-                                                                .compareTo(
-                                                                                new BigDecimal("50")) > 0)) {
-
-                        throw new ResponseStatusException(
-                                        HttpStatus.BAD_REQUEST,
-                                        "El descuento debe estar entre 0 y 50");
-                }
-
-                if (request.getDescripcion() == null
-                                || request.getDescripcion().isBlank()) {
-
-                        throw new ResponseStatusException(
-                                        HttpStatus.BAD_REQUEST,
-                                        "La descripcion es obligatoria");
-                }
-
-                if (request.getDescripcion().length() > 600) {
-                        throw new ResponseStatusException(
-                                        HttpStatus.BAD_REQUEST,
-                                        "La descripcion no puede superar los 600 caracteres");
-                }
-
-                if (request.getHoraRetiroDevolucion() == null) {
-                        throw new ResponseStatusException(
-                                        HttpStatus.BAD_REQUEST,
-                                        "La hora de retiro y devolucion es obligatoria");
-                }
-
-                if (request.getIdVehiculo() == null) {
-                        throw new ResponseStatusException(
-                                        HttpStatus.BAD_REQUEST,
-                                        "El vehiculo es obligatorio");
-                }
-
-                if (request.getIdUbicacion() == null) {
-                        throw new ResponseStatusException(
-                                        HttpStatus.BAD_REQUEST,
-                                        "La ubicacion es obligatoria");
-                }
+                ValidacionVolanta.validarDatosCompletos(request);
+                ValidacionVolanta.validarPrecioDiaPositivo(request.getPrecioDia());
+                ValidacionVolanta.validarDescuentoValido(request.getDescuentoPorcentaje());
+                ValidacionVolanta.validarDescripcionNoVacia(request.getDescripcion());
+                ValidacionVolanta.validarHoraRetiroObligatoria(request.getHoraRetiroDevolucion());
+                ValidacionVolanta.validarIdVehiculoPositivo(request.getIdVehiculo());
+                ValidacionVolanta.validarIdUbicacionPositivo(request.getIdUbicacion());
         }
 
         @Override
         public Page<Publicacion> obtenerPublicacionesPorZona(String zona, Pageable pageable) {
-                validarTextoFiltro(zona, "La zona es obligatoria");
+                validarTextoFiltro(zona, "Elegí la zona.");
 
                 return publicacionRepository
                                 .findByUbicacion_ZonaIgnoreCaseAndEstado(
@@ -485,25 +434,25 @@ public class PublicacionServiceImpl implements PublicacionService {
 
                 if ((fechaInicio == null) != (fechaFin == null)) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                        "Elegí la fecha de retiro y la de devolución");
+                                        "Elegí la fecha de retiro y la de devolución.");
                 }
                 if (fechaInicio != null && fechaInicio.isBefore(LocalDate.now())) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                        "La fecha de retiro no puede ser anterior a hoy");
+                                        "La fecha de retiro no puede ser anterior a hoy.");
                 }
                 if (fechaInicio != null && !fechaFin.isAfter(fechaInicio)) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                        "La fecha de devolución debe ser posterior a la de retiro");
+                                        "La devolución tiene que ser al menos un día después del retiro.");
                 }
                 String ordenElegido = orden == null || orden.isBlank() ? "recientes" : orden;
                 if (!ORDENES_CATALOGO.contains(ordenElegido)) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Orden no válido");
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Elegí un orden de la lista.");
                 }
 
                 // El orden lo arma la consulta; de la página solo se usan número y tamaño
                 Pageable pagina = PageRequest.of(pageable.getPageNumber(), Math.min(pageable.getPageSize(), 100));
                 if (pagina.getOffset() > Integer.MAX_VALUE) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Número de página demasiado grande");
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No hay más resultados para mostrar.");
                 }
 
                 return publicacionRepository.buscarCatalogo(

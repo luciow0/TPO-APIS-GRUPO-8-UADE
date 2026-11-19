@@ -1,5 +1,8 @@
 package com.uade.tpo.marketplace.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -24,6 +27,8 @@ import com.uade.tpo.marketplace.repository.VehiculoRepository;
 
 @Service
 public class ImagenVehiculoServiceImpl implements ImagenVehiculoService {
+
+    private static final Logger log = LoggerFactory.getLogger(ImagenVehiculoServiceImpl.class);
 
     private final ImagenVehiculoRepository imagenVehiculoRepository;
     private final VehiculoRepository vehiculoRepository;
@@ -60,7 +65,7 @@ public class ImagenVehiculoServiceImpl implements ImagenVehiculoService {
     @PreAuthorize("@seguridadDominio.esDuenioDeVehiculo(authentication, #idVehiculo) or hasRole('ADMIN')")
     public ImagenVehiculoResponse guardar(Long idVehiculo, Integer orden, MultipartFile file) {
         Vehiculo vehiculo = vehiculoRepository.findById(idVehiculo)
-                .orElseThrow(() -> new EntityNotFoundException("Vehiculo no encontrado con id: " + idVehiculo));
+                .orElseThrow(() -> new EntityNotFoundException("No encontramos ese vehículo."));
 
         ImagenVehiculo imagen = new ImagenVehiculo();
         imagen.setVehiculo(vehiculo);
@@ -92,25 +97,26 @@ public class ImagenVehiculoServiceImpl implements ImagenVehiculoService {
     @PreAuthorize("@seguridadDominio.esDuenioDeImagen(authentication, #id) or hasRole('ADMIN')")
     public void eliminar(Long id) {
         if (!imagenVehiculoRepository.existsById(id)) {
-            throw new EntityNotFoundException("Imagen de vehiculo no encontrada con id: " + id);
+            throw new EntityNotFoundException("No encontramos esa foto.");
         }
         imagenVehiculoRepository.deleteById(id);
     }
 
     private ImagenVehiculo obtener(Long id) {
         return imagenVehiculoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Imagen de vehiculo no encontrada con id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("No encontramos esa foto."));
     }
 
     // MultipartFile -> Blob
     private Blob toBlob(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("El archivo de imagen es requerido");
+            throw new IllegalArgumentException("Elegí una imagen para subir.");
         }
         try {
             return new SerialBlob(file.getBytes());
         } catch (IOException | SQLException e) {
-            throw new RuntimeException("No se pudo procesar la imagen", e);
+            log.warn("No se pudo procesar la imagen subida", e);
+            throw new IllegalArgumentException("No pudimos leer la imagen. Probá con un JPG o PNG.");
         }
     }
 
@@ -126,7 +132,8 @@ public class ImagenVehiculoServiceImpl implements ImagenVehiculoService {
                     .file(base64)
                     .build();
         } catch (SQLException e) {
-            throw new RuntimeException("No se pudo leer la imagen", e);
+            log.warn("No se pudo leer la imagen {}", imagen.getIdImagen(), e);
+            throw new IllegalArgumentException("No pudimos leer la imagen. Probá con un JPG o PNG.");
         }
     }
 }
