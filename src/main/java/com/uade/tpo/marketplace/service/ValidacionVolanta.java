@@ -2,6 +2,7 @@ package com.uade.tpo.marketplace.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Year;
 
 import com.uade.tpo.marketplace.Enum.MetodoPago;
 import com.uade.tpo.marketplace.exception.DatoInvalidoException;
@@ -16,8 +17,9 @@ public final class ValidacionVolanta {
     private static final String SOLO_LETRAS_REGEX = "^[\\p{L} '\\-]+$";
     private static final String EMAIL_REGEX = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$";
 
-    private static final int ANIO_MINIMO = 1900;
-    private static final int ANIO_MAXIMO = 2027;
+    // Mismos limites que el front (utils/vehiculos.js). Se admite el año siguiente
+    // porque los modelos nuevos salen antes de que termine el año.
+    private static final int ANIO_MINIMO = 1990;
 
     private ValidacionVolanta() {
     }
@@ -85,9 +87,10 @@ public final class ValidacionVolanta {
     }
 
     public static void validarAnioValido(Integer anio) {
-        validarEnteroPositivo(anio, "Ingresá el año del vehículo.");
-        validarEnteroEnRango(anio, ANIO_MINIMO, ANIO_MAXIMO,
-                "El año tiene que estar entre " + ANIO_MINIMO + " y " + ANIO_MAXIMO + ".");
+        int anioMaximo = Year.now().getValue() + 1;
+        validarObligatorio(anio, "Ingresá el año del vehículo.");
+        validarEnteroEnRango(anio, ANIO_MINIMO, anioMaximo,
+                "El año tiene que estar entre " + ANIO_MINIMO + " y " + anioMaximo + ".");
     }
 
     public static void validarColorNoVacio(String color) {
@@ -96,7 +99,7 @@ public final class ValidacionVolanta {
     }
 
     public static void validarCantidadAsientosValida(Integer cantidadAsientos) {
-        validarEnteroPositivo(cantidadAsientos, "Ingresá la cantidad de asientos.");
+        validarObligatorio(cantidadAsientos, "Ingresá la cantidad de asientos.");
         validarEnteroEnRango(cantidadAsientos, 1, 9, "La cantidad de asientos tiene que estar entre 1 y 9.");
     }
 
@@ -123,7 +126,7 @@ public final class ValidacionVolanta {
     }
 
     public static void validarZonaNoVacia(String zona) {
-        validarTextoNoVacio(zona, "Elegí la zona.");
+        validarTextoNoVacio(zona, "Ingresá el barrio o la zona.");
     }
 
     // Latitud y longitud las arma el autocompletado de Google Places.
@@ -209,12 +212,6 @@ public final class ValidacionVolanta {
     }
 
     private static void validarLongPositivo(Long valor, String mensaje) {
-        if (valor == null || valor <= 0) {
-            throw new DatoInvalidoException(mensaje);
-        }
-    }
-
-    private static void validarEnteroPositivo(Integer valor, String mensaje) {
         if (valor == null || valor <= 0) {
             throw new DatoInvalidoException(mensaje);
         }

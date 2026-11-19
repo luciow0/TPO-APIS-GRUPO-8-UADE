@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.uade.tpo.marketplace.dto.VehiculoDTO;
 import com.uade.tpo.marketplace.dto.VehiculoRequest;
@@ -57,7 +58,7 @@ VehiculoController {
         validarVehiculo(request);
         // Validar que la patente no exista
         if (vehiculoService.existePatente(request.getPatente())) {
-            throw new IllegalArgumentException("Ya hay un vehículo registrado con esa patente.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya hay un vehículo registrado con esa patente.");
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(vehiculoService.guardar(request));
     }

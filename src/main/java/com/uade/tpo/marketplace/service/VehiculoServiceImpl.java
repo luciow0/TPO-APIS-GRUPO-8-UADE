@@ -8,15 +8,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.uade.tpo.marketplace.auth.SeguridadDominio;
 import com.uade.tpo.marketplace.dto.VehiculoDTO;
 import com.uade.tpo.marketplace.dto.VehiculoRequest;
 import com.uade.tpo.marketplace.entity.TipoVehiculo;
 import com.uade.tpo.marketplace.entity.Usuario;
 import com.uade.tpo.marketplace.entity.Vehiculo;
+import com.uade.tpo.marketplace.exception.DatoInvalidoException;
 import com.uade.tpo.marketplace.exception.EntityNotFoundException;
 import com.uade.tpo.marketplace.repository.UsuarioRepository;
 import com.uade.tpo.marketplace.repository.VehiculoRepository;
@@ -27,13 +30,16 @@ public class VehiculoServiceImpl implements VehiculoService {
     private final VehiculoRepository vehiculoRepository;
     private final TipoVehiculoService tipoVehiculoService;
     private final UsuarioRepository usuarioRepository;
+    private final SeguridadDominio seguridadDominio;
 
     public VehiculoServiceImpl(VehiculoRepository vehiculoRepository,
             TipoVehiculoService tipoVehiculoService,
-            UsuarioRepository usuarioRepository) {
+            UsuarioRepository usuarioRepository,
+            SeguridadDominio seguridadDominio) {
         this.vehiculoRepository = vehiculoRepository;
         this.tipoVehiculoService = tipoVehiculoService;
         this.usuarioRepository = usuarioRepository;
+        this.seguridadDominio = seguridadDominio;
     }
 
     @Override
@@ -62,6 +68,7 @@ public class VehiculoServiceImpl implements VehiculoService {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')") // Si fuera público, cualquiera podría averiguar si una patente está registrada
     public VehiculoDTO buscarPorPatente(String patente) {
         Vehiculo vehiculo = vehiculoRepository.findByPatente(patente)
                 .orElseThrow(() -> new EntityNotFoundException("No encontramos un vehículo con esa patente."));
@@ -103,7 +110,7 @@ public class VehiculoServiceImpl implements VehiculoService {
         vehiculoRepository.findByPatente(request.getPatente())
                 .filter(otro -> !otro.getIdVehiculo().equals(id))
                 .ifPresent(otro -> {
-                    throw new IllegalArgumentException("Ya hay un vehículo registrado con esa patente.");
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya hay un vehículo registrado con esa patente.");
                 });
 
         vehiculoExistente.setPatente(request.getPatente());
@@ -146,21 +153,24 @@ public class VehiculoServiceImpl implements VehiculoService {
      //buscamos ese id en la BD.
      // si no viene tipo (o sin id) -> el vehiculo queda sin tipo (esta permitido)
      // si el id existe -> devolvemos el tipo real de la BD
-     // si el id NO existe -> 404 limpio
+     // si el id NO existe -> 400 (es un dato invalido del request, no un recurso pedido por URL)
      //
     private TipoVehiculo resolverTipoVehiculo(Long idTipoVehiculo) {
         if (idTipoVehiculo == null) {
             return null;
         }
         return tipoVehiculoService.obtenerTipoVehiculoPorId(idTipoVehiculo)
-                .orElseThrow(() -> new EntityNotFoundException(
+                .orElseThrow(() -> new DatoInvalidoException(
                         "Elegí un tipo de vehículo de la lista."));
     }
 
     private VehiculoDTO convertirADTO(Vehiculo vehiculo) {
+        boolean verPatente = seguridadDominio.puedeVerPatente(
+                SecurityContextHolder.getContext().getAuthentication(), vehiculo);
+
         return new VehiculoDTO(
                 vehiculo.getIdVehiculo(),
-                vehiculo.getPatente(),
+                verPatente ? vehiculo.getPatente() : null,
                 vehiculo.getMarca(),
                 vehiculo.getModelo(),
                 vehiculo.getAnio(),

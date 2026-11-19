@@ -86,6 +86,18 @@ public class SeguridadDominio {
                         email, publicacion.getIdPublicacion(), EstadoReserva.CONFIRMADA);
     }
 
+    // La patente solo la ve el dueño del vehículo o un admin; en el catálogo y el detalle público va en null.
+    public boolean puedeVerPatente(Authentication auth, Vehiculo vehiculo) {
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return false;
+        }
+
+        return auth.getAuthorities().stream()
+                        .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))
+                || (vehiculo.getPropietario() != null
+                        && vehiculo.getPropietario().getEmail().equals(auth.getName()));
+    }
+
     // GET /ubicaciones/{id}: el admin, o quien puede ver la ubicación exacta de alguna publicación que la usa
     public boolean puedeVerUbicacion(Authentication auth, Long idUbicacion) {
         if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {

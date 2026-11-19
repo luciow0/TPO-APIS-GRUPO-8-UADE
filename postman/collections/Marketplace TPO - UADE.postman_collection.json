@@ -332,8 +332,9 @@
           "response": []
         },
         {
-          "name": "Buscar vehiculo por patente",
+          "name": "Buscar vehiculo por patente (ADMIN)",
           "request": {
+            "description": "Requiere rol ADMIN: hacer Login con una cuenta ADMIN antes, para que {{token}} sea el de admin. Con otra cuenta o sin sesion responde 403.",
             "method": "GET",
             "header": [],
             "url": {

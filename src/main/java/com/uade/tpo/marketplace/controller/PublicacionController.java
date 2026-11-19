@@ -293,8 +293,9 @@ public class PublicacionController {
         TipoVehiculo tipoVehiculo = vehiculo.getTipoVehiculo();
         Ubicacion ubicacion = publicacion.getUbicacion();
 
-        boolean exacta = seguridadDominio.puedeVerUbicacionExacta(
-                SecurityContextHolder.getContext().getAuthentication(), publicacion);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean exacta = seguridadDominio.puedeVerUbicacionExacta(auth, publicacion);
+        boolean verPatente = seguridadDominio.puedeVerPatente(auth, vehiculo);
 
         return new PublicacionResponse(
                 publicacion.getIdPublicacion(),
@@ -305,7 +306,7 @@ public class PublicacionController {
                 publicacion.getDescripcion(),
                 publicacion.getHoraRetiroDevolucion(),
                 vehiculo.getIdVehiculo(),
-                vehiculo.getPatente(),
+                verPatente ? vehiculo.getPatente() : null,
                 vehiculo.getMarca(),
                 vehiculo.getModelo(),
                 vehiculo.getAnio(),

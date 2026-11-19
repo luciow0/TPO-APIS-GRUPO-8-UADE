@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(
-        code = HttpStatus.BAD_REQUEST,
+        code = HttpStatus.CONFLICT,
         reason = "Ya tenés un auto en el carrito. Confirmá esa reserva o quitalo antes de agregar otro."
 )
 public class CarritoDuplicateException extends Exception {
