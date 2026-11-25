@@ -21,6 +21,7 @@ import com.uade.tpo.marketplace.entity.Usuario;
 import com.uade.tpo.marketplace.entity.Vehiculo;
 import com.uade.tpo.marketplace.exception.DatoInvalidoException;
 import com.uade.tpo.marketplace.exception.EntityNotFoundException;
+import com.uade.tpo.marketplace.repository.PublicacionRepository; // NUEVO (10a)
 import com.uade.tpo.marketplace.repository.UsuarioRepository;
 import com.uade.tpo.marketplace.repository.VehiculoRepository;
 
@@ -31,15 +32,18 @@ public class VehiculoServiceImpl implements VehiculoService {
     private final TipoVehiculoService tipoVehiculoService;
     private final UsuarioRepository usuarioRepository;
     private final SeguridadDominio seguridadDominio;
+    private final PublicacionRepository publicacionRepository; // NUEVO (10b)
 
     public VehiculoServiceImpl(VehiculoRepository vehiculoRepository,
             TipoVehiculoService tipoVehiculoService,
             UsuarioRepository usuarioRepository,
-            SeguridadDominio seguridadDominio) {
+            SeguridadDominio seguridadDominio,
+            PublicacionRepository publicacionRepository) { // NUEVO (10b)
         this.vehiculoRepository = vehiculoRepository;
         this.tipoVehiculoService = tipoVehiculoService;
         this.usuarioRepository = usuarioRepository;
         this.seguridadDominio = seguridadDominio;
+        this.publicacionRepository = publicacionRepository; // NUEVO (10b)
     }
 
     @Override
@@ -124,11 +128,18 @@ public class VehiculoServiceImpl implements VehiculoService {
         return convertirADTO(vehiculoRepository.save(vehiculoExistente));
     }
 
+    // NUEVO (10c): ahora verifica que el vehículo no tenga publicaciones antes de borrarlo
     @Override
     @Transactional
     @PreAuthorize("@seguridadDominio.esDuenioDeVehiculo(authentication, #id) or hasRole('ADMIN')")
     public void eliminar(Long id) {
-        vehiculoRepository.delete(obtenerVehiculo(id));
+        Vehiculo vehiculo = obtenerVehiculo(id);
+        if (publicacionRepository.existsByVehiculo_IdVehiculo(id)) {
+            // IllegalStateException llega al front como 409 con este mensaje
+            throw new IllegalStateException(
+                    "Este vehículo tiene publicaciones asociadas, por eso no se puede eliminar.");
+        }
+        vehiculoRepository.delete(vehiculo);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.uade.tpo.marketplace.repository;
+        package com.uade.tpo.marketplace.repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -24,6 +24,8 @@ public interface PublicacionRepository extends JpaRepository<Publicacion, Long> 
         boolean existsByVehiculo_IdVehiculoAndEstadoIn(
                         Long idVehiculo,
                         Collection<EstadoPublicacion> estados);
+
+         boolean existsByVehiculo_IdVehiculo(Long idVehiculo);
 
         List<Publicacion> findByUbicacion_IdUbicacion(Long idUbicacion);
 
