@@ -133,8 +133,7 @@ public class PagoController {
     // back_url de la preferencia: Mercado Pago devuelve el navegador aca y lo mandamos a la pantalla de la reserva.
     @GetMapping("/mercadopago/retorno")
     public ResponseEntity<Void> retornoDesdeMercadoPago(
-            @RequestParam(name = "payment_id", required = false) String paymentId,
-            @RequestParam(name = "external_reference", required = false) String externalReference) {
+            @RequestParam(name = "payment_id", required = false) String paymentId) {
 
         Optional<Pago> pago = Optional.empty();
         Long idPaymentMercadoPago = parsearId(paymentId);
@@ -147,17 +146,9 @@ public class PagoController {
             }
         }
 
-        Long idPago = parsearId(externalReference);
-
-        if (pago.isEmpty() && idPago != null) {
-            pago = pagoService.buscarPagoMercadoPago(idPago);
-        }
-
         String destino = pago
-                .map(p -> frontendUrl + "/reservas/" + p.getReserva().getIdReserva()
-                        + "?idPago=" + p.getIdPago()
-                        + "&estadoPago=" + p.getEstado())
-                .orElse(frontendUrl + "/reservas");
+                .map(p -> frontendUrl + "/reservas/" + p.getReserva().getIdReserva())
+                .orElse(frontendUrl + "/mis-reservas");
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(destino))

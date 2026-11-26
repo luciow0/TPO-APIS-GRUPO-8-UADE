@@ -1,5 +1,9 @@
 package com.uade.tpo.marketplace.repository;
 
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.util.Optional; // Para manejar valores que pueden ser nulos
 
 import org.springframework.data.domain.Page;
@@ -12,7 +16,11 @@ import org.springframework.stereotype.Repository; // Para marcar la clase como u
 import com.uade.tpo.marketplace.entity.Vehiculo; // Para importar la clase Vehiculo, que es la entidad que se va a manejar en este repositorio
 
 @Repository
-public interface VehiculoRepository extends JpaRepository<Vehiculo, Long> { // Se define la interfaz que extiende jpaRepository
+public interface VehiculoRepository extends JpaRepository<Vehiculo, Long> {
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select v from Vehiculo v where v.idVehiculo = :id")
+    Optional<Vehiculo> buscarParaRetencion(@Param("id") Long id);
+ // Se define la interfaz que extiende jpaRepository
     @EntityGraph(attributePaths = {"propietario", "tipoVehiculo"})
     Page<Vehiculo> findByPropietario_Email(String email, Pageable pageable);
 

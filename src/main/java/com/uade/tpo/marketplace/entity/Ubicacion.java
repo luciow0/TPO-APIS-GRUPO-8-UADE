@@ -1,6 +1,7 @@
 package com.uade.tpo.marketplace.entity;
 
 import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,6 +17,11 @@ public class Ubicacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idUbicacion;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_creador")
+    private Usuario creador;
 
     @NotBlank private String direccion;
     @NotBlank private String ciudad;

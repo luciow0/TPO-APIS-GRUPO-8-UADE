@@ -32,6 +32,7 @@ public class DisponibilidadController {
     private DisponibilidadService disponibilidadService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<DisponibilidadResponse>> obtenerDisponibilidades(Pageable pageable) {
 
         return ResponseEntity.ok(
@@ -40,6 +41,7 @@ public class DisponibilidadController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@seguridadDominio.puedeVerDisponibilidad(authentication, #id)")
     public ResponseEntity<DisponibilidadResponse> obtenerDisponibilidadPorId(
             @PathVariable Long id)
             throws DisponibilidadNotFoundException {

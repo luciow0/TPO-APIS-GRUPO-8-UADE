@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -388,13 +389,22 @@ public class PublicacionServiceImpl implements PublicacionService {
                 }
         }
 
-        // Una ubicación ya usada por una publicación de otro propietario no se puede reutilizar
+        // Las ubicaciones anteriores se verifican por sus publicaciones.
         private void validarUbicacionPropia(Ubicacion ubicacion, Vehiculo vehiculo) {
                 String emailPropietario = vehiculo.getPropietario().getEmail();
+                var autenticacion = SecurityContextHolder.getContext().getAuthentication();
+                if (autenticacion != null && autenticacion.getAuthorities().stream()
+                                .anyMatch(rol -> rol.getAuthority().equals("ROLE_ADMIN"))) {
+                        return;
+                }
+                if (ubicacion.getCreador() != null && ubicacion.getCreador().getIdUsuario()
+                                .equals(vehiculo.getPropietario().getIdUsuario())) {
+                        return;
+                }
 
-                boolean usadaPorOtro = publicacionRepository
-                                .findByUbicacion_IdUbicacion(ubicacion.getIdUbicacion())
-                                .stream()
+                List<Publicacion> publicaciones = publicacionRepository
+                                .findByUbicacion_IdUbicacion(ubicacion.getIdUbicacion());
+                boolean usadaPorOtro = publicaciones.isEmpty() || publicaciones.stream()
                                 .anyMatch(p -> !p.getVehiculo().getPropietario().getEmail()
                                                 .equals(emailPropietario));
 

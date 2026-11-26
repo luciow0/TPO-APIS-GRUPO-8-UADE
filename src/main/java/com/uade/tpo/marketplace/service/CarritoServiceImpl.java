@@ -7,11 +7,15 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Isolation;
+import com.uade.tpo.marketplace.repository.VehiculoRepository;
 
 import com.uade.tpo.marketplace.Enum.EstadoPago;
 import com.uade.tpo.marketplace.Enum.EstadoPublicacion;
@@ -45,6 +49,12 @@ public class CarritoServiceImpl implements CarritoService {
     private CarritoRepository carritoRepository;
 
     @Autowired
+    private VehiculoRepository vehiculoRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Autowired
     private UsuarioService usuarioService;
 
     @Autowired
@@ -61,6 +71,7 @@ public class CarritoServiceImpl implements CarritoService {
 
     @PreAuthorize("isAuthenticated()")
     @Override
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED)
     public CarritoResponse agregarPublicacionAlCarrito(
             Long idPublicacion,
             String emailUsuario,
@@ -83,6 +94,7 @@ public class CarritoServiceImpl implements CarritoService {
                 publicacionService.obtenerPublicacionPorId(
                         idPublicacion);
 
+        bloquearVehiculo(publicacion);
         validarPublicacionActiva(publicacion);
 
         validarDisponibilidad(
@@ -149,6 +161,8 @@ public class CarritoServiceImpl implements CarritoService {
 
     @PreAuthorize("@seguridadDominio.esDuenioDeCarrito(authentication, #idCarrito)")
     @Override
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED,
+            noRollbackFor = {PublicacionNoDisponibleException.class, CarritoNotFoundException.class})
     public CarritoResponse modificarFechas(
             Long idCarrito,
             ModificarFechasCarritoRequest request)
@@ -158,13 +172,14 @@ public class CarritoServiceImpl implements CarritoService {
             PublicacionNotFoundException {
 
         Optional<Carrito> carritoOptional =
-                carritoRepository.findById(idCarrito);
+                carritoRepository.buscarParaModificar(idCarrito);
 
         if (carritoOptional.isEmpty()) {
             throw new CarritoNotFoundException();
         }
 
         Carrito carrito = carritoOptional.get();
+        entityManager.refresh(carrito);
 
         ValidacionVolanta.validarDatosCompletos(request);
 
@@ -181,6 +196,7 @@ public class CarritoServiceImpl implements CarritoService {
                 request.getFechaFin());
 
         Publicacion publicacion = carrito.getPublicacion();
+        bloquearVehiculo(publicacion);
 
         validarPublicacionDelCarrito(carrito);
 
@@ -221,7 +237,7 @@ public class CarritoServiceImpl implements CarritoService {
 
     @Override
     @Transactional(
-            rollbackFor = Exception.class,
+            rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED,
             noRollbackFor = PublicacionNoDisponibleException.class)
     @PreAuthorize("@seguridadDominio.esDuenioDeCarrito(authentication, #idCarrito)")
     public ConfirmacionCarritoResponse confirmarCarrito(
@@ -239,13 +255,14 @@ public class CarritoServiceImpl implements CarritoService {
         ValidacionVolanta.validarMetodoPagoElegido(metodoPago);
 
         Optional<Carrito> carritoOptional =
-                carritoRepository.findById(idCarrito);
+                carritoRepository.buscarParaModificar(idCarrito);
 
         if (carritoOptional.isEmpty()) {
             throw new CarritoNotFoundException();
         }
 
         Carrito carrito = carritoOptional.get();
+        entityManager.refresh(carrito);
 
         if (!carrito.getFechaExpiracion()
                 .isAfter(LocalDateTime.now())) {
@@ -259,6 +276,7 @@ public class CarritoServiceImpl implements CarritoService {
                 carrito.getFechaFin());
 
         Publicacion publicacion = carrito.getPublicacion();
+        bloquearVehiculo(publicacion);
 
         validarPublicacionDelCarrito(carrito);
 
@@ -302,6 +320,11 @@ public class CarritoServiceImpl implements CarritoService {
                 pago.getIdPago(),
                 pago.getEstado(),
                 pago.getMonto());
+    }
+
+    private void bloquearVehiculo(Publicacion publicacion) {
+        vehiculoRepository.buscarParaRetencion(publicacion.getVehiculo().getIdVehiculo())
+                .orElseThrow(() -> new IllegalStateException("No encontramos el vehículo de la publicación."));
     }
 
     private void validarFechas(
@@ -400,6 +423,7 @@ public class CarritoServiceImpl implements CarritoService {
 
         if (carritoExpirado || publicacionNoDisponible) {
             carritoRepository.delete(carritoExistente);
+            carritoRepository.flush();
             return;
         }
 

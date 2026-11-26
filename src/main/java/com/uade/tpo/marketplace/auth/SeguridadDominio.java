@@ -22,6 +22,7 @@ public class SeguridadDominio {
     @Autowired private PagoRepository pagoRepository;
     @Autowired private DisponibilidadRepository disponibilidadRepository;
     @Autowired private ImagenVehiculoRepository imagenVehiculoRepository;
+    @Autowired private UbicacionRepository ubicacionRepository;
 
     public boolean esMismoUsuario(Authentication auth, Long idUsuarioRequest) throws UsuarioNotFoundException {
         Usuario usuario = usuarioRepository.findById(idUsuarioRequest)
@@ -116,7 +117,11 @@ public class SeguridadDominio {
             return true;
         }
 
-        return publicacionRepository.findByUbicacion_IdUbicacion(idUbicacion).stream()
+        boolean esCreador = ubicacionRepository.findById(idUbicacion)
+                .map(ubicacion -> ubicacion.getCreador() != null
+                        && ubicacion.getCreador().getEmail().equals(auth.getName()))
+                .orElse(false);
+        return esCreador || publicacionRepository.findByUbicacion_IdUbicacion(idUbicacion).stream()
                 .anyMatch(publicacion -> puedeVerUbicacionExacta(auth, publicacion));
     }
 
@@ -130,6 +135,13 @@ public class SeguridadDominio {
         Pago pago = pagoRepository.findById(idPago)
                 .orElseThrow(() -> new PagoNotFoundException("No encontramos ese pago."));
         return pago.getReserva().getCliente().getEmail().equals(auth.getName());
+    }
+
+    public boolean puedeVerDisponibilidad(Authentication auth, Long idDisponibilidad)
+            throws DisponibilidadNotFoundException, PublicacionNotFoundException, PublicacionNoDisponibleException {
+        Disponibilidad disponibilidad = disponibilidadRepository.findById(idDisponibilidad)
+                .orElseThrow(DisponibilidadNotFoundException::new);
+        return puedeVerPublicacion(auth, disponibilidad.getPublicacion().getIdPublicacion());
     }
 
     public boolean esDuenioDeDisponibilidad(Authentication auth, Long idDisponibilidad) throws DisponibilidadNotFoundException {

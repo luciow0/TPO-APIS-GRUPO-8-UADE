@@ -171,7 +171,7 @@ public class ReservaServiceImpl implements ReservaService {
     }
 
     @Override
-    @PreAuthorize("@seguridadDominio.esDuenioDeReserva(authentication, #idReserva) or hasRole('ADMIN')")
+    @PreAuthorize("@seguridadDominio.esDuenioDeReserva(authentication, #idReserva) or @seguridadDominio.esPropietarioDeReserva(authentication, #idReserva) or hasRole('ADMIN')")
     public Optional<Reserva> getReservaById(Long idReserva) {
         return reservaRepository.findById(idReserva);
     }

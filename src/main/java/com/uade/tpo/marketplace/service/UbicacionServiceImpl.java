@@ -8,6 +8,9 @@ import com.uade.tpo.marketplace.exception.UbicacionNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.AccessDeniedException;
+import com.uade.tpo.marketplace.repository.UsuarioRepository;
 
 import com.uade.tpo.marketplace.entity.Ubicacion;
 import com.uade.tpo.marketplace.repository.UbicacionRepository;
@@ -18,14 +21,21 @@ public class UbicacionServiceImpl implements UbicacionService {
     @Autowired
     private UbicacionRepository ubicacionRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     @Override
     public Optional<Ubicacion> obtenerUbicacionPorId(Long idUbicacion) {
         return ubicacionRepository.findById(idUbicacion);
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public Ubicacion crear(UbicacionRequest request) {
         Ubicacion u = new Ubicacion();
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        u.setCreador(usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new AccessDeniedException("No encontramos tu cuenta.")));
         u.setZona(request.getZona());
         u.setDireccion(request.getDireccion());
         u.setCiudad(request.getCiudad());
