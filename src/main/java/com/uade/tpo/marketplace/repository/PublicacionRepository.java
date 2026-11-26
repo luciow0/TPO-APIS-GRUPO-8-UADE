@@ -42,6 +42,10 @@ public interface PublicacionRepository extends JpaRepository<Publicacion, Long> 
                         and (:estado is null or p.estado = :estado)
                         and (:busqueda is null or lower(concat(v.marca, ' ', v.modelo, ' ', v.patente))
                              like :busqueda escape '!')
+                        order by case
+                             when p.estado = com.uade.tpo.marketplace.Enum.EstadoPublicacion.ACTIVA then 0
+                             when p.estado = com.uade.tpo.marketplace.Enum.EstadoPublicacion.PAUSADA then 1
+                             else 2 end, p.idPublicacion desc
                         """, countQuery = """
                         select count(p) from Publicacion p join p.vehiculo v
                         where v.propietario.email = :emailUsuario

@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -103,8 +102,7 @@ public class PublicacionServiceImpl implements PublicacionService {
                                         .replace("!", "!!").replace("%", "!%").replace("_", "!_");
                         patron = "%" + texto + "%";
                 }
-                Pageable pagina = PageRequest.of(pageable.getPageNumber(), Math.min(pageable.getPageSize(), 100),
-                                Sort.by(Sort.Direction.DESC, "idPublicacion"));
+                Pageable pagina = PageRequest.of(pageable.getPageNumber(), Math.min(pageable.getPageSize(), 100));
                 if (pagina.getOffset() > Integer.MAX_VALUE) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No hay más resultados para mostrar.");
                 }
