@@ -2,6 +2,7 @@ package com.uade.tpo.marketplace.controller;
 
 import com.uade.tpo.marketplace.entity.Reserva;
 import com.uade.tpo.marketplace.dto.ReservaResponse;
+import com.uade.tpo.marketplace.dto.UsuarioResumen;
 import com.uade.tpo.marketplace.exception.ReservaInvalidException;
 import com.uade.tpo.marketplace.exception.ReservaNotFoundException;
 import com.uade.tpo.marketplace.service.ReservaService;
@@ -63,6 +64,23 @@ public class ReservaController {
         return ResponseEntity.ok(result);
     }
 
+    // Reservas de los autos del usuario logueado (vista del propietario).
+    @GetMapping("/de-mis-vehiculos")
+    public ResponseEntity<Page<ReservaResponse>> getReservasDeMisVehiculos(
+            Authentication authentication,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+
+        PageRequest pageRequest = (page == null || size == null)
+                ? PageRequest.of(0, Integer.MAX_VALUE)
+                : PageRequest.of(page, size);
+
+        return ResponseEntity.ok(
+                reservaService
+                        .getReservasDeMisVehiculos(authentication.getName(), pageRequest)
+                        .map(this::convertirAResponse));
+    }
+
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<Page<ReservaResponse>> getReservasByUsuario(
             @PathVariable Long idUsuario,
@@ -96,6 +114,15 @@ public class ReservaController {
         return ResponseEntity.ok(convertirAResponse(result));
     }
 
+    // El propietario confirma que recibió el auto.
+    @PutMapping("/{idReserva}/finalizar")
+    public ResponseEntity<ReservaResponse> finalizarReserva(
+            @PathVariable Long idReserva)
+            throws ReservaNotFoundException {
+
+        return ResponseEntity.ok(convertirAResponse(reservaService.finalizarReserva(idReserva)));
+    }
+
     private ReservaResponse convertirAResponse(Reserva reserva) {
 
         long cantidadDias = ChronoUnit.DAYS.between(
@@ -116,6 +143,9 @@ public class ReservaController {
                 reserva.getEstado(),
                 reserva.getPrecioDiaAplicado(),
                 cantidadDias,
-                precioTotal);
+                precioTotal,
+                UsuarioResumen.de(reserva.getPublicacion().getVehiculo().getPropietario()),
+                UsuarioResumen.de(reserva.getCliente()),
+                reserva.getFechaFinalizacion());
     }
 }

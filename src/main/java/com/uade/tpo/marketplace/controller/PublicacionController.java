@@ -91,6 +91,17 @@ public class PublicacionController {
                         .map(this::convertirAResponse));
     }
 
+    // Público: solo las ACTIVAS de esa persona.
+    @GetMapping("/usuario/{idUsuario}")
+    public ResponseEntity<Page<PublicacionResponse>> obtenerPublicacionesDeUsuario(
+            @PathVariable Long idUsuario,
+            @PageableDefault(size = 10) Pageable pageable) {
+
+        return ResponseEntity.ok(
+                publicacionService.obtenerPublicacionesActivasDeUsuario(idUsuario, pageable)
+                        .map(this::convertirAResponse));
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("@seguridadDominio.puedeVerPublicacion(authentication, #id)")
     public ResponseEntity<PublicacionResponse> obtenerPublicacionPorId(

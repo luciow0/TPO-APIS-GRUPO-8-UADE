@@ -26,4 +26,12 @@ public class UsuarioDTO {
     // Solo lectura: si se aceptara en POST/PUT /usuarios, cualquiera podria hacerse ADMIN.
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Role role;
+
+    // Solo lectura: la foto se sube por POST /usuarios/me/foto.
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDate fechaRegistro;
+
+    // Imagen en base64 o null.
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String foto;
 }

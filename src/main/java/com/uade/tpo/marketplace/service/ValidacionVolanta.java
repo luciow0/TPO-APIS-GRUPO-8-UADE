@@ -50,6 +50,23 @@ public final class ValidacionVolanta {
         validarLargoMaximo(password, 100, "La contraseña puede tener hasta 100 caracteres.");
     }
 
+    // Para cambiar la contraseña: más estricta que el registro (8+, una letra y un número).
+    public static void validarPasswordNueva(String password) {
+        validarTextoNoVacio(password, "Ingresá la contraseña nueva.");
+        validarLargoMinimo(password, 8, "La contraseña nueva tiene que tener al menos 8 caracteres.");
+        validarLargoMaximo(password, 100, "La contraseña puede tener hasta 100 caracteres.");
+        if (!password.matches(".*\\p{L}.*") || !password.matches(".*\\d.*")) {
+            throw new DatoInvalidoException("La contraseña nueva tiene que tener al menos una letra y un número.");
+        }
+    }
+
+    public static void validarTelefonoNuevo(String telefono) {
+        validarTextoNoVacio(telefono, "Ingresá tu teléfono.");
+        if (!telefono.matches("^\\d{8,15}$")) {
+            throw new DatoInvalidoException("El teléfono tiene que tener entre 8 y 15 dígitos, sin espacios ni símbolos.");
+        }
+    }
+
     public static void validarPasswordIngresada(String password) {
         validarTextoNoVacio(password, "Ingresá tu contraseña.");
     }

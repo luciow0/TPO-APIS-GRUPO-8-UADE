@@ -37,6 +37,10 @@ public class Reserva {
     @Enumerated(EnumType.STRING)
     private EstadoReserva estado;
 
+    // null hasta que el propietario confirma que recibió el auto.
+    @Column(name = "fecha_finalizacion")
+    private LocalDateTime fechaFinalizacion;
+
 
     @Column(name = "precio_dia_aplicado", precision = 12, scale = 2)
     private BigDecimal precioDiaAplicado;

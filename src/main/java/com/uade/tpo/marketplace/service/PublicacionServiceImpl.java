@@ -91,6 +91,14 @@ public class PublicacionServiceImpl implements PublicacionService {
                 return publicacionRepository.findByEstado(EstadoPublicacion.ACTIVA, pageable);
         }
 
+        @Override
+        @Transactional(readOnly = true)
+        public Page<Publicacion> obtenerPublicacionesActivasDeUsuario(Long idUsuario, Pageable pageable) {
+                Pageable pagina = PageRequest.of(pageable.getPageNumber(), Math.min(pageable.getPageSize(), 100));
+                return publicacionRepository.findByVehiculo_Propietario_IdUsuarioAndEstado(
+                                idUsuario, EstadoPublicacion.ACTIVA, pagina);
+        }
+
         @PreAuthorize("isAuthenticated() and #emailUsuario == authentication.name")
         @Override
         @Transactional(readOnly = true)

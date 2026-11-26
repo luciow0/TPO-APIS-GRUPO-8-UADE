@@ -1,6 +1,7 @@
 package com.uade.tpo.marketplace.entity;
 
 
+import java.sql.Blob;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +55,21 @@ public class Usuario {
     @NotNull
     @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
+
+    // Los usuarios anteriores a este campo quedan en null.
+    @Column(name = "fecha_registro", updatable = false)
+    private LocalDate fechaRegistro;
+
+    // Foto de perfil guardada como binario; se devuelve en base64 vía UsuarioDTO.
+    @JsonIgnore
+    private Blob foto;
+
+    @PrePersist
+    void alRegistrar() {
+        if (fechaRegistro == null) {
+            fechaRegistro = LocalDate.now();
+        }
+    }
 
     @JsonIgnore
     @OneToMany(mappedBy = "propietario")

@@ -33,6 +33,9 @@ public interface PublicacionRepository extends JpaRepository<Publicacion, Long> 
         Page<Publicacion> findByEstado(EstadoPublicacion estado, Pageable pageable);
 
         @EntityGraph(attributePaths = {"vehiculo", "vehiculo.tipoVehiculo", "ubicacion"})
+        Page<Publicacion> findByVehiculo_Propietario_IdUsuarioAndEstado(
+                        Long idUsuario, EstadoPublicacion estado, Pageable pageable);
+
         Page<Publicacion> findByVehiculo_Propietario_Email(String email, Pageable pageable);
 
         @EntityGraph(attributePaths = {"vehiculo", "vehiculo.tipoVehiculo", "ubicacion"})

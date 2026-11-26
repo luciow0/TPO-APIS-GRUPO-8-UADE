@@ -41,6 +41,13 @@ public class SeguridadDominio {
         return reserva.getCliente().getEmail().equals(auth.getName());
     }
 
+    // El propietario del auto reservado (no el conductor).
+    public boolean esPropietarioDeReserva(Authentication auth, Long idReserva) throws ReservaNotFoundException {
+        Reserva reserva = reservaRepository.findById(idReserva)
+                .orElseThrow(ReservaNotFoundException::new);
+        return reserva.getPublicacion().getVehiculo().getPropietario().getEmail().equals(auth.getName());
+    }
+
     public boolean esDuenioDePublicacion(Authentication auth, Long idPublicacion) throws PublicacionNotFoundException {
         Publicacion publicacion = publicacionRepository.findById(idPublicacion)
                 .orElseThrow(PublicacionNotFoundException::new);

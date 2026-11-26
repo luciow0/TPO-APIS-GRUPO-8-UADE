@@ -59,7 +59,9 @@ public class SecurityConfig {
                                 "/vehiculo",
                                 "/vehiculo/**",
                                 "/tipo-vehiculo",
-                                "/tipo-vehiculo/**")
+                                "/tipo-vehiculo/**",
+                                "/usuarios/{idUsuario}/perfil",
+                                "/resenas/usuario/{idUsuario}")
                         .permitAll()
                         .anyRequest().authenticated()
 

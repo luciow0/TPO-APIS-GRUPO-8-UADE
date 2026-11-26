@@ -24,4 +24,7 @@ public class ReservaResponse {
     private BigDecimal precioDiaAplicado;
     private Long cantidadDias;
     private BigDecimal precioTotal;
+    private UsuarioResumen propietario;
+    private UsuarioResumen conductor;
+    private LocalDateTime fechaFinalizacion;
 }

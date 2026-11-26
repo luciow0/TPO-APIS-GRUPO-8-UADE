@@ -15,6 +15,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.uade.tpo.marketplace.auth.AuthResponse;
+import com.uade.tpo.marketplace.dto.EmailRequest;
+import com.uade.tpo.marketplace.dto.PasswordRequest;
+import com.uade.tpo.marketplace.dto.PerfilPublicoResponse;
+import com.uade.tpo.marketplace.dto.TelefonoRequest;
 import com.uade.tpo.marketplace.dto.UsuarioDTO;
 import com.uade.tpo.marketplace.exception.UsuarioDuplicateException;
 import com.uade.tpo.marketplace.exception.UsuarioNotFoundException;
@@ -36,6 +44,43 @@ public class UsuarioController {
 	@GetMapping("/me")
 	public ResponseEntity<UsuarioDTO> obtenerUsuarioActual(Authentication authentication) throws UsuarioNotFoundException {
 		return ResponseEntity.ok(usuarioService.buscarPorEmail(authentication.getName()));
+	}
+
+	@PostMapping("/me/foto")
+	public ResponseEntity<UsuarioDTO> subirFoto(Authentication authentication,
+			@RequestParam("file") MultipartFile file) throws UsuarioNotFoundException {
+		return ResponseEntity.ok(usuarioService.actualizarFoto(authentication.getName(), file));
+	}
+
+	@DeleteMapping("/me/foto")
+	public ResponseEntity<UsuarioDTO> quitarFoto(Authentication authentication) throws UsuarioNotFoundException {
+		return ResponseEntity.ok(usuarioService.quitarFoto(authentication.getName()));
+	}
+
+	@PutMapping("/me/telefono")
+	public ResponseEntity<UsuarioDTO> actualizarTelefono(Authentication authentication,
+			@RequestBody TelefonoRequest request) throws UsuarioNotFoundException {
+		return ResponseEntity.ok(usuarioService.actualizarTelefono(authentication.getName(), request.getTelefono()));
+	}
+
+	@PutMapping("/me/email")
+	public ResponseEntity<AuthResponse> actualizarEmail(Authentication authentication,
+			@RequestBody EmailRequest request) throws UsuarioNotFoundException {
+		return ResponseEntity.ok(usuarioService.actualizarEmail(
+				authentication.getName(), request.getEmail(), request.getPassword()));
+	}
+
+	@PutMapping("/me/password")
+	public ResponseEntity<Void> actualizarPassword(Authentication authentication,
+			@RequestBody PasswordRequest request) throws UsuarioNotFoundException {
+		usuarioService.actualizarPassword(authentication.getName(), request.getActual(), request.getNueva());
+		return ResponseEntity.noContent().build();
+	}
+
+	// Público: nunca incluye email, teléfono ni fecha de nacimiento.
+	@GetMapping("/{id}/perfil")
+	public ResponseEntity<PerfilPublicoResponse> perfilPublico(@PathVariable Long id) throws UsuarioNotFoundException {
+		return ResponseEntity.ok(usuarioService.buscarPerfilPublico(id));
 	}
 
 	@GetMapping("/{id}")

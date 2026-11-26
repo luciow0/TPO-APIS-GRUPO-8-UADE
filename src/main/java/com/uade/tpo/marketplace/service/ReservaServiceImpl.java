@@ -189,6 +189,33 @@ public class ReservaServiceImpl implements ReservaService {
         return reservaRepository.findByClienteEmail(emailUsuario, pageRequest);
     }
 
+    @PreAuthorize("isAuthenticated() and #emailPropietario == authentication.name")
+    @Override
+    public Page<Reserva> getReservasDeMisVehiculos(String emailPropietario, PageRequest pageRequest) {
+        return reservaRepository.findByPublicacionVehiculoPropietarioEmail(emailPropietario, pageRequest);
+    }
+
+    @PreAuthorize("@seguridadDominio.esPropietarioDeReserva(authentication, #idReserva)")
+    @Transactional
+    @Override
+    public Reserva finalizarReserva(Long idReserva) throws ReservaNotFoundException {
+        Reserva reserva = reservaRepository.findById(idReserva)
+                .orElseThrow(ReservaNotFoundException::new);
+
+        if (reserva.getEstado() != EstadoReserva.CONFIRMADA) {
+            throw new IllegalStateException(
+                    "Solo se puede finalizar una reserva confirmada.");
+        }
+        if (LocalDate.now().isBefore(reserva.getFechaFin())) {
+            throw new IllegalStateException(
+                    "Todavía no llegó la fecha de devolución, así que no podés finalizar la reserva.");
+        }
+
+        reserva.setEstado(EstadoReserva.FINALIZADA);
+        reserva.setFechaFinalizacion(LocalDateTime.now());
+        return reservaRepository.save(reserva);
+    }
+
     private void validarFechas(LocalDate fechaInicio, LocalDate fechaFin)throws ReservaInvalidException {
 
         ValidacionVolanta.validarFechasRetiroYDevolucion(fechaInicio, fechaFin);

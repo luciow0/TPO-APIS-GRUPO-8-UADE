@@ -23,6 +23,8 @@ public interface PublicacionService {
         Page<Publicacion> obtenerMisPublicaciones(
                         String emailUsuario, EstadoPublicacion estado, String busqueda, Pageable pageable);
 
+        Page<Publicacion> obtenerPublicacionesActivasDeUsuario(Long idUsuario, Pageable pageable);
+
         Publicacion obtenerPublicacionPorId(Long id)
                         throws PublicacionNotFoundException;
 
